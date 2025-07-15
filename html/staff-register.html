@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMS Staff Registration</title>
+    <!-- Bootstrap CSS -->
+    <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PPMS Custom Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css">
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+</head>
+<body class="staff-auth-body">
+    <div class="staff-auth-container">
+        <!-- Left Panel -->
+        <div class="staff-left-panel">
+            <h2>Join Our Team!</h2>
+            <img src="../assets/stafforganization.gif" alt="Staff Register Illustration">
+            <p>"Together we achieve more"</p>
+        </div>
+
+        <!-- Right Panel (Form) -->
+        <div class="staff-right-panel">
+            <!-- Sticky Header -->
+            <div class="staff-header-section">
+                <h2>Staff Registration</h2>
+                <p class="staff-welcome-text">Create your account to get started</p>
+            </div>
+
+            <!-- Scrollable Form Content -->
+            <div class="staff-form-content">
+                <form method="post" action="../php/staff-register.php" class="w-100">
+                <!-- Full Name Field -->
+                <div class="staff-form-group">
+                    <label for="staff-name" class="staff-form-label">Full Name</label>
+                    <div class="position-relative">
+                        <i class="fas fa-user staff-input-icon"></i>
+                        <input
+                            type="text"
+                            class="staff-form-control"
+                            id="staff-name"
+                            name="name"
+                            placeholder="Enter your full name"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Staff ID Field -->
+                <div class="staff-form-group">
+                    <label for="staffId" class="staff-form-label">Staff ID</label>
+                    <div class="position-relative">
+                        <i class="fas fa-id-badge staff-input-icon"></i>
+                        <input
+                            type="text"
+                            class="staff-form-control"
+                            id="staffId"
+                            name="staffId"
+                            placeholder="Enter your staff ID"
+                            required
+                            maxlength="4">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="staff-form-group">
+                    <label for="staff-password" class="staff-form-label">Password</label>
+                    <div class="password-field-container">
+                        <i class="fas fa-lock staff-input-icon"></i>
+                        <input
+                            type="password"
+                            class="staff-form-control"
+                            id="staff-password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            required
+                            minlength="12">
+
+                        <!-- Password Requirements Popup -->
+                        <div class="password-requirements">
+                        <small>Password must:
+                            <button type="button" class="password-requirements-close" onclick="this.closest('.password-requirements').classList.remove('show')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </small>
+                        <ul class="password-checklist">
+                            <li class="requirement" data-requirement="length">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least 12 characters
+                            </li>
+                            <li class="requirement" data-requirement="uppercase">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one uppercase letter
+                            </li>
+                            <li class="requirement" data-requirement="lowercase">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one lowercase letter
+                            </li>
+                            <li class="requirement" data-requirement="number">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one number
+                            </li>
+                            <li class="requirement" data-requirement="special">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one special character
+                            </li>
+                        </ul>
+                        <!-- Password Strength Meter -->
+                        <div class="password-strength-meter">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="staffStrengthFill"></div>
+                            </div>
+                            <small class="strength-text" id="staffStrengthText">Enter password to see strength</small>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="staff-form-group">
+                    <label for="staff-confirm-password" class="staff-form-label">Confirm Password</label>
+                    <div class="password-field-container">
+                        <i class="fas fa-lock staff-input-icon"></i>
+                        <input
+                            type="password"
+                            class="staff-form-control"
+                            id="staff-confirm-password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            required>
+                    </div>
+                    <!-- Password Match Indicator -->
+                    <div class="password-match-indicator" id="staffPasswordMatch"></div>
+                </div>
+
+                <!-- Register Button -->
+                <button type="submit" class="staff-btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Create Account
+                </button>
+                </form>
+
+                <!-- Additional Links -->
+                <div class="staff-auth-links">
+                    <p>
+                        Already have an account?
+                        <a href="staff-login.html">Login here</a>
+                    </p>
+                </div>
+
+                <button onclick="window.location.href='landingpage.html'" class="staff-btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Landing Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Local Bootstrap JS -->
+    <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Password Validation JS -->
+    <script src="../js/password-validation.js"></script>
+
+    <script>
+        // Check for the ?registered=1 parameter in the URL
+        if (window.location.search.includes('registered=1')) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Staff Registration Successful!',
+                text: 'Your account has been created. You can now login.',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f9fafb',
+                color: '#234567',
+                customClass: {
+                    popup: 'swal2-toast-custom-staff'
+                }
+            });
+            // Remove the parameter from the URL after showing the toast
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Initialize password validation
+        let staffPasswordValidator;
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing staff password validator'); // Debug
+            // Create custom password validator for staff with unique IDs
+            staffPasswordValidator = new PasswordValidator('staff-password', 'staff-confirm-password');
+
+            // Override the default IDs for staff-specific elements
+            staffPasswordValidator.strengthFillId = 'staffStrengthFill';
+            staffPasswordValidator.strengthTextId = 'staffStrengthText';
+            staffPasswordValidator.matchIndicatorId = 'staffPasswordMatch';
+
+            console.log('Staff validator initialized:', staffPasswordValidator); // Debug
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const staffId = document.getElementById('staff-id').value;
+            const password = document.getElementById('staff-password').value;
+
+            // Validate Staff ID (4 characters, letters and numbers only)
+            if (!/^[A-Za-z0-9]{4}$/.test(staffId)) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Staff ID!',
+                    text: 'Staff ID must be exactly 4 characters (letters and numbers only).',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            // Validate password length
+            if (password.length < 8) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Too Short!',
+                    text: 'Password must be at least 8 characters long.',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+        });
+
+        // Real-time validation
+        document.getElementById('staff-id').addEventListener('input', function() {
+            const staffId = this.value;
+            if (/^[A-Za-z0-9]{4}$/.test(staffId)) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else if (staffId.length > 0) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-valid', 'is-invalid');
+            }
+        });
+
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (staffPasswordValidator && !staffPasswordValidator.isValid()) {
+                e.preventDefault();
+
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Password',
+                    text: 'Please ensure your password meets all requirements and passwords match.',
+                    confirmButtonColor: '#f093fb'
+                });
+
+                return false;
+            }
+        });
+    </script>
+    <style>
+        /* Custom style for the staff registration success toast */
+        .swal2-toast-custom-staff {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(106, 27, 154, 0.25);
+            border: 1px solid rgba(106, 27, 154, 0.1);
+        }
+
+        .swal2-toast-custom-staff .swal2-icon.swal2-success {
+            border-color: #6A1B9A;
+        }
+
+        .swal2-toast-custom-staff .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #6A1B9A;
+        }
+
+        .swal2-toast-custom-staff .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(106, 27, 154, 0.3);
+        }
+
+        .swal2-toast-custom-staff .swal2-timer-progress-bar {
+            background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+        }
+    </style>
+</body>
+</html>

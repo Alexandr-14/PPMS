@@ -1,0 +1,403 @@
+/* ===================================
+   PPMS Receiver Dashboard Overrides
+   Critical fixes and enhancements
+   ================================== */
+
+/* === Universal Reset for Perfect Alignment === */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    vertical-align: baseline !important;
+}
+
+/* === Selective Reset - Only Target Spacing Pseudo-elements, Not Icons === */
+body::before, body::after {
+    content: none !important;
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* === AGGRESSIVE Font Awesome Protection - Override ALL External CSS === */
+.fas,
+.far,
+.fab,
+.fa,
+i.fas,
+i.far,
+i.fab,
+i.fa {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+.fas::before,
+.far::before,
+.fab::before,
+.fa::before,
+i.fas::before,
+i.far::before,
+i.fab::before,
+i.fa::before {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+/* Specific Font Awesome weights */
+.fas, i.fas { font-weight: 900 !important; }
+.far, i.far { font-weight: 400 !important; }
+.fab, i.fab { font-weight: 400 !important; }
+.fa, i.fa { font-weight: 900 !important; }
+
+/* Force specific icons to show */
+.fa-envelope::before { content: "\f0e0" !important; }
+.fa-phone::before { content: "\f095" !important; }
+.fa-map-marker-alt::before { content: "\f3c5" !important; }
+.fa-clock::before { content: "\f017" !important; }
+.fa-bell::before { content: "\f0f3" !important; }
+
+/* === Remove Default Browser Spacing === */
+body {
+    line-height: 1 !important;
+    -webkit-margin-before: 0 !important;
+    -webkit-margin-after: 0 !important;
+    -webkit-margin-start: 0 !important;
+    -webkit-margin-end: 0 !important;
+    -webkit-padding-before: 0 !important;
+    -webkit-padding-after: 0 !important;
+    -webkit-padding-start: 0 !important;
+    -webkit-padding-end: 0 !important;
+}
+
+/* === Force White Background for All Inputs === */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+    background-color: #ffffff !important;
+    color: #2d3748 !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus {
+    background-color: #ffffff !important;
+    color: #2d3748 !important;
+    border-color: #43e97b !important;
+    box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.15) !important;
+}
+
+/* === Specific Override for Tracking Input === */
+#trackingNumber {
+    background: #ffffff !important;
+    color: #2d3748 !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+#trackingNumber:focus {
+    background: #ffffff !important;
+    color: #2d3748 !important;
+    border-color: #43e97b !important;
+    box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.15) !important;
+}
+
+/* === Enhanced Label Styling === */
+.form-label {
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+}
+
+/* === Force Green Theme Colors with High Specificity === */
+.welcome-section {
+    background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%) !important;
+    box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4) !important;
+}
+
+
+
+.nav-tabs .nav-link:hover:not(.active) {
+    background: rgba(67, 233, 123, 0.15) !important;
+    color: #43e97b !important;
+}
+
+/* === Statistics Cards Green Theme === */
+.stats-card.border-primary {
+    border: 2px solid #43e97b !important;
+    background: linear-gradient(135deg, rgba(67, 233, 123, 0.08), rgba(56, 217, 169, 0.08)) !important;
+}
+
+.stats-card.border-warning {
+    border: 2px solid #38d9a9 !important;
+    background: linear-gradient(135deg, rgba(56, 217, 169, 0.08), rgba(67, 233, 123, 0.08)) !important;
+}
+
+.stats-card.border-success {
+    border: 2px solid #43e97b !important;
+    background: linear-gradient(135deg, rgba(67, 233, 123, 0.08), rgba(56, 217, 169, 0.08)) !important;
+}
+
+/* === Professional Polish === */
+.welcome-section {
+    background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%) !important;
+    box-shadow: 0 8px 32px rgba(67, 233, 123, 0.15) !important;
+    border: none !important;
+    border-radius: 16px !important;
+}
+
+
+
+/* === Enhanced Dashboard Container === */
+.dashboard-container {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    margin: 2rem auto !important;
+    padding: 2.5rem !important;
+    max-width: 1200px !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* === Professional Card Styling === */
+.card {
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* === Enhanced Welcome Section Typography === */
+.welcome-title {
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+    opacity: 0.9 !important;
+}
+
+/* === Professional Tab Styling === */
+.nav-tabs {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 16px !important;
+    padding: 8px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+.nav-tabs .nav-link {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    padding: 12px 24px !important;
+    transition: all 0.3s ease !important;
+    color: #64748b !important;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    background: rgba(67, 233, 123, 0.08) !important;
+    color: #43e97b !important;
+    transform: translateY(-1px) !important;
+}
+
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(67, 233, 123, 0.25) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    background: rgba(67, 233, 123, 0.08) !important;
+    color: #43e97b !important;
+    transform: translateY(-1px) !important;
+}
+
+/* === Professional Statistics Cards === */
+.stats-card {
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stats-number {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+.stats-label {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-top: 0.5rem !important;
+}
+
+/* === Professional Table Styling === */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    border: none !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #475569 !important;
+    padding: 1rem 1.5rem !important;
+}
+
+.table tbody tr {
+    border: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.table tbody tr:hover {
+    background: rgba(67, 233, 123, 0.03) !important;
+    transform: scale(1.001) !important;
+}
+
+.table tbody td {
+    border: none !important;
+    padding: 1.25rem 1.5rem !important;
+    vertical-align: middle !important;
+}
+
+/* === Enhanced Buttons === */
+.btn {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 12px 24px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+}
+
+.btn:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* === Professional Badges === */
+.badge {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+}
+
+/* === Enhanced Form Styling === */
+.form-control {
+    border-radius: 12px !important;
+    border: 2px solid #e2e8f0 !important;
+    padding: 12px 16px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    border-color: #43e97b !important;
+    box-shadow: 0 0 0 4px rgba(67, 233, 123, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* === Professional Micro-interactions === */
+.welcome-avatar {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.welcome-avatar:hover {
+    transform: scale(1.05) !important;
+    background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* === Enhanced Empty States === */
+.empty-state {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6)) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* === Professional Alerts === */
+.alert {
+    border: none !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05)) !important;
+    color: #856404 !important;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05)) !important;
+    color: #721c24 !important;
+}
+
+/* === Smooth Page Transitions === */
+* {
+    transition: all 0.3s ease !important;
+}
+
+/* === Professional Scrollbar === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #43e97b, #38d9a9);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #3dd46f, #2dd4aa);
+}

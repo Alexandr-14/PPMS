@@ -1,0 +1,584 @@
+/* ===================================
+   PPMS Typography System - Engaging & Student-Friendly
+   ================================== */
+
+/* === Google Fonts Import === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&family=Poppins:wght@100;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* === Base Typography === */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-normal);
+    letter-spacing: var(--letter-spacing-normal);
+}
+
+/* === Heading Styles - More Engaging === */
+.heading-display {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-lg);
+}
+
+.heading-1 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.heading-2 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.heading-3 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.heading-4 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-snug);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* === Body Text Styles === */
+.text-lead {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-relaxed);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.text-body {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-relaxed);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.text-small {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-muted);
+}
+
+.text-tiny {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-light);
+}
+
+/* === Special Text Effects === */
+.text-gradient {
+    /* Fallback color for browsers that don't support background-clip */
+    color: var(--primary-color);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: var(--font-weight-bold);
+}
+
+/* Fallback for unsupported browsers */
+@supports not (-webkit-background-clip: text) {
+    .text-gradient {
+        color: var(--primary-color) !important;
+        background: none !important;
+    }
+}
+
+.text-gradient-secondary {
+    /* Fallback color */
+    color: var(--secondary-color);
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: var(--font-weight-bold);
+}
+
+@supports not (-webkit-background-clip: text) {
+    .text-gradient-secondary {
+        color: var(--secondary-color) !important;
+        background: none !important;
+    }
+}
+
+.text-gradient-success {
+    /* Fallback color */
+    color: var(--success-color);
+    background: var(--success-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: var(--font-weight-bold);
+}
+
+@supports not (-webkit-background-clip: text) {
+    .text-gradient-success {
+        color: var(--success-color) !important;
+        background: none !important;
+    }
+}
+
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-glow {
+    text-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+/* === Interactive Text === */
+.text-hover-gradient {
+    transition: var(--transition-normal);
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.text-hover-gradient:hover {
+    color: var(--primary-color);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transform: translateY(-1px);
+}
+
+/* Fallback for unsupported browsers */
+@supports not (-webkit-background-clip: text) {
+    .text-hover-gradient:hover {
+        color: var(--primary-color) !important;
+        background: none !important;
+    }
+}
+
+/* === Emphasis Styles === */
+.text-highlight {
+    background: linear-gradient(120deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.2) 100%);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.text-badge {
+    display: inline-block;
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    padding: 0.25em 0.75em;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+}
+
+/* === Code and Monospace === */
+.text-code {
+    font-family: var(--font-family-mono);
+    font-size: 0.9em;
+    background: var(--bg-gray-100);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+}
+
+/* === Responsive Typography === */
+@media (max-width: 768px) {
+    .heading-display {
+        font-size: var(--font-size-4xl);
+    }
+    
+    .heading-1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .heading-2 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .heading-3 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .text-lead {
+        font-size: var(--font-size-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .heading-display {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .heading-1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .heading-2 {
+        font-size: var(--font-size-xl);
+    }
+}
+
+/* === Animation Classes === */
+.text-animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.text-animate-slide-in {
+    animation: slideInRight 0.8s ease-out;
+}
+
+.text-animate-bounce {
+    animation: bounceIn 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* === Utility Classes === */
+.font-display { font-family: var(--font-family-display); }
+.font-body { font-family: var(--font-family-body); }
+.font-mono { font-family: var(--font-family-mono); }
+
+.font-thin { font-weight: var(--font-weight-thin); }
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
+.font-black { font-weight: var(--font-weight-black); }
+
+.leading-none { line-height: var(--line-height-none); }
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
+
+.tracking-tighter { letter-spacing: var(--letter-spacing-tighter); }
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.tracking-widest { letter-spacing: var(--letter-spacing-widest); }
+
+/* === Student-Friendly Engaging Elements === */
+.text-fun {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    /* Fallback color */
+    color: var(--primary-color);
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+/* Fallback for unsupported browsers */
+@supports not (-webkit-background-clip: text) {
+    .text-fun {
+        color: var(--primary-color) !important;
+        background: none !important;
+        animation: none !important;
+    }
+}
+
+.text-exciting {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-extrabold);
+    font-size: 1.2em;
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    transform: perspective(500px) rotateX(15deg);
+    transition: all 0.3s ease;
+}
+
+.text-exciting:hover {
+    transform: perspective(500px) rotateX(0deg) scale(1.05);
+    text-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.text-playful {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+}
+
+.text-playful::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.text-playful:hover::after {
+    transform: scaleX(1);
+}
+
+.text-bounce {
+    animation: gentleBounce 2s ease-in-out infinite;
+}
+
+.text-pulse {
+    animation: gentlePulse 2s ease-in-out infinite;
+}
+
+.text-wiggle {
+    animation: gentleWiggle 1s ease-in-out infinite;
+}
+
+/* === Interactive Text Effects === */
+.text-interactive {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.text-interactive::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.text-interactive:hover::before {
+    left: 100%;
+}
+
+.text-sparkle {
+    position: relative;
+    overflow: hidden;
+}
+
+.text-sparkle::after {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 0.8em;
+    opacity: 0;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+/* === Motivational Text Styles === */
+.text-motivational {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    /* Fallback color */
+    color: var(--success-color);
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    font-size: 1.1em;
+    margin: 1rem 0;
+}
+
+@supports not (-webkit-background-clip: text) {
+    .text-motivational {
+        color: var(--success-color) !important;
+        background: none !important;
+    }
+}
+
+.text-achievement {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-extrabold);
+    /* Fallback color */
+    color: var(--secondary-color);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    font-size: 0.9em;
+}
+
+@supports not (-webkit-background-clip: text) {
+    .text-achievement {
+        color: var(--secondary-color) !important;
+        background: none !important;
+    }
+}
+
+/* === Keyframe Animations === */
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes gentleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes gentlePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.9; }
+}
+
+@keyframes gentleWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(1deg); }
+    75% { transform: rotate(-1deg); }
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* === Status and Badge Enhancements === */
+.status-text-pending {
+    color: #f59e0b;
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
+}
+
+.status-text-success {
+    color: #10b981;
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
+}
+
+.status-text-info {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
+}
+
+/* === Text Visibility Fixes === */
+/* Ensure text is always visible with high contrast fallbacks */
+.text-gradient,
+.text-fun,
+.text-motivational,
+.text-achievement {
+    /* Force visible text if gradient fails */
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .text-gradient,
+    .text-fun,
+    .text-motivational,
+    .text-achievement {
+        color: var(--text-primary) !important;
+        background: none !important;
+        -webkit-text-fill-color: unset !important;
+    }
+}
+
+/* === Mobile Optimizations === */
+@media (max-width: 768px) {
+    .text-fun,
+    .text-exciting,
+    .text-playful {
+        font-size: 0.9em;
+        /* Ensure visibility on mobile */
+        color: var(--primary-color);
+    }
+
+    .text-motivational {
+        font-size: 1em;
+        color: var(--success-color);
+    }
+
+    .text-achievement {
+        font-size: 0.8em;
+        letter-spacing: var(--letter-spacing-normal);
+        color: var(--secondary-color);
+    }
+}

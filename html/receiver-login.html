@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMS Receiver Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- PPMS Custom Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/login.css">
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+</head>
+<body class="receiver-auth-body">
+    <div class="receiver-auth-container">
+        <!-- Left Panel -->
+        <div class="receiver-left-panel">
+            <h2 class="text-engaging">Welcome Back!</h2>
+            <p class="welcome-text">Parcel just arrived? Login now to retrieve it.</p>
+            <img src="../assets/parceldeliverGIF2.gif" alt="Login Illustration">
+        </div>
+
+        <!-- Right Panel (Form) -->
+        <div class="receiver-right-panel">
+            <h2>Receiver Login</h2>
+            <p class="receiver-welcome-text">Enter your credentials to access your dashboard</p>
+
+            <form method="post" action="../php/receiver-login.php" class="w-100">
+                <!-- IC Number Field -->
+                <div class="receiver-form-group">
+                    <label for="icnumber" class="receiver-form-label">IC Number</label>
+                    <div class="position-relative">
+                        <i class="fas fa-id-card receiver-input-icon"></i>
+                        <input
+                            type="text"
+                            class="receiver-form-control"
+                            id="icnumber"
+                            name="icnumber"
+                            placeholder="Enter your IC Number"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="receiver-form-group">
+                    <label for="password" class="receiver-form-label">Password</label>
+                    <div class="position-relative">
+                        <i class="fas fa-lock receiver-input-icon"></i>
+                        <input
+                            type="password"
+                            class="receiver-form-control"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required>
+                        <i class="fas fa-eye receiver-password-toggle" onclick="togglePassword('password', this)"></i>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="receiver-btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login to Dashboard
+                </button>
+            </form>
+
+            <!-- Additional Links -->
+            <div class="receiver-auth-links">
+                <p>
+                    <a href="forgot-password.html">Forgot your password?</a>
+                </p>
+                <p>
+                    Not yet a member?
+                    <a href="receiver-register.html" class="text-friendly gentle-hover">Register here</a>
+                </p>
+            </div>
+
+            <button onclick="window.location.href='landingpage.html'" class="receiver-btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Landing Page
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    // Show toast for login success or failure
+    if (window.location.search.includes('login=fail')) {
+        Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Login failed! Please check your IC and password.',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        background: '#f9fafb',
+        color: '#234567',
+        customClass: {
+        popup: 'swal2-toast-custom'
+        }
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Password visibility toggle function
+    function togglePassword(fieldId, icon) {
+        const passwordField = document.getElementById(fieldId);
+        const isPassword = passwordField.type === 'password';
+
+        passwordField.type = isPassword ? 'text' : 'password';
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    }
+    </script>
+    <style>
+    .swal2-toast-custom {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    }
+    </style>
+</body>
+</html>

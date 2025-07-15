@@ -1,0 +1,198 @@
+<?php
+/**
+ * Notification Helper Functions for PPMS
+ * Handles creating and sending notifications to receivers
+ */
+
+require_once 'db_connect.php';
+
+/**
+ * Send notification to receiver when parcel arrives/is added
+ * @param string $icNumber 
+ * @param string $trackingNumber 
+ * @param string $parcelName 
+ * @param string $deliveryLocation 
+ * @return bool - Success status
+ */
+function sendParcelArrivalNotification($icNumber, $trackingNumber, $parcelName, $deliveryLocation) {
+    global $conn;
+
+    try {
+        // Create smart notification message
+        $packageText = ($parcelName && $parcelName !== 'Package') ? $parcelName : 'your package';
+        $message = "New parcel arrived! Your package (Tracking No: {$trackingNumber}) is ready for pickup at {$deliveryLocation}.";
+
+        // Insert notification into database
+        $stmt = $conn->prepare("
+            INSERT INTO Notification (
+                ICNumber,
+                TrackingNumber,
+                notificationType,
+                messageContent,
+                sentTimestamp,
+                notificationStatus,
+                isRead,
+                deliveryMethod
+            ) VALUES (?, ?, 'arrival', ?, NOW(), 'sent', 0, 'system')
+        ");
+
+        $stmt->bind_param("sss", $icNumber, $trackingNumber, $message);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            error_log("Failed to send arrival notification: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+    } catch (Exception $e) {
+        error_log("Error sending arrival notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Send notification when parcel status changes to Retrieved
+ * @param string $icNumber - Receiver's IC number
+ * @param string $trackingNumber - Parcel tracking number
+ * @param string $parcelName - Name/description of the parcel
+ * @return bool - Success status
+ */
+function sendParcelRetrievedNotification($icNumber, $trackingNumber, $parcelName) {
+    global $conn;
+
+    try {
+        // Create smart notification message
+        $message = "Parcel collected! Your package (Tracking No: {$trackingNumber}) has been successfully retrieved. Thank you for using our service!";
+
+        // Insert notification into database
+        $stmt = $conn->prepare("
+            INSERT INTO Notification (
+                ICNumber,
+                TrackingNumber,
+                notificationType,
+                messageContent,
+                sentTimestamp,
+                notificationStatus,
+                isRead,
+                deliveryMethod
+            ) VALUES (?, ?, 'pickup', ?, NOW(), 'sent', 0, 'system')
+        ");
+
+        $stmt->bind_param("sss", $icNumber, $trackingNumber, $message);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            error_log("Failed to send retrieved notification: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+    } catch (Exception $e) {
+        error_log("Error sending retrieved notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Send notification when parcel is ready for pickup (status change to Pending)
+ * @param string $icNumber - Receiver's IC number
+ * @param string $trackingNumber - Parcel tracking number
+ * @param string $parcelName - Name/description of the parcel
+ * @param string $deliveryLocation - Where parcel can be collected
+ * @return bool - Success status
+ */
+function sendParcelReadyNotification($icNumber, $trackingNumber, $parcelName, $deliveryLocation) {
+    global $conn;
+
+    try {
+        // Create smart notification message
+        $message = "Parcel ready for pickup! Your package (Tracking No: {$trackingNumber}) is now available for collection at {$deliveryLocation}.";
+
+        // Insert notification into database
+        $stmt = $conn->prepare("
+            INSERT INTO Notification (
+                ICNumber,
+                TrackingNumber,
+                notificationType,
+                messageContent,
+                sentTimestamp,
+                notificationStatus,
+                isRead,
+                deliveryMethod
+            ) VALUES (?, ?, 'delivery', ?, NOW(), 'sent', 0, 'system')
+        ");
+
+        $stmt->bind_param("sss", $icNumber, $trackingNumber, $message);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            error_log("Failed to send ready notification: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+    } catch (Exception $e) {
+        error_log("Error sending ready notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Get receiver name by IC number
+ * @param string $icNumber - Receiver's IC number
+ * @return string - Receiver's name or 'Unknown'
+ */
+function getReceiverName($icNumber) {
+    global $conn;
+    
+    try {
+        $stmt = $conn->prepare("SELECT name FROM Receiver WHERE ICNumber = ?");
+        $stmt->bind_param("s", $icNumber);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            $stmt->close();
+            return $row['name'];
+        } else {
+            $stmt->close();
+            return 'Unknown';
+        }
+        
+    } catch (Exception $e) {
+        error_log("Error getting receiver name: " . $e->getMessage());
+        return 'Unknown';
+    }
+}
+
+/**
+ * Check if receiver exists
+ * @param string $icNumber - Receiver's IC number
+ * @return bool - True if receiver exists
+ */
+function receiverExists($icNumber) {
+    global $conn;
+    
+    try {
+        $stmt = $conn->prepare("SELECT ICNumber FROM Receiver WHERE ICNumber = ?");
+        $stmt->bind_param("s", $icNumber);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $exists = $result->num_rows > 0;
+        $stmt->close();
+        return $exists;
+        
+    } catch (Exception $e) {
+        error_log("Error checking receiver existence: " . $e->getMessage());
+        return false;
+    }
+}
+?>

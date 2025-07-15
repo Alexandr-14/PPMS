@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMS Receiver Registration</title>
+    <!-- Bootstrap CSS -->
+    <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- PPMS Custom Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css">
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+</head>
+<body class="receiver-auth-body">
+    <div class="receiver-auth-container">
+        <!-- Left Panel -->
+        <div class="receiver-left-panel">
+            <h2>Join Us Now!</h2>
+            <img src="../assets/parcelsecure.gif" alt="Receiver Register Illustration">
+            <p>"Your parcel could not be more secure in our care"</p>
+        </div>
+
+        <!-- Right Panel (Form) -->
+        <div class="receiver-right-panel">
+            <!-- Sticky Header -->
+            <div class="receiver-header-section">
+                <h2>Receiver Registration</h2>
+                <p class="receiver-welcome-text">Create your account to get started</p>
+            </div>
+
+            <!-- Scrollable Form Content -->
+            <div class="receiver-form-content">
+                <form method="post" action="../php/receiver-register.php" class="w-100">
+                <!-- Full Name Field -->
+                <div class="receiver-form-group">
+                    <label for="receiver-name" class="receiver-form-label">Full Name</label>
+                    <div class="position-relative">
+                        <i class="fas fa-user receiver-input-icon"></i>
+                        <input
+                            type="text"
+                            class="receiver-form-control"
+                            id="receiver-name"
+                            name="name"
+                            placeholder="Enter your full name"
+                            required
+                            pattern="^[a-zA-Z\s@/.',-]{2,100}$"
+                            title="Name must be 2-100 characters, letters and common symbols only"
+                            maxlength="100"
+                            minlength="2">
+                    </div>
+                </div>
+
+                <!-- IC Number Field -->
+                <div class="receiver-form-group">
+                    <label for="icnumber" class="receiver-form-label">IC Number</label>
+                    <div class="position-relative">
+                        <i class="fas fa-id-card receiver-input-icon"></i>
+                        <input
+                            type="text"
+                            class="receiver-form-control"
+                            id="icnumber"
+                            name="icnumber"
+                            placeholder="Enter your IC Number"
+                            required
+                            maxlength="12"
+                            pattern="^[0-9]{12}$"
+                            title="IC No must be exactly 12 digits.">
+                    </div>
+                </div>
+
+                <!-- Phone Number Field -->
+                <div class="receiver-form-group">
+                    <label for="phone" class="receiver-form-label">Phone Number</label>
+                    <div class="position-relative">
+                        <i class="fas fa-phone receiver-input-icon"></i>
+                        <input
+                            type="tel"
+                            class="receiver-form-control"
+                            id="phone"
+                            name="phoneNumber"
+                            placeholder="e.g., +60123456789 or 0123456789"
+                            required
+                            pattern="^(\+60|0)[1-9][0-9]{7,9}$"
+                            title="Enter Malaysian phone number: +60xxxxxxxxx or 01xxxxxxxx"
+                            maxlength="13">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="receiver-form-group">
+                    <label for="receiver-password" class="receiver-form-label">Password</label>
+                    <div class="password-field-container">
+                        <i class="fas fa-lock receiver-input-icon"></i>
+                        <input
+                            type="password"
+                            class="receiver-form-control"
+                            id="receiver-password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            required
+                            minlength="12"
+                            title="Password must be at least 12 characters long with uppercase, lowercase, number and special character.">
+
+                        <!-- Password Requirements Popup -->
+                        <div class="password-requirements">
+                        <small>Password must:
+                            <button type="button" class="password-requirements-close" onclick="this.closest('.password-requirements').classList.remove('show')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </small>
+                        <ul class="password-checklist">
+                            <li class="requirement" data-requirement="length">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least 12 characters
+                            </li>
+                            <li class="requirement" data-requirement="uppercase">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one uppercase letter
+                            </li>
+                            <li class="requirement" data-requirement="lowercase">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one lowercase letter
+                            </li>
+                            <li class="requirement" data-requirement="number">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one number
+                            </li>
+                            <li class="requirement" data-requirement="special">
+                                <div class="requirement-icon invalid"></div>
+                                Have at least one special character
+                            </li>
+                        </ul>
+                        <!-- Password Strength Meter -->
+                        <div class="password-strength-meter">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <small class="strength-text" id="strengthText">Enter password to see strength</small>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="receiver-form-group">
+                    <label for="receiver-confirm-password" class="receiver-form-label">Confirm Password</label>
+                    <div class="password-field-container">
+                        <i class="fas fa-lock receiver-input-icon"></i>
+                        <input
+                            type="password"
+                            class="receiver-form-control"
+                            id="receiver-confirm-password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            required>
+                    </div>
+                    <!-- Password Match Indicator -->
+                    <div class="password-match-indicator"></div>
+                </div>
+
+                    <!-- Register Button -->
+                    <button type="submit" class="receiver-btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Create Account
+                    </button>
+                </form>
+
+                <!-- Additional Links -->
+                <div class="receiver-auth-links">
+                    <p>
+                        Already have an account?
+                        <a href="receiver-login.html">Login here</a>
+                    </p>
+                </div>
+
+                <button onclick="window.location.href='landingpage.html'" class="receiver-btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Landing Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Password Validation JS -->
+    <script src="../js/password-validation.js"></script>
+<script>
+  // Check for the ?registered=1 parameter in the URL
+  if (window.location.search.includes('registered=1')) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Registration successful!',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      background: '#f9fafb',
+      color: '#234567',
+      customClass: {
+        popup: 'swal2-toast-custom'
+      }
+    });
+    // Remove the parameter from the URL after showing the toast
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  // Initialize password validation
+  let passwordValidator;
+  document.addEventListener('DOMContentLoaded', function() {
+    passwordValidator = new PasswordValidator('receiver-password', 'receiver-confirm-password');
+  });
+
+  // Form validation
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const icNumber = document.getElementById('icnumber').value;
+    const phoneNumber = document.getElementById('phone').value;
+    const password = document.getElementById('receiver-password').value;
+
+    // Validate IC number (12 digits)
+    if (!/^[0-9]{12}$/.test(icNumber)) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid IC Number!',
+        text: 'IC Number must be exactly 12 digits.',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+
+    // Validate Malaysian phone number
+    if (!/^(\+60|0)[1-9][0-9]{7,9}$/.test(phoneNumber)) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Phone Number!',
+        text: 'Please enter a valid Malaysian phone number (e.g., +60123456789 or 0123456789).',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Too Short!',
+        text: 'Password must be at least 8 characters long.',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+  });
+
+  // Real-time validation
+  document.getElementById('receiver-name').addEventListener('input', function() {
+    const name = this.value.trim();
+    if (name.length >= 2 && name.length <= 100 && /^[a-zA-Z\s@/.',-]+$/.test(name)) {
+      this.classList.remove('is-invalid');
+      this.classList.add('is-valid');
+    } else if (name.length > 0) {
+      this.classList.remove('is-valid');
+      this.classList.add('is-invalid');
+    } else {
+      this.classList.remove('is-valid', 'is-invalid');
+    }
+  });
+
+  document.getElementById('icnumber').addEventListener('input', function() {
+    const icNumber = this.value;
+    if (icNumber.length === 12 && /^[0-9]{12}$/.test(icNumber)) {
+      this.classList.remove('is-invalid');
+      this.classList.add('is-valid');
+    } else if (icNumber.length > 0) {
+      this.classList.remove('is-valid');
+      this.classList.add('is-invalid');
+    } else {
+      this.classList.remove('is-valid', 'is-invalid');
+    }
+  });
+
+  document.getElementById('phone').addEventListener('input', function() {
+    const phoneNumber = this.value;
+    if (/^(\+60|0)[1-9][0-9]{7,9}$/.test(phoneNumber)) {
+      this.classList.remove('is-invalid');
+      this.classList.add('is-valid');
+    } else if (phoneNumber.length > 0) {
+      this.classList.remove('is-valid');
+      this.classList.add('is-invalid');
+    } else {
+      this.classList.remove('is-valid', 'is-invalid');
+    }
+  });
+
+  // Form submission validation
+  document.querySelector('form').addEventListener('submit', function(e) {
+    if (passwordValidator && !passwordValidator.isValid()) {
+      e.preventDefault();
+
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Password',
+        text: 'Please ensure your password meets all requirements and passwords match.',
+        confirmButtonColor: '#667eea'
+      });
+
+      return false;
+    }
+  });
+</script>
+<style>
+/* Optional: Custom style for the toast */
+.swal2-toast-custom {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+</style>
+</body>
+</html>

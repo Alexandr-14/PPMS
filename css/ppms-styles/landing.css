@@ -1,0 +1,156 @@
+/* ===================================
+   PPMS Landing Page Styles
+   ================================== */
+
+/* === Landing Page Layout === */
+.landing-page-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-family: var(--font-family-primary);
+}
+
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+/* === Choice Container === */
+.choice-container {
+    position: relative;
+    margin: 0 auto;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.9);
+    padding: var(--spacing-3xl) var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl);
+    max-width: 600px;
+    animation: slideUp 0.8s ease-out;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.choice-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.choice-header img {
+    display: block;
+    margin: 0 auto var(--spacing-lg) auto;
+    width: 200px;
+    transition: transform 0.3s ease;
+}
+
+.choice-header img:hover {
+    transform: scale(1.1);
+}
+
+.choice-header h2,
+.choice-header p {
+    text-align: center;
+}
+
+.choice-container h2 {
+    margin-bottom: var(--spacing-md);
+    font-weight: var(--font-weight-bold);
+    color: #1a202c;
+    font-size: var(--font-size-3xl);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.choice-container p {
+    font-size: var(--font-size-lg);
+    color: #4a5568;
+    margin-bottom: var(--spacing-xl);
+    font-weight: var(--font-weight-medium);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/* === Button Container === */
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.btn-container a {
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    padding: var(--spacing-sm) 0;
+    flex: 1;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.landing-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #43e97b 100%);
+    color: var(--text-white);
+    border: none;
+    font-weight: var(--font-weight-semibold);
+    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+}
+
+.landing-btn-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #43e97b 100%);
+    transform: translateY(-2px) scale(1.02);
+    color: var(--text-white);
+    box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+}
+
+.landing-btn-secondary {
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+    color: var(--text-white);
+    border: none;
+    font-weight: var(--font-weight-semibold);
+    box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3);
+}
+
+.landing-btn-secondary:hover {
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+    transform: translateY(-2px) scale(1.02);
+    color: var(--text-white);
+    box-shadow: 0 8px 25px rgba(106, 27, 154, 0.4);
+}
+
+/* === Copyright Section === */
+.copyright {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright i {
+    color: #ff6b6b;
+}
+
+/* === Animations === */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,528 @@
+/* ===================================
+   PPMS Login Page Styles
+   ================================== */
+
+/* === Shared Authentication Animations === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === Staff Authentication Styles === */
+.staff-auth-body {
+    font-family: var(--font-family-primary);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.staff-auth-container {
+    display: flex;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 25px 50px rgba(106, 27, 154, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(106, 27, 154, 0.2);
+    width: 85%;
+    max-width: 900px;
+    min-height: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    animation: slideUp 0.8s ease-out;
+    margin: var(--spacing-2xl) auto;
+}
+
+.staff-left-panel {
+    flex: 1;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    text-align: center;
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--border-light);
+}
+
+.staff-left-panel h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-sm);
+    color: #1a202c;
+    z-index: 2;
+    position: relative;
+}
+
+.staff-left-panel p {
+    font-size: var(--font-size-base);
+    opacity: 1;
+    margin-bottom: var(--spacing-xl);
+    color: #2d3748;
+    z-index: 2;
+    position: relative;
+}
+
+.staff-left-panel img {
+    width: 75%;
+    max-width: 250px;
+    height: auto;
+    border-radius: var(--radius-lg);
+    z-index: 2;
+    position: relative;
+}
+
+.staff-right-panel {
+    flex: 1;
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--bg-white);
+    overflow-y: auto;
+}
+
+.staff-right-panel h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.staff-welcome-text {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xl);
+    font-size: var(--font-size-sm);
+}
+
+.staff-form-group {
+    margin-bottom: var(--spacing-md);
+    position: relative;
+}
+
+.staff-form-label {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    display: block;
+}
+
+.staff-form-control {
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 2.8rem;
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    background: #ffffff;
+    color: #2d3748;
+    width: 100%;
+}
+
+.staff-form-control:focus {
+    border-color: #6A1B9A;
+    box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.1);
+    background: #ffffff;
+    color: #2d3748;
+    outline: none;
+}
+
+.staff-form-control::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+.staff-input-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: var(--font-size-lg);
+}
+
+.staff-password-toggle {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 3;
+}
+
+.staff-password-toggle:hover {
+    color: #6A1B9A;
+}
+
+.staff-btn-primary {
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-2xl);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-white);
+    width: 100%;
+    margin-top: var(--spacing-md);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.staff-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(106, 27, 154, 0.3);
+}
+
+.staff-btn-secondary {
+    background: transparent;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-2xl);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    width: 100%;
+    margin-top: var(--spacing-md);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.staff-btn-secondary:hover {
+    border-color: #6A1B9A;
+    color: #6A1B9A;
+    background: rgba(106, 27, 154, 0.05);
+}
+
+.staff-auth-links {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.staff-auth-links a {
+    color: #6A1B9A;
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition);
+}
+
+.staff-auth-links a:hover {
+    color: #FF9800;
+}
+
+.staff-auth-links .text-muted {
+    color: #6c757d !important;
+    font-size: 0.875rem;
+}
+
+.staff-auth-links .text-muted i {
+    color: #6c757d !important;
+}
+
+.staff-copyright {
+    position: fixed;
+    bottom: var(--spacing-md);
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.staff-copyright i {
+    color: #ff6b6b;
+}
+
+/* === Receiver Authentication Styles === */
+.receiver-auth-body {
+    font-family: var(--font-family-primary);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #43e97b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.receiver-auth-container {
+    display: flex;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 25px 50px rgba(67, 233, 123, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(67, 233, 123, 0.2);
+    width: 85%;
+    max-width: 900px;
+    min-height: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    animation: slideUp 0.8s ease-out;
+    margin: var(--spacing-2xl) auto;
+}
+
+.receiver-left-panel {
+    flex: 1;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    text-align: center;
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--border-light);
+}
+
+.receiver-left-panel h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-sm);
+    color: #1a202c;
+    z-index: 2;
+    position: relative;
+}
+
+.receiver-left-panel p {
+    font-size: var(--font-size-base);
+    opacity: 1;
+    margin-bottom: var(--spacing-xl);
+    color: #2d3748;
+    z-index: 2;
+    position: relative;
+}
+
+.receiver-left-panel img {
+    width: 75%;
+    max-width: 250px;
+    height: auto;
+    border-radius: var(--radius-lg);
+    z-index: 2;
+    position: relative;
+}
+
+.receiver-right-panel {
+    flex: 1;
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--bg-white);
+    overflow-y: auto;
+}
+
+.receiver-right-panel h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.receiver-welcome-text {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xl);
+    font-size: var(--font-size-sm);
+}
+
+.receiver-form-group {
+    margin-bottom: var(--spacing-md);
+    position: relative;
+}
+
+.receiver-form-label {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    display: block;
+}
+
+.receiver-form-control {
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 2.8rem;
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    background: #ffffff;
+    color: #2d3748;
+    width: 100%;
+}
+
+.receiver-form-control:focus {
+    border-color: #43e97b;
+    box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.1);
+    background: #ffffff;
+    color: #2d3748;
+    outline: none;
+}
+
+.receiver-form-control::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+.receiver-input-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: var(--font-size-lg);
+}
+
+.receiver-password-toggle {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 3;
+}
+
+.receiver-password-toggle:hover {
+    color: #43e97b;
+}
+
+.receiver-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #43e97b 100%);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-2xl);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-white);
+    width: 100%;
+    margin-top: var(--spacing-md);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.receiver-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(67, 233, 123, 0.3);
+}
+
+.receiver-btn-secondary {
+    background: transparent;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-2xl);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    width: 100%;
+    margin-top: var(--spacing-md);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.receiver-btn-secondary:hover {
+    border-color: #43e97b;
+    color: #43e97b;
+    background: rgba(67, 233, 123, 0.05);
+}
+
+.receiver-auth-links {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.receiver-auth-links a {
+    color: #43e97b;
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition);
+}
+
+.receiver-auth-links a:hover {
+    color: #667eea;
+}
+
+.receiver-copyright {
+    position: fixed;
+    bottom: var(--spacing-md);
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.receiver-copyright i {
+    color: #ff6b6b;
+}
+
+/* === FORGOT PASSWORD STYLES === */
+/* Receiver-only forgot password functionality */
+
+/* === RESET PASSWORD STYLES === */
+/* Uses existing staff/receiver auth styles dynamically via JavaScript */
+
+/* === Responsive Design for Password Reset === */
+@media (max-width: 768px) {
+    .user-type-selection {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .user-type-option {
+        padding: 0.75rem;
+    }
+
+    .user-type-option i {
+        font-size: 1.25rem;
+    }
+
+    #forgot-password-form-group,
+    #reset-password-form-group {
+        margin-bottom: 1rem;
+    }
+
+    .forgot-password-form-control,
+    .reset-password-form-control {
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+    }
+
+    .forgot-password-input-icon,
+    .reset-password-input-icon {
+        left: 0.75rem;
+    }
+
+    .reset-password-password-toggle {
+        right: 0.75rem;
+    }
+}

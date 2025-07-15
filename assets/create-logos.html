@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Delivery Logos</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .logo { margin: 10px; display: inline-block; }
+        canvas { border: 1px solid #ccc; margin: 5px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>🚚 Delivery Partner Logo Generator</h2>
+    <p>Click "Generate & Download All" to create logo files for your PPMS system.</p>
+    
+    <button onclick="generateAndDownloadAll()">📥 Generate & Download All Logos</button>
+    <button onclick="generatePreviews()">👁️ Preview Logos</button>
+    
+    <div id="previews"></div>
+
+    <script>
+        const logos = [
+            { name: 'posMalaysia', text: 'Pos Malaysia', bg: '#1e40af', color: 'white' },
+            { name: 'gdex', text: 'GDEX', bg: '#dc2626', color: 'white' },
+            { name: 'flashexpress', text: 'Flash Express', bg: '#f59e0b', color: 'white' },
+            { name: 'shopeeExpress', text: 'Shopee Express', bg: '#ea580c', color: 'white' },
+            { name: 'JNT', text: 'J&T Express', bg: '#dc2626', color: 'white' },
+            { name: 'dhl', text: 'DHL', bg: '#facc15', color: '#1f2937' },
+            { name: 'fedex', text: 'FedEx', bg: '#7c3aed', color: 'white' },
+            { name: 'ninjavan', text: 'Ninja Van', bg: '#1f2937', color: 'white' }
+        ];
+
+        function createLogo(logoData) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 120;
+            canvas.height = 40;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = logoData.bg;
+            ctx.fillRect(0, 0, 120, 40);
+            
+            // Border radius effect
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 120, 40, 8);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // Text
+            ctx.fillStyle = logoData.color;
+            ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(logoData.text, 60, 20);
+            
+            return canvas;
+        }
+
+        function generatePreviews() {
+            const container = document.getElementById('previews');
+            container.innerHTML = '<h3>Logo Previews:</h3>';
+            
+            logos.forEach(logoData => {
+                const canvas = createLogo(logoData);
+                const div = document.createElement('div');
+                div.className = 'logo';
+                div.innerHTML = `<div>${logoData.name}.png</div>`;
+                div.appendChild(canvas);
+                container.appendChild(div);
+            });
+        }
+
+        function generateAndDownloadAll() {
+            logos.forEach(logoData => {
+                const canvas = createLogo(logoData);
+                const link = document.createElement('a');
+                link.download = logoData.name + '.png';
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+            
+            alert('✅ All 8 logo files have been downloaded!\n\n📁 Save them in your assets/ folder and refresh your dashboard.');
+        }
+
+        // Auto-generate previews on load
+        window.onload = generatePreviews;
+    </script>
+</body>
+</html>

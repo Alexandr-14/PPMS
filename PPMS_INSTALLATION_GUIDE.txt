@@ -1,0 +1,88 @@
+===============================================
+   PPMS COMPLETE BACKUP - INSTALLATION GUIDE
+===============================================
+
+📦 BACKUP FILE CREATED: PPMS_Complete_Backup_2025-06-24_16-24-07.zip
+📍 LOCATION: C:\xampp\htdocs\ppms\
+
+🎯 WHAT'S INCLUDED:
+✅ Complete PPMS system files (HTML, PHP, CSS, JS)
+✅ Database backup (ppms_database_backup.sql)
+✅ All assets (images, videos, logos)
+✅ Documentation and installation instructions
+✅ Default accounts for testing
+
+🚀 INSTALLATION STEPS:
+
+1. EXTRACT THE ZIP FILE
+   - Extract PPMS_Complete_Backup_2025-06-24_16-24-07.zip
+   - Copy the 'ppms' folder to C:\xampp\htdocs\
+
+2. DATABASE SETUP
+   - Start XAMPP (Apache + MySQL)
+   - Open phpMyAdmin: http://localhost/phpmyadmin
+   - Create new database: CREATE DATABASE ppms;
+   - Import the file: ppms_database_backup.sql
+
+3. ACCESS THE SYSTEM
+   - Landing Page: http://localhost/ppms/html/landingpage.html
+   - Receiver Login: http://localhost/ppms/html/receiver-login.html
+   - Staff Login: http://localhost/ppms/html/staff-login.html
+
+🔑 DEFAULT ACCOUNTS:
+
+ADMIN ACCOUNT:
+- Username: admin
+- Password: admin123
+- Role: Administrator (full access)
+
+TEST RECEIVER:
+- IC: 010401150099
+- Password: MikailTest123!
+- Name: Mikail
+
+TEST STAFF:
+- Staff ID: 0105
+- Password: StaffTest123!
+- Role: Staff
+
+🎨 SYSTEM FEATURES:
+✅ Complete CRUD operations for parcels
+✅ Role-based access control (Staff/Admin)
+✅ Real-time notification system
+✅ QR code generation and verification
+✅ Modern, responsive UI design
+✅ Security features (password hashing, SQL injection prevention)
+✅ Parcel tracking system
+✅ Statistics dashboard
+✅ Email notifications
+
+🔧 TECHNICAL SPECIFICATIONS:
+- Backend: PHP 7.4+
+- Database: MySQL/MariaDB
+- Frontend: HTML5, CSS3, JavaScript, Bootstrap 5
+- Security: bcrypt password hashing, prepared statements
+- Design: Modern, minimalist, mobile-responsive
+
+📊 DATABASE TABLES:
+- receiver (user accounts)
+- staff (staff/admin accounts)
+- parcel (parcel information)
+- notification (notification system)
+- retrievalrecord (pickup records)
+
+⚠️ IMPORTANT NOTES:
+1. Change default passwords before production use
+2. Update database credentials in php/db_connect.php if needed
+3. Ensure XAMPP is properly configured
+4. Keep regular database backups
+5. Enable HTTPS for production deployment
+
+🎉 SYSTEM READY FOR USE!
+
+For detailed documentation, see README.md in the backup.
+
+===============================================
+   BACKUP CREATED: June 24, 2025
+   SYSTEM: Perwira Parcel Management System
+===============================================

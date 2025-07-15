@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Delivery Partner Logos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .logo-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .logo-card h3 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+        }
+        canvas {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        .download-all {
+            background: linear-gradient(135deg, #10b981, #059669);
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 10px;">🚚 Professional Delivery Partner Logos</h1>
+        <p style="text-align: center; opacity: 0.9; margin-bottom: 30px;">High-quality logos based on official brand guidelines</p>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Click <strong>"Download All Logos"</strong> to get all 8 files at once</li>
+                <li>Save all downloaded files directly to your <code>assets/</code> folder</li>
+                <li>Refresh your PPMS dashboard to see the logos</li>
+                <li>The logos will appear in grayscale and show color on hover</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="download-btn download-all" onclick="downloadAllLogos()">
+                📥 Download All Logos (8 files)
+            </button>
+        </div>
+
+        <div class="logo-grid" id="logoGrid"></div>
+    </div>
+
+    <script>
+        const logos = [
+            {
+                name: 'posMalaysia',
+                displayName: 'Pos Malaysia',
+                colors: { bg: '#003087', text: '#FFFFFF', accent: '#FFD700' },
+                style: 'corporate'
+            },
+            {
+                name: 'gdex',
+                displayName: 'GDEX',
+                colors: { bg: '#E31E24', text: '#FFFFFF', accent: '#FFFFFF' },
+                style: 'bold'
+            },
+            {
+                name: 'flashexpress',
+                displayName: 'Flash Express',
+                colors: { bg: '#FF6B35', text: '#FFFFFF', accent: '#FFE135' },
+                style: 'modern'
+            },
+            {
+                name: 'shopeeExpress',
+                displayName: 'Shopee Express',
+                colors: { bg: '#EE4D2D', text: '#FFFFFF', accent: '#FF7337' },
+                style: 'ecommerce'
+            },
+            {
+                name: 'JNT',
+                displayName: 'J&T Express',
+                colors: { bg: '#D71920', text: '#FFFFFF', accent: '#FFD700' },
+                style: 'express'
+            },
+            {
+                name: 'dhl',
+                displayName: 'DHL',
+                colors: { bg: '#FFCC00', text: '#D40511', accent: '#D40511' },
+                style: 'international'
+            },
+            {
+                name: 'fedex',
+                displayName: 'FedEx',
+                colors: { bg: '#4B0082', text: '#FFFFFF', accent: '#FF6600' },
+                style: 'premium'
+            },
+            {
+                name: 'ninjavan',
+                displayName: 'Ninja Van',
+                colors: { bg: '#2C3E50', text: '#FFFFFF', accent: '#E74C3C' },
+                style: 'tech'
+            }
+        ];
+
+        function createLogo(logoData) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 60;
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 160, 60);
+            gradient.addColorStop(0, logoData.colors.bg);
+            gradient.addColorStop(1, adjustBrightness(logoData.colors.bg, -20));
+            
+            // Background with rounded corners
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, 160, 60, 12);
+            ctx.fill();
+            
+            // Add subtle border
+            ctx.strokeStyle = adjustBrightness(logoData.colors.bg, -30);
+            ctx.lineWidth = 2;
+            roundRect(ctx, 1, 1, 158, 58, 11);
+            ctx.stroke();
+            
+            // Company name
+            ctx.fillStyle = logoData.colors.text;
+            ctx.font = 'bold 14px "Segoe UI", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Add text shadow for better readability
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            ctx.fillText(logoData.displayName, 80, 30);
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Add accent element based on style
+            addAccentElement(ctx, logoData);
+            
+            return canvas;
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function addAccentElement(ctx, logoData) {
+            ctx.fillStyle = logoData.colors.accent;
+            
+            switch(logoData.style) {
+                case 'corporate':
+                    // Small rectangle accent
+                    ctx.fillRect(20, 45, 30, 4);
+                    break;
+                case 'bold':
+                    // Triangle accent
+                    ctx.beginPath();
+                    ctx.moveTo(140, 15);
+                    ctx.lineTo(150, 15);
+                    ctx.lineTo(145, 25);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'modern':
+                    // Circle accent
+                    ctx.beginPath();
+                    ctx.arc(140, 20, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                    break;
+                case 'ecommerce':
+                    // Shopping bag icon
+                    ctx.fillRect(135, 15, 12, 10);
+                    ctx.fillRect(137, 12, 2, 6);
+                    ctx.fillRect(143, 12, 2, 6);
+                    break;
+                case 'express':
+                    // Lightning bolt
+                    ctx.beginPath();
+                    ctx.moveTo(140, 12);
+                    ctx.lineTo(135, 20);
+                    ctx.lineTo(142, 20);
+                    ctx.lineTo(137, 28);
+                    ctx.lineTo(145, 20);
+                    ctx.lineTo(138, 20);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'international':
+                    // Globe dots
+                    for(let i = 0; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.arc(135 + i * 5, 20, 2, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                    break;
+                case 'premium':
+                    // Diamond shape
+                    ctx.beginPath();
+                    ctx.moveTo(142, 15);
+                    ctx.lineTo(147, 20);
+                    ctx.lineTo(142, 25);
+                    ctx.lineTo(137, 20);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'tech':
+                    // Circuit pattern
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = logoData.colors.accent;
+                    ctx.beginPath();
+                    ctx.moveTo(135, 20);
+                    ctx.lineTo(140, 20);
+                    ctx.lineTo(140, 15);
+                    ctx.lineTo(145, 15);
+                    ctx.stroke();
+                    break;
+            }
+        }
+
+        function generateLogos() {
+            const grid = document.getElementById('logoGrid');
+            grid.innerHTML = '';
+            
+            logos.forEach(logoData => {
+                const card = document.createElement('div');
+                card.className = 'logo-card';
+                
+                const canvas = createLogo(logoData);
+                
+                card.innerHTML = `
+                    <h3>${logoData.displayName}</h3>
+                    <div>${canvas.outerHTML}</div>
+                    <button class="download-btn" onclick="downloadLogo('${logoData.name}', '${logoData.displayName}')">
+                        📥 Download ${logoData.name}.png
+                    </button>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function downloadLogo(filename, displayName) {
+            const logoData = logos.find(l => l.name === filename);
+            const canvas = createLogo(logoData);
+            
+            const link = document.createElement('a');
+            link.download = filename + '.png';
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadAllLogos() {
+            let downloaded = 0;
+            const total = logos.length;
+            
+            logos.forEach((logoData, index) => {
+                setTimeout(() => {
+                    downloadLogo(logoData.name, logoData.displayName);
+                    downloaded++;
+                    
+                    if (downloaded === total) {
+                        setTimeout(() => {
+                            alert(`✅ Successfully downloaded all ${total} delivery partner logos!\n\n📁 Please save them in your assets/ folder and refresh your PPMS dashboard.`);
+                        }, 500);
+                    }
+                }, index * 200); // Stagger downloads
+            });
+        }
+
+        // Generate logos on page load
+        window.onload = generateLogos;
+    </script>
+</body>
+</html>

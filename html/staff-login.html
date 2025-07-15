@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMS Staff Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PPMS Custom Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/login.css">
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+
+
+</head>
+<body class="staff-auth-body">
+    <div class="staff-auth-container">
+        <!-- Left Panel -->
+        <div class="staff-left-panel">
+            <h2>Welcome Back!</h2>
+            <p>Ready to manage your tasks? Login to get started.</p>
+            <img src="../assets/stafflogin.gif" alt="Staff Login Illustration">
+        </div>
+
+        <!-- Right Panel (Form) -->
+        <div class="staff-right-panel">
+            <h2>Staff Login</h2>
+            <p class="staff-welcome-text">Enter your credentials to access your dashboard</p>
+
+            <form method="post" action="../php/staff-login.php" class="w-100">
+                <!-- Staff ID Field -->
+                <div class="staff-form-group">
+                    <label for="staffId" class="staff-form-label">Staff ID</label>
+                    <div class="position-relative">
+                        <i class="fas fa-id-badge staff-input-icon"></i>
+                        <input
+                            type="text"
+                            class="staff-form-control"
+                            id="staffId"
+                            name="staffId"
+                            placeholder="Enter your Staff ID"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="staff-form-group">
+                    <label for="staff-password" class="staff-form-label">Password</label>
+                    <div class="position-relative">
+                        <i class="fas fa-lock staff-input-icon"></i>
+                        <input
+                            type="password"
+                            class="staff-form-control"
+                            id="staff-password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required>
+                        <i class="fas fa-eye staff-password-toggle" onclick="togglePassword('staff-password', this)"></i>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="staff-btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login to Dashboard
+                </button>
+            </form>
+
+            <!-- Additional Links -->
+            <div class="staff-auth-links">
+                <p>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Forgot password? Contact your administrator
+                    </small>
+                </p>
+                <p>
+                    Not yet a member?
+                    <a href="staff-register.html">Register here</a>
+                </p>
+            </div>
+
+            <button onclick="window.location.href='landingpage.html'" class="staff-btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Landing Page
+            </button>
+        </div>
+    </div>
+
+    <!-- Local Bootstrap JS -->
+    <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Check for login status from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'fail') {
+            // Show error toast if login failed
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'Login Failed',
+                text: 'Please check your credentials and try again.',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Password visibility toggle function
+        function togglePassword(fieldId, icon) {
+            const passwordField = document.getElementById(fieldId);
+            const isPassword = passwordField.type === 'password';
+
+            passwordField.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+    </script>
+</body>
+</html>

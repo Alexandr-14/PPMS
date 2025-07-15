@@ -1,0 +1,195 @@
+/* ===================================
+   PPMS Design System - CSS Variables
+   ================================== */
+
+:root {
+    /* === Color Gradients === */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    --dark-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    --light-bg: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    
+    /* === Solid Colors === */
+    --primary-color: #667eea;
+    --secondary-color: #f093fb;
+    --success-color: #4facfe;
+    --warning-color: #43e97b;
+    --danger-color: #ff6b6b;
+    --dark-color: #1f2937;
+    --light-color: #fdfbfb;
+    
+    /* === Text Colors === */
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --text-white: #ffffff;
+    
+    /* === Background Colors === */
+    --bg-white: #ffffff;
+    --bg-light: #f8fafc;
+    --bg-gray-50: #f9fafb;
+    --bg-gray-100: #f3f4f6;
+    --bg-gray-200: #e5e7eb;
+    
+    /* === Border Colors === */
+    --border-light: #e2e8f0;
+    --border-gray: #d1d5db;
+    --border-primary: rgba(102, 126, 234, 0.2);
+    --border-success: rgba(79, 172, 254, 0.2);
+    --border-warning: rgba(67, 233, 123, 0.2);
+    --border-danger: rgba(255, 107, 107, 0.2);
+    
+    /* === Shadows === */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --shadow-card-hover: 0 20px 60px rgba(0, 0, 0, 0.15);
+    
+    /* === Border Radius === */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 20px;
+    --radius-full: 50%;
+    --border-radius: 16px; /* Main border radius */
+    
+    /* === Spacing === */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 2.5rem;
+    --spacing-3xl: 3rem;
+    --spacing-4xl: 4rem;
+    
+    /* === Enhanced Typography System === */
+    /* Font Families - More Engaging */
+    --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-family-secondary: 'Poppins', 'Inter', sans-serif;
+    --font-family-display: 'Poppins', 'Inter', sans-serif; /* For headings */
+    --font-family-body: 'Inter', 'Segoe UI', sans-serif; /* For body text */
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    /* Font Sizes - More Dynamic Scale */
+    --font-size-xs: 0.75rem;     /* 12px */
+    --font-size-sm: 0.875rem;    /* 14px */
+    --font-size-base: 1rem;      /* 16px */
+    --font-size-lg: 1.125rem;    /* 18px */
+    --font-size-xl: 1.25rem;     /* 20px */
+    --font-size-2xl: 1.5rem;     /* 24px */
+    --font-size-3xl: 1.875rem;   /* 30px */
+    --font-size-4xl: 2.25rem;    /* 36px */
+    --font-size-5xl: 3rem;       /* 48px */
+    --font-size-6xl: 3.75rem;    /* 60px */
+    --font-size-7xl: 4.5rem;     /* 72px */
+
+    /* Font Weights - More Variety */
+    --font-weight-thin: 100;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+
+    /* Line Heights - Better Readability */
+    --line-height-none: 1;
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+
+    /* Letter Spacing - Modern Feel */
+    --letter-spacing-tighter: -0.05em;
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0em;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+    --letter-spacing-widest: 0.1em;
+    
+    /* === Transitions === */
+    --transition-fast: all 0.15s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+    --transition-bounce: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Main transition */
+    
+    /* === Z-Index === */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    
+    /* === Breakpoints (for reference) === */
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-2xl: 1400px;
+    
+    /* === Component Specific === */
+    --navbar-height: 70px;
+    --sidebar-width: 280px;
+    --container-max-width: 1200px;
+    
+    /* === Form Elements === */
+    --input-height: 44px;
+    --input-padding: 0.75rem 1rem;
+    --input-border-width: 2px;
+    --input-focus-ring: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    
+    /* === Button Sizes === */
+    --btn-padding-sm: 0.5rem 1rem;
+    --btn-padding-md: 0.75rem 1.5rem;
+    --btn-padding-lg: 1rem 2rem;
+    
+    /* === Animation Durations === */
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    
+    /* === Opacity Levels === */
+    --opacity-disabled: 0.5;
+    --opacity-muted: 0.7;
+    --opacity-hover: 0.9;
+    
+    /* === Badge/Status Colors === */
+    --status-pending: var(--warning-gradient);
+    --status-success: var(--success-gradient);
+    --status-error: var(--danger-gradient);
+    --status-info: var(--primary-gradient);
+}
+
+/* === Dark Mode Variables (for future use) === */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: #f7fafc;
+        --text-secondary: #e2e8f0;
+        --text-muted: #a0aec0;
+        --bg-white: #1a202c;
+        --bg-light: #2d3748;
+        --border-light: #4a5568;
+    }
+}
+
+/* === Print Styles === */
+@media print {
+    :root {
+        --shadow-card: none;
+        --shadow-card-hover: none;
+        --transition: none;
+    }
+}

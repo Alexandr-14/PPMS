@@ -1,0 +1,185 @@
+/* ===================================
+   PPMS Safe Typography Enhancements
+   Gentle improvements without breaking anything
+   ================================== */
+
+/* === Safe Font Improvements === */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+}
+
+/* === Headings - Subtle Improvements === */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.5rem; font-weight: 700; }
+h2 { font-size: 2rem; font-weight: 600; }
+h3 { font-size: 1.75rem; font-weight: 600; }
+h4 { font-size: 1.5rem; font-weight: 600; }
+h5 { font-size: 1.25rem; font-weight: 600; }
+h6 { font-size: 1.125rem; font-weight: 600; }
+
+/* === Safe Text Enhancements === */
+.text-engaging {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #667eea;
+    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.1);
+}
+
+.text-friendly {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #43e97b;
+}
+
+.text-warm {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #f093fb;
+}
+
+/* === Button Text Improvements === */
+.btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: none;
+}
+
+/* === Form Label Improvements === */
+.form-label,
+.receiver-form-label,
+.staff-form-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* === Link Improvements === */
+a {
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+
+/* === Badge Text === */
+.badge {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* === Status Text === */
+.status-pending {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.status-success {
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* === Welcome Messages === */
+.welcome-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+/* === Subtle Animations - Safe === */
+.gentle-hover {
+    transition: all 0.2s ease;
+}
+
+.gentle-hover:hover {
+    transform: translateY(-1px);
+    color: #667eea;
+}
+
+/* === Tab Improvements === */
+.nav-link {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* === Card Title Improvements === */
+.card-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* === Alert Text === */
+.alert {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.alert-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+/* === Table Headers === */
+th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* === Empty State Text === */
+.empty-state h5 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.empty-state p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+/* === Responsive Typography === */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+    
+    .welcome-text {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.125rem; }
+}
+
+/* === Print Styles === */
+@media print {
+    * {
+        color: black !important;
+        text-shadow: none !important;
+    }
+}
