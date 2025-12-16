@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("
             SELECT p.*, r.name as receiverName
             FROM Parcel p
-            LEFT JOIN Receiver r ON p.ICNumber = r.ICNumber
+            LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
             WHERE p.TrackingNumber = ?
         ");
         $stmt->bind_param("s", $trackingNumber);
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <table class='info-table'>
                     <tr><td>Tracking Number:</td><td>$trackingNumber</td></tr>
-                    <tr><td>Receiver IC:</td><td>{$parcel['ICNumber']}</td></tr>
+                    <tr><td>Receiver IC:</td><td>{$parcel['MatricNumber']}</td></tr>
                     <tr><td>Pickup Location:</td><td>{$parcel['deliveryLocation']}</td></tr>
                     <tr><td>Status:</td><td>{$parcel['status']}</td></tr>
                     <tr><td>Generated:</td><td>" . date('Y-m-d H:i:s') . "</td></tr>
@@ -224,12 +224,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Log successful email
             $logStmt = $conn->prepare("
                 INSERT INTO Notification (
-                    ICNumber, TrackingNumber, notificationType, messageContent,
+                    MatricNumber, TrackingNumber, notificationType, messageContent,
                     sentTimestamp, notificationStatus, isRead, deliveryMethod
                 ) VALUES (?, ?, 'qr_email', ?, NOW(), 'sent', 0, 'email')
             ");
             $logMessage = "QR verification code emailed to: $receiverEmail";
-            $logStmt->bind_param("sss", $parcel['ICNumber'], $trackingNumber, $logMessage);
+            $logStmt->bind_param("sss", $parcel['MatricNumber'], $trackingNumber, $logMessage);
             $logStmt->execute();
 
             // Clean up temporary QR file

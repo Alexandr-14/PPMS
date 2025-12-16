@@ -13,7 +13,7 @@ try {
     $query = "
         SELECT
             p.TrackingNumber,
-            p.ICNumber,
+            p.MatricNumber,
             p.date,
             p.time,
             p.name,
@@ -21,11 +21,12 @@ try {
             p.QR,
             p.weight,
             p.status,
+            p.addedBy,
             r.name as receiverName,
             ret.retrieveDate,
             ret.retrieveTime
         FROM Parcel p
-        LEFT JOIN Receiver r ON p.ICNumber = r.ICNumber
+        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
         LEFT JOIN retrievalrecord ret ON p.TrackingNumber = ret.trackingNumber
         ORDER BY p.date DESC, p.time DESC
     ";
@@ -37,7 +38,7 @@ try {
         while ($row = $result->fetch_assoc()) {
             $parcels[] = [
                 'TrackingNumber' => $row['TrackingNumber'],
-                'ICNumber' => $row['ICNumber'],
+                'MatricNumber' => $row['MatricNumber'],
                 'receiverName' => $row['receiverName'],
                 'name' => $row['name'],
                 'deliveryLocation' => $row['deliveryLocation'],
@@ -46,6 +47,7 @@ try {
                 'date' => $row['date'],
                 'time' => $row['time'],
                 'status' => $row['status'],
+                'addedBy' => $row['addedBy'],
                 'retrieveDate' => $row['retrieveDate'],
                 'retrieveTime' => $row['retrieveTime']
             ];

@@ -38,11 +38,12 @@ function sanitizePhone($phone) {
     return $phone;
 }
 
-function sanitizeIC($ic) {
-    $ic = sanitizeInput($ic);
-    // Remove any non-digit characters
-    $ic = preg_replace('/[^0-9]/', '', $ic);
-    return $ic;
+function sanitizeMatric($matric) {
+    $matric = sanitizeInput($matric);
+    // Convert to uppercase and keep only letters and digits
+    $matric = strtoupper($matric);
+    $matric = preg_replace('/[^A-Z0-9]/', '', $matric);
+    return $matric;
 }
 
 // Function to show error and redirect
@@ -72,13 +73,13 @@ function showError($title, $message) {
 }
 
 // Validate required fields
-if (empty($_POST['name']) || empty($_POST['icnumber']) || empty($_POST['phoneNumber']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+if (empty($_POST['name']) || empty($_POST['matricnumber']) || empty($_POST['phoneNumber']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
     showError('Missing Information!', 'Please fill in all required fields.');
 }
 
 // Sanitize and validate input data
 $name = sanitizeName($_POST['name']);
-$icnumber = sanitizeIC($_POST['icnumber']);
+$matricnumber = sanitizeMatric($_POST['matricnumber']);
 $phone = sanitizePhone($_POST['phoneNumber']);
 $password = $_POST['password']; // Don't sanitize password as it may contain special chars
 $confirmPassword = $_POST['confirm_password'];
@@ -88,9 +89,9 @@ if (empty($name) || strlen($name) < 2 || strlen($name) > 100) {
     showError('Invalid Name!', 'Name must be between 2-100 characters and contain only letters and common symbols.');
 }
 
-// Validate IC number format (12 digits)
-if (!preg_match('/^[0-9]{12}$/', $icnumber)) {
-    showError('Invalid IC Number!', 'IC Number must be exactly 12 digits.');
+// Validate Matric number format (2 letters + 6 digits)
+if (!preg_match('/^[A-Z]{2}[0-9]{6}$/', $matricnumber)) {
+    showError('Invalid Matric Number!', 'Matric Number must be 2 letters followed by 6 digits (e.g., CI230010).');
 }
 
 // Validate Malaysian phone number format
@@ -115,17 +116,17 @@ if (!empty($matchErrors)) {
     showError('Password Mismatch!', implode(' ', $matchErrors));
 }
 
-// Check if IC number already exists
-$stmt = $conn->prepare("SELECT ICNumber FROM Receiver WHERE ICNumber = ?");
-$stmt->bind_param("s", $icnumber);
+// Check if Matric number already exists
+$stmt = $conn->prepare("SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?");
+$stmt->bind_param("s", $matricnumber);
 $stmt->execute();
 $stmt->store_result();
 
 if ($stmt->num_rows > 0) {
-    // IC already registered
+    // Matric already registered
     $stmt->close();
     $conn->close();
-    showError('IC Number already registered!', 'Please use a different IC Number.');
+    showError('Matric Number already registered!', 'Please use a different Matric Number.');
 }
 $stmt->close();
 
@@ -133,8 +134,8 @@ $stmt->close();
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Insert new receiver
-$stmt = $conn->prepare("INSERT INTO Receiver (ICNumber, name, phoneNumber, password) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $icnumber, $name, $phone, $hashed_password);
+$stmt = $conn->prepare("INSERT INTO Receiver (MatricNumber, name, phoneNumber, password) VALUES (?, ?, ?, ?)");
+$stmt->bind_param("ssss", $matricnumber, $name, $phone, $hashed_password);
 
 if ($stmt->execute()) {
     // Registration successful, redirect with flag

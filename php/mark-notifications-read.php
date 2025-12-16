@@ -3,7 +3,7 @@ session_start();
 require_once 'db_connect.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['receiver_ic']) || empty($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit();
@@ -16,7 +16,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-$receiverIC = $_SESSION['receiver_ic'];
+$receiverMatric = $_SESSION['receiver_matric'];
 
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
@@ -32,9 +32,9 @@ $action = $input['action'];
 try {
     if ($action === 'mark_all_read') {
         // Mark all notifications as read for this receiver
-        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE ICNumber = ? AND isRead = 0");
-        $stmt->bind_param("s", $receiverIC);
-        
+        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE MatricNumber = ? AND isRead = 0");
+        $stmt->bind_param("s", $receiverMatric);
+
         if ($stmt->execute()) {
             $affectedRows = $stmt->affected_rows;
             echo json_encode([
@@ -45,21 +45,21 @@ try {
         } else {
             throw new Exception('Failed to update notifications');
         }
-        
+
         $stmt->close();
-        
+
     } elseif ($action === 'mark_single_read') {
         if (!isset($input['notificationId'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Notification ID required']);
             exit();
         }
-        
+
         $notificationId = $input['notificationId'];
-        
+
         // Mark single notification as read (ensure it belongs to this receiver)
-        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE notificationID = ? AND ICNumber = ?");
-        $stmt->bind_param("is", $notificationId, $receiverIC);
+        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE notificationID = ? AND MatricNumber = ?");
+        $stmt->bind_param("is", $notificationId, $receiverMatric);
         
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {

@@ -3,7 +3,7 @@ session_start();
 require_once 'db_connect.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['receiver_ic']) || empty($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit();
@@ -16,7 +16,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-$receiverIC = $_SESSION['receiver_ic'];
+$receiverMatric = $_SESSION['receiver_matric'];
 
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
@@ -31,8 +31,8 @@ $notificationId = $input['notificationId'];
 
 try {
     // Delete notification (ensure it belongs to this receiver)
-    $stmt = $conn->prepare("DELETE FROM Notification WHERE notificationID = ? AND ICNumber = ?");
-    $stmt->bind_param("is", $notificationId, $receiverIC);
+    $stmt = $conn->prepare("DELETE FROM Notification WHERE notificationID = ? AND MatricNumber = ?");
+    $stmt->bind_param("is", $notificationId, $receiverMatric);
     
     if ($stmt->execute()) {
         if ($stmt->affected_rows > 0) {

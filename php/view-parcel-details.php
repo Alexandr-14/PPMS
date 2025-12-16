@@ -3,7 +3,7 @@ session_start();
 require_once 'db_connect.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['receiver_ic']) || empty($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
     header("Location: ../html/receiver-login.html");
     exit();
 }
@@ -15,12 +15,12 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $trackingNumber = $_GET['id'];
-$receiverIC = $_SESSION['receiver_ic'];
+$receiverMatric = $_SESSION['receiver_matric'];
 
 try {
     // Query the database for the parcel, ensuring it belongs to the logged-in user
-    $stmt = $conn->prepare("SELECT * FROM Parcel WHERE TrackingNumber = ? AND ICNumber = ?");
-    $stmt->bind_param("ss", $trackingNumber, $receiverIC);
+    $stmt = $conn->prepare("SELECT * FROM Parcel WHERE TrackingNumber = ? AND MatricNumber = ?");
+    $stmt->bind_param("ss", $trackingNumber, $receiverMatric);
     $stmt->execute();
     $result = $stmt->get_result();
     

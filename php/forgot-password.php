@@ -25,7 +25,7 @@ if (count($_SESSION[$rate_limit_key]) >= 5) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_type = trim($_POST['user_type'] ?? '');
-    $ic_number = trim($_POST['ic_number'] ?? '');
+    $matric_number = trim($_POST['matric_number'] ?? '');
 
     // Security: Only allow receiver type for forgot password
     if ($user_type !== 'receiver') {
@@ -37,23 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validate input
-    if (empty($ic_number)) {
+    if (empty($matric_number)) {
         echo json_encode([
             'success' => false,
-            'message' => 'Please enter your IC number.'
+            'message' => 'Please enter your Matric Number.'
         ]);
         exit;
     }
 
-    // Validate IC format
-    if (!preg_match('/^\d{6}-\d{2}-\d{4}$/', $ic_number)) {
+    // Validate Matric format (2 letters + 6 digits)
+    if (!preg_match('/^[A-Z]{2}[0-9]{6}$/', $matric_number)) {
         echo json_encode([
             'success' => false,
-            'message' => 'Please enter a valid IC number format: 123456-78-9012'
+            'message' => 'Please enter a valid Matric Number: 2 letters + 6 digits (e.g., CI230010)'
         ]);
         exit;
     }
-    
+
     // Add to rate limiting
     $_SESSION[$rate_limit_key][] = time();
 
@@ -61,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_exists = false;
     $user_name = '';
 
-    $stmt = $conn->prepare("SELECT name FROM Receiver WHERE ICNumber = ?");
-    $stmt->bind_param("s", $ic_number);
+    $stmt = $conn->prepare("SELECT name FROM Receiver WHERE MatricNumber = ?");
+    $stmt->bind_param("s", $matric_number);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {

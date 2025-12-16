@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             SELECT
                 ret.retrievalID,
                 ret.trackingNumber as TrackingNumber,
-                ret.ICNumber,
+                ret.MatricNumber,
                 ret.staffID,
                 ret.retrieveDate,
                 ret.retrieveTime,
@@ -28,9 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 p.name as parcelName,
                 p.weight,
                 p.deliveryLocation,
-                p.date as parcelDate
+                p.date as parcelDate,
+                p.addedBy
             FROM retrievalrecord ret
-            LEFT JOIN Receiver r ON ret.ICNumber = r.ICNumber
+            LEFT JOIN Receiver r ON ret.MatricNumber = r.MatricNumber
             LEFT JOIN Parcel p ON ret.trackingNumber = p.TrackingNumber
             WHERE 1=1
         ";
@@ -66,11 +67,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $types .= "s";
         }
 
-        // Add receiver IC filter
+        // Add receiver Matric filter
         $receiverIC = trim($_POST['receiverIC'] ?? '');
         if (!empty($receiverIC)) {
-            $query .= " AND ret.ICNumber = ?";
+            $query .= " AND ret.MatricNumber = ?";
             $params[] = $receiverIC;
+            $types .= "s";
+        }
+
+        // Add addedBy filter (who registered the parcel)
+        $addedBy = trim($_POST['addedBy'] ?? '');
+        if (!empty($addedBy)) {
+            $query .= " AND p.addedBy = ?";
+            $params[] = $addedBy;
             $types .= "s";
         }
 
@@ -89,12 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $report[] = [
                 'retrievalID' => $row['retrievalID'],
                 'TrackingNumber' => $row['TrackingNumber'],
-                'ICNumber' => $row['ICNumber'],
+                'MatricNumber' => $row['MatricNumber'],
                 'receiverName' => $row['receiverName'],
                 'parcelName' => $row['parcelName'],
                 'weight' => $row['weight'],
                 'deliveryLocation' => $row['deliveryLocation'],
                 'parcelDate' => $row['parcelDate'],
+                'addedBy' => $row['addedBy'],
                 'staffID' => $row['staffID'],
                 'retrieveDate' => $row['retrieveDate'],
                 'retrieveTime' => $row['retrieveTime'],
@@ -110,7 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'endDate' => $endDate,
                 'status' => $status,
                 'staffID' => $staffID,
-                'receiverIC' => $receiverIC
+                'receiverIC' => $receiverIC,
+                'addedBy' => $addedBy
             ],
             'totalRecords' => count($report)
         ]);

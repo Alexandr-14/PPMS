@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Set default description if empty
     if (empty($name)) {
-        $name = 'Package'; // Default description
+        $name = 'Description only'; // Default description
     }
 
     // Validate weight is numeric
@@ -46,22 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Check if receiver IC exists in receivers table
-        $receiverQuery = "SELECT ICNumber FROM Receiver WHERE ICNumber = ?";
+        // Check if receiver Matric exists in receivers table
+        $receiverQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
         $receiverStmt = $conn->prepare($receiverQuery);
         $receiverStmt->bind_param("s", $receiverIC);
         $receiverStmt->execute();
         $receiverResult = $receiverStmt->get_result();
 
         if ($receiverResult->num_rows === 0) {
-            echo json_encode(['success' => false, 'message' => 'Receiver IC number not found. Please ensure the receiver is registered.']);
+            echo json_encode(['success' => false, 'message' => 'Receiver Matric number not found. Please ensure the receiver is registered.']);
             exit();
         }
 
-        // Insert new parcel with default status 'Pending'
-        $insertQuery = "INSERT INTO Parcel (TrackingNumber, ICNumber, date, time, name, deliveryLocation, weight, status) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending')";
+        // Get staff/admin ID who is adding this parcel
+        $addedBy = $_SESSION['staff_id'] ?? 'ADMIN';
+
+        // Insert new parcel with default status 'Pending' and track who added it
+        $insertQuery = "INSERT INTO Parcel (TrackingNumber, MatricNumber, date, time, name, deliveryLocation, weight, status, addedBy) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending', ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssssd", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight);
+        $insertStmt->bind_param("ssssds", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight, $addedBy);
 
         if ($insertStmt->execute()) {
             // Send notification to receiver about new parcel arrival

@@ -59,21 +59,21 @@
                     </div>
                 </div>
 
-                <!-- IC Number Field -->
+                <!-- Matric Number Field -->
                 <div class="receiver-form-group">
-                    <label for="icnumber" class="receiver-form-label">IC Number</label>
+                    <label for="matricnumber" class="receiver-form-label">Matric Number</label>
                     <div class="position-relative">
                         <i class="fas fa-id-card receiver-input-icon"></i>
                         <input
                             type="text"
                             class="receiver-form-control"
-                            id="icnumber"
-                            name="icnumber"
-                            placeholder="Enter your IC Number"
+                            id="matricnumber"
+                            name="matricnumber"
+                            placeholder="e.g., CI123456"
                             required
-                            maxlength="12"
-                            pattern="^[0-9]{12}$"
-                            title="IC No must be exactly 12 digits.">
+                            maxlength="8"
+                            pattern="^[A-Z]{2}[0-9]{6}$"
+                            title="Matric Number must be 2 letters followed by 6 digits (e.g., CI230010)">
                     </div>
                 </div>
 
@@ -224,17 +224,17 @@
 
   // Form validation
   document.querySelector('form').addEventListener('submit', function(e) {
-    const icNumber = document.getElementById('icnumber').value;
+    const matricNumber = document.getElementById('matricnumber').value;
     const phoneNumber = document.getElementById('phone').value;
     const password = document.getElementById('receiver-password').value;
 
-    // Validate IC number (12 digits)
-    if (!/^[0-9]{12}$/.test(icNumber)) {
+    // Validate Matric number (2 letters + 6 digits)
+    if (!/^[A-Z]{2}[0-9]{6}$/.test(matricNumber)) {
       e.preventDefault();
       Swal.fire({
         icon: 'error',
-        title: 'Invalid IC Number!',
-        text: 'IC Number must be exactly 12 digits.',
+        title: 'Invalid Matric Number!',
+        text: 'Matric Number must be 2 letters followed by 6 digits (e.g., CI230010).',
         confirmButtonText: 'OK'
       });
       return false;
@@ -279,12 +279,13 @@
     }
   });
 
-  document.getElementById('icnumber').addEventListener('input', function() {
-    const icNumber = this.value;
-    if (icNumber.length === 12 && /^[0-9]{12}$/.test(icNumber)) {
+  document.getElementById('matricnumber').addEventListener('input', function() {
+    const matricNumber = this.value.toUpperCase();
+    this.value = matricNumber; // Convert to uppercase as user types
+    if (matricNumber.length === 8 && /^[A-Z]{2}[0-9]{6}$/.test(matricNumber)) {
       this.classList.remove('is-invalid');
       this.classList.add('is-valid');
-    } else if (icNumber.length > 0) {
+    } else if (matricNumber.length > 0) {
       this.classList.remove('is-valid');
       this.classList.add('is-invalid');
     } else {

@@ -26,10 +26,14 @@ $is_admin = ($user_role === 'Admin');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <!-- QR Code Generator - Primary CDN -->
     <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
     <!-- Local QR Code Fallback -->
     <script src="../js/qrcode-simple.js"></script>
+    <!-- PPMS QR Code Configuration -->
+    <script src="../js/qr-config.js"></script>
     <!-- PPMS Custom Styles -->
     <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css?v=<?php echo time(); ?>">
@@ -40,6 +44,275 @@ $is_admin = ($user_role === 'Admin');
     <link rel="stylesheet" href="../css/ppms-styles/staff/staff-navbar-buttons.css?v=<?php echo time(); ?>">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+    <style>
+        /* Row hover effect for parcel tables (Staff) */
+        #parcelsTableBody tr,
+        #historyTableBody tr {
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #parcelsTableBody tr:hover,
+        #historyTableBody tr:hover {
+            background-color: rgba(106, 27, 154, 0.06); /* purple tint */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hide native browser clear (X) to prevent overlap with our custom clear buttons */
+        #parcelListSearchInput::-ms-clear, #parcelListSearchInput::-ms-reveal,
+        #historySearchInput::-ms-clear, #historySearchInput::-ms-reveal { display: none; width:0; height:0; }
+        #parcelListSearchInput::-webkit-search-cancel-button,
+        #historySearchInput::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+        /* Override CSS for search inputs - remove borders */
+        #parcelListSearchInput,
+        #historySearchInput {
+            border: none !important;
+            border-radius: 50px !important;
+            background: white !important;
+            padding: 12px 20px 12px 20px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #parcelListSearchInput:focus,
+        #historySearchInput:focus {
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(106, 27, 154, 0.2) !important;
+            outline: none !important;
+        }
+
+        /* QR Action Buttons - Staff Theme */
+        .btn-qr-staff {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .btn-qr-staff-download {
+            background: #9C27B0 !important;
+        }
+
+        .btn-qr-staff-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.3);
+            background: #7B1FA2 !important;
+        }
+
+        .btn-qr-staff-enlarge {
+            background: #FF9800 !important;
+        }
+
+        .btn-qr-staff-enlarge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+            background: #F57C00 !important;
+        }
+
+        /* ===== ADMIN REPORT MODULE STYLES ===== */
+
+        /* Purple Gradient Badge */
+        .bg-purple-gradient {
+            background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
+            color: white;
+        }
+
+        .bg-purple {
+            background-color: #6A1B9A !important;
+            color: white;
+        }
+
+        .bg-purple-light {
+            background: linear-gradient(135deg, rgba(106, 27, 154, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%);
+            border-bottom: 2px solid #6A1B9A;
+        }
+
+        /* Report Header */
+        .report-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(106, 27, 154, 0.05) 0%, rgba(255, 152, 0, 0.05) 100%);
+            border-radius: 12px;
+            border-left: 4px solid #6A1B9A;
+        }
+
+        .report-badge .badge {
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Quick Filter Buttons */
+        .quick-filters {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .btn-outline-purple {
+            color: #6A1B9A;
+            border-color: #6A1B9A;
+        }
+
+        .btn-outline-purple:hover, .btn-outline-purple:focus, .btn-outline-purple.active {
+            background-color: #6A1B9A;
+            border-color: #6A1B9A;
+            color: white;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #5c1786 0%, #8a1f9e 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background: linear-gradient(135deg, #e68a00 0%, #d66a00 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        /* Report Filter Card */
+        .report-filter-card {
+            border: none;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .report-filter-card .card-header {
+            font-weight: 600;
+        }
+
+        /* Report Statistics Cards */
+        .report-stat-card {
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .report-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .report-stat-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .report-stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-total {
+            background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
+            color: white;
+        }
+
+        .stat-retrieved {
+            background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+            color: white;
+        }
+
+        .stat-pending {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .stat-rate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Report Table */
+        .table-purple {
+            background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
+            color: white;
+        }
+
+        .table-purple th {
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        #reportTable tbody tr:hover {
+            background-color: rgba(106, 27, 154, 0.08);
+        }
+
+        #reportTable td {
+            vertical-align: middle;
+            padding: 0.875rem 0.75rem;
+        }
+
+        /* Status badges in report */
+        .badge-retrieved {
+            background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print, .navbar-custom, .quick-filters, .report-filter-card, .btn-group {
+                display: none !important;
+            }
+            .report-stat-card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+
+        /* SweetAlert Toast Styling - Solid White Background, No Backdrop */
+        .swal2-container.swal2-top-end.swal2-backdrop-show,
+        .swal2-container.swal2-top-end {
+            background: transparent !important;
+        }
+
+        .swal2-popup.swal2-toast {
+            background: #ffffff !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            border-radius: 10px !important;
+        }
+
+        .swal2-popup.swal2-toast .swal2-title {
+            color: #333 !important;
+        }
+
+    </style>
 </head>
 <body>
     <!-- Modern Enhanced Navbar -->
@@ -80,7 +353,7 @@ $is_admin = ($user_role === 'Admin');
                     </div>
                 </div>
             </div>
-            <button class="logout-btn" onclick="logout()">
+            <button type="button" class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt me-2"></i>Logout
             </button>
         </div>
@@ -88,7 +361,7 @@ $is_admin = ($user_role === 'Admin');
 
     <!-- Dashboard Container -->
     <div class="dashboard-container">
-                
+
                 <?php if ($is_admin): ?>
                 <!-- Admin Stats Cards -->
                 <div class="row mb-4">
@@ -172,6 +445,11 @@ $is_admin = ($user_role === 'Admin');
                     <i class="fas fa-qrcode me-1"></i> QR Generation
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="parcel-history-tab" data-bs-toggle="tab" data-bs-target="#parcel-history" type="button" role="tab">
+                    <i class="fas fa-history me-1"></i> Parcel History
+                </button>
+            </li>
             <?php if ($is_admin): ?>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
@@ -197,16 +475,16 @@ $is_admin = ($user_role === 'Admin');
                                 </label>
                                 <input type="text" class="form-control" id="trackingNumber" required
                                        placeholder="Enter unique tracking number">
-                                <div class="form-text">Must be unique for each parcel</div>
+                                <div class="form-text">Tracking number of the parcel</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="receiverIC" class="form-label">
-                                    <i class="fas fa-id-card me-2"></i>Receiver IC Number *
+                                    <i class="fas fa-id-card me-2"></i>Receiver Matric Number *
                                 </label>
                                 <input type="text" class="form-control" id="receiverIC" required
-                                       placeholder="Enter receiver's IC number">
+                                       placeholder="Enter receiver's Matric number (8 digits)">
                                 <div class="form-text">IC number of the parcel receiver</div>
                             </div>
                         </div>
@@ -222,7 +500,7 @@ $is_admin = ($user_role === 'Admin');
                                            placeholder="0.00">
                                     <span class="weight-unit">kg</span>
                                 </div>
-                                <div class="form-text">Enter parcel weight in kilograms</div>
+                                <div class="form-text">Enter parcel weight</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -243,7 +521,6 @@ $is_admin = ($user_role === 'Admin');
                                 </label>
                                 <input type="text" class="form-control" id="parcelName"
                                        placeholder="Optional parcel description">
-                                <div class="form-text">Optional description for the parcel</div>
                             </div>
                         </div>
                     </div>
@@ -262,43 +539,8 @@ $is_admin = ($user_role === 'Admin');
             <div class="tab-pane fade" id="parcel-list" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h4 class="mb-1">Parcel Management</h4>
-                        <p class="text-muted mb-0">View, edit, and manage all parcels in the system.</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-sort me-1"></i> Sort By
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'asc')">
-                                    <i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'desc')">
-                                    <i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'desc')">
-                                    <i class="fas fa-calendar me-2"></i>Date (Newest First)
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'asc')">
-                                    <i class="fas fa-calendar me-2"></i>Date (Oldest First)
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterParcels('all')">
-                                    <i class="fas fa-list me-2"></i>Show All
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterParcels('Pending')">
-                                    <i class="fas fa-clock me-2"></i>Pending Only
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterParcels('Retrieved')">
-                                    <i class="fas fa-check me-2"></i>Retrieved Only
-                                </a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-outline-primary" onclick="refreshParcels()">
-                            <i class="fas fa-sync-alt me-1"></i> Refresh
-                        </button>
+                        <h4 class="mb-1">Active Parcels</h4>
+                        <p class="text-muted mb-0">View, edit, and manage pending parcels in the system.</p>
                     </div>
                 </div>
 
@@ -326,14 +568,43 @@ $is_admin = ($user_role === 'Admin');
 
                     <!-- Table Container -->
                     <div class="table-wrapper">
+                    <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                        <div class="input-group" style="width: 100%; max-width: 450px;">
+                            <input type="text" id="parcelListSearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(106, 27, 154, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
+                            <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
+                                <i class="fas fa-search" style="color: #6a1b9a; font-size: 1.1rem;"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                                    <i class="fas fa-sort me-1"></i> Sort By
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('all')"><i class="fas fa-list me-2"></i>Show All</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('Pending')"><i class="fas fa-clock me-2"></i>Pending Only</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('Retrieved')"><i class="fas fa-check me-2"></i>Retrieved Only</a></li>
+                                </ul>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" onclick="refreshParcels()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div id="parcelListNoResults" class="text-muted small mb-2 d-none">No parcels match your search</div>
+
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" id="parcelsTable">
                                 <thead class="table-header">
                                     <tr>
                                         <th class="px-4 py-3">Tracking Number</th>
-                                        <th class="px-4 py-3">Receiver IC</th>
-                                        <th class="px-4 py-3">Receiver Name</th>
-                                        <th class="px-4 py-3">Delivery Location</th>
+                                        <th class="px-4 py-3">Receiver Matric</th>
+                                        <th class="px-4 py-3">Location</th>
                                         <th class="px-4 py-3">Date & Time</th>
                                         <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Actions</th>
@@ -440,7 +711,7 @@ $is_admin = ($user_role === 'Admin');
                                                 <div class="info-box h-100 p-3 rounded-3" style="background: #f8f9fa; border-left: 4px solid #6A1B9A;">
                                                     <div class="d-flex align-items-center mb-2">
                                                         <i class="fas fa-id-card text-primary me-2"></i>
-                                                        <small class="text-muted fw-semibold text-uppercase">Receiver IC</small>
+                                                        <small class="text-muted fw-semibold text-uppercase">Receiver Matric</small>
                                                     </div>
                                                     <div id="parcelIC" class="fw-bold text-dark" style="font-size: 1.1rem; font-family: 'Courier New', monospace;"></div>
                                                 </div>
@@ -524,14 +795,11 @@ $is_admin = ($user_role === 'Admin');
 
                                         <!-- Enhanced Action Buttons -->
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-success" onclick="downloadQR()" style="border-radius: 10px;">
+                                            <button type="button" class="btn-qr-staff btn-qr-staff-download" onclick="downloadQR()">
                                                 <i class="fas fa-download me-2"></i>Download QR Image
                                             </button>
-                                            <button class="btn btn-info" onclick="emailQR()" style="border-radius: 10px;">
-                                                <i class="fas fa-envelope me-2"></i>Email to Receiver
-                                            </button>
-                                            <button class="btn btn-warning" onclick="printQR()" style="border-radius: 10px;">
-                                                <i class="fas fa-print me-2"></i>Print QR Code
+                                            <button type="button" class="btn-qr-staff btn-qr-staff-enlarge" onclick="enlargeQR()">
+                                                <i class="fas fa-expand me-2"></i>Enlarge QR Code
                                             </button>
                                         </div>
                                     </div>
@@ -542,66 +810,226 @@ $is_admin = ($user_role === 'Admin');
                 </div>
             </div>
 
+            <!-- Parcel History Tab -->
+            <div class="tab-pane fade" id="parcel-history" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1">Parcel History</h4>
+                        <p class="text-muted mb-0">View all retrieved parcels and historical records.</p>
+                    </div>
+                </div>
+
+                <!-- Parcel History Table -->
+                <div class="parcel-table-container">
+                    <!-- Top Controls Bar -->
+                    <div class="table-controls-top">
+                        <div class="entries-control">
+                            <span class="control-label">Show</span>
+                            <select class="entries-select" id="historyItemsPerPage" onchange="changeHistoryItemsPerPage()">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="control-label">entries</span>
+                        </div>
+                        <div id="historyInfo" class="entries-info">
+                            <!-- Showing X to Y of Z entries -->
+                        </div>
+                    </div>
+
+                    <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                        <div class="input-group" style="width: 100%; max-width: 450px;">
+                            <input type="text" id="historySearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(106, 27, 154, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
+                            <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
+                                <i class="fas fa-search" style="color: #6a1b9a; font-size: 1.1rem;"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="historySort" data-bs-toggle="dropdown">
+                                    <i class="fas fa-sort me-1"></i> Sort By
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</a></li>
+                                </ul>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" onclick="refreshParcelHistory()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div id="historyNoResults" class="text-muted small mb-2 d-none">No parcels match your search</div>
+
+                    <!-- Table Container -->
+                    <div class="table-wrapper">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="historyTable">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-4 py-3">Tracking Number</th>
+                                        <th class="px-4 py-3">Receiver Matric</th>
+                                        <th class="px-4 py-3">Receiver Name</th>
+
+                                        <th class="px-4 py-3">Location</th>
+                                        <th class="px-4 py-3">Date & Time</th>
+                                        <th class="px-4 py-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                    <!-- Dynamic content will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Pagination Bar -->
+                    <div class="table-controls-bottom">
+                        <div id="historyPaginationInfo" class="pagination-info">
+                            <!-- Page info will be displayed here -->
+                        </div>
+                        <nav aria-label="History pagination" class="pagination-nav">
+                            <ul class="pagination-controls" id="historyPaginationControls">
+                                <!-- Pagination buttons will be generated here -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
                     <?php if ($is_admin): ?>
                     <!-- Admin Reports Tab -->
                     <div class="tab-pane fade" id="reports" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Admin Reports</h5>
-                                <small class="text-muted">Generate reports from retrieval records</small>
+                        <!-- Report Header -->
+                        <div class="report-header mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="mb-1"><i class="fas fa-chart-bar me-2"></i>Admin Reports</h4>
+                                    <p class="text-muted mb-0">Generate and export retrieval records reports</p>
+                                </div>
+                                <div class="report-badge">
+                                    <span class="badge bg-purple-gradient">
+                                        <i class="fas fa-user-shield me-1"></i>Admin Access
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Date Filters -->
+                        <div class="quick-filters mb-4">
+                            <label class="form-label fw-semibold"><i class="fas fa-clock me-2"></i>Quick Filters:</label>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-purple btn-sm" onclick="setQuickFilter('today')">
+                                    <i class="fas fa-calendar-day me-1"></i>Today
+                                </button>
+                                <button type="button" class="btn btn-outline-purple btn-sm" onclick="setQuickFilter('week')">
+                                    <i class="fas fa-calendar-week me-1"></i>This Week
+                                </button>
+                                <button type="button" class="btn btn-outline-purple btn-sm" onclick="setQuickFilter('month')">
+                                    <i class="fas fa-calendar-alt me-1"></i>This Month
+                                </button>
+                                <button type="button" class="btn btn-outline-purple btn-sm" onclick="setQuickFilter('year')">
+                                    <i class="fas fa-calendar me-1"></i>This Year
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setQuickFilter('all')">
+                                    <i class="fas fa-infinity me-1"></i>All Time
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filter Card -->
+                        <div class="card report-filter-card mb-4">
+                            <div class="card-header bg-purple-light">
+                                <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Advanced Filters</h6>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="reportStartDate" class="form-label">Start Date</label>
-                                            <input type="date" class="form-control" id="reportStartDate">
-                                        </div>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label for="reportStartDate" class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="reportStartDate">
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="reportEndDate" class="form-label">End Date</label>
-                                            <input type="date" class="form-control" id="reportEndDate">
-                                        </div>
+                                    <div class="col-md-3">
+                                        <label for="reportEndDate" class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="reportEndDate">
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="reportStatus" class="form-label">Status Filter</label>
-                                            <select class="form-select" id="reportStatus">
-                                                <option value="">All Status</option>
-                                                <option value="Retrieved">Retrieved</option>
-                                                <option value="Pending">Pending</option>
-                                            </select>
-                                        </div>
+                                    <div class="col-md-3">
+                                        <label for="reportStatus" class="form-label">Status</label>
+                                        <select class="form-select" id="reportStatus">
+                                            <option value="">All Status</option>
+                                            <option value="Retrieved">Retrieved</option>
+                                            <option value="Pending">Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="reportReceiverIC" class="form-label">Receiver Matric</label>
+                                        <input type="text" class="form-control" id="reportReceiverIC" placeholder="Optional">
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="reportStaffID" class="form-label">Staff ID Filter</label>
-                                            <input type="text" class="form-control" id="reportStaffID" placeholder="Enter staff ID (optional)">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="reportReceiverIC" class="form-label">Receiver IC Filter</label>
-                                            <input type="text" class="form-control" id="reportReceiverIC" placeholder="Enter receiver IC (optional)">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-primary" onclick="generateReport()">
-                                        <i class="fas fa-file-alt me-2"></i>Generate Report
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2 mt-4 flex-wrap">
+                                    <button type="button" class="btn btn-purple" onclick="generateReport()">
+                                        <i class="fas fa-search me-2"></i>Generate Report
                                     </button>
-                                    <button class="btn btn-success" onclick="exportReport()">
+                                    <button type="button" class="btn btn-success" onclick="exportToExcel()" id="btnExportExcel" disabled>
                                         <i class="fas fa-file-excel me-2"></i>Export to Excel
                                     </button>
-                                    <button class="btn btn-info" onclick="printReport()">
+                                    <button type="button" class="btn btn-orange" onclick="exportToCSV()" id="btnExportCSV" disabled>
+                                        <i class="fas fa-file-csv me-2"></i>Export to CSV
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="printReport()" id="btnPrintReport" disabled>
                                         <i class="fas fa-print me-2"></i>Print Report
                                     </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                        <i class="fas fa-times me-2"></i>Clear Filters
+                                    </button>
                                 </div>
-                                <div id="reportResults" class="mt-4" style="display: none;">
-                                    <!-- Report results will be displayed here -->
+                            </div>
+                        </div>
+
+                        <!-- Report Results -->
+                        <div id="reportResults" class="card" style="display: none;">
+                            <div class="card-header bg-purple-light d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="fas fa-table me-2"></i>Report Results</h6>
+                                <span class="badge bg-purple" id="resultCount">0 records</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover mb-0" id="reportTable">
+                                        <thead class="table-purple">
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">#</th>
+                                                <th class="text-center" style="width: 100px;">Retrieval ID</th>
+                                                <th>Tracking Number</th>
+                                                <th>Receiver</th>
+                                                <th>Matric Number</th>
+                                                <th><i class="fas fa-sort-down me-1"></i>Timestamp</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportTableBody">
+                                            <!-- Report data will be inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" id="reportMeta">
+                                        Generated on: <span id="reportGeneratedDate">-</span> |
+                                        Generated by: <span id="reportGeneratedBy">-</span>
+                                    </small>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-purple" onclick="printReport()">
+                                            <i class="fas fa-print me-1"></i>Print
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
+                                            <i class="fas fa-file-excel me-1"></i>Excel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -838,18 +1266,18 @@ $is_admin = ($user_role === 'Admin');
                         </div>
 
                         <!-- Navigation Arrows -->
-                        <button class="carousel-nav carousel-nav-prev" onclick="moveCarousel('prev')" aria-label="Previous partners">
+                        <button type="button" class="carousel-nav carousel-nav-prev" onclick="moveCarousel('prev')" aria-label="Previous partners">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <button class="carousel-nav carousel-nav-next" onclick="moveCarousel('next')" aria-label="Next partners">
+                        <button type="button" class="carousel-nav carousel-nav-next" onclick="moveCarousel('next')" aria-label="Next partners">
                             <i class="fas fa-chevron-right"></i>
                         </button>
 
                         <!-- Elegant Indicators -->
                         <div class="carousel-indicators">
-                            <button class="carousel-indicator active" onclick="goToSlide(0)" aria-label="Go to slide 1"></button>
-                            <button class="carousel-indicator" onclick="goToSlide(1)" aria-label="Go to slide 2"></button>
-                            <button class="carousel-indicator" onclick="goToSlide(2)" aria-label="Go to slide 3"></button>
+                            <button type="button" class="carousel-indicator active" onclick="goToSlide(0)" aria-label="Go to slide 1"></button>
+                            <button type="button" class="carousel-indicator" onclick="goToSlide(1)" aria-label="Go to slide 2"></button>
+                            <button type="button" class="carousel-indicator" onclick="goToSlide(2)" aria-label="Go to slide 3"></button>
                         </div>
                     </div>
                 </div>
@@ -882,9 +1310,9 @@ $is_admin = ($user_role === 'Admin');
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editReceiverIC" class="form-label fw-bold text-dark">
-                                        <i class="fas fa-id-card me-2 text-primary"></i>Receiver IC Number
+                                        <i class="fas fa-id-card me-2 text-primary"></i>Receiver Matric Number
                                     </label>
-                                    <input type="text" class="form-control" id="editReceiverIC" maxlength="12" pattern="\d{12}" title="IC Number must be exactly 12 digits" placeholder="e.g., 123456789012" required>
+                                    <input type="text" class="form-control" id="editReceiverIC" maxlength="8" pattern="[A-Z]{2}[0-9]{6}" title="Matric Number must be 2 letters + 6 digits (e.g., CI230010)" placeholder="e.g., CI230010" required>
                                 </div>
                             </div>
                         </div>
@@ -959,7 +1387,7 @@ $is_admin = ($user_role === 'Admin');
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Receiver IC:</label>
+                                <label class="form-label fw-bold">Receiver Matric:</label>
                                 <p id="viewReceiverIC" class="form-control-plaintext"></p>
                             </div>
                         </div>
@@ -1080,6 +1508,7 @@ $is_admin = ($user_role === 'Admin');
                     loadDashboardStats();
                 }
                 loadParcels(); // Also refresh parcel list to keep data in sync
+                loadParcelHistory(); // Also refresh parcel history
             }, 30000); // 30 seconds
         }
 
@@ -1089,6 +1518,7 @@ $is_admin = ($user_role === 'Admin');
                 loadDashboardStats();
             }
             loadParcels();
+            loadParcelHistory(); // Load parcel history
             startAutoRefresh(); // Start auto-refresh
 
             // Check for login success message (only show once)
@@ -1114,7 +1544,9 @@ $is_admin = ($user_role === 'Admin');
         function loadDashboardStats() {
             if (!isAdmin) return;
 
-            fetch('../php/admin-get-stats.php')
+            fetch('../php/admin-get-stats.php', {
+                credentials: 'include'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1161,13 +1593,16 @@ $is_admin = ($user_role === 'Admin');
 
         // Load all parcels
         function loadParcels() {
-            fetch('../php/staff-get-parcels.php')
+            fetch('../php/staff-get-parcels.php', {
+                credentials: 'include'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         allParcels = data.parcels;
                         currentPage = 1; // Reset to first page when loading new data
-                        displayParcels(allParcels);
+                        // Show only Pending in Parcel List tab by default
+                        displayParcels(allParcels.filter(p => (p.status || '').toLowerCase() === 'pending'));
                     } else {
                         console.error('Error loading parcels:', data.message);
                     }
@@ -1207,6 +1642,10 @@ $is_admin = ($user_role === 'Admin');
             // Display parcels for current page
             paginatedParcels.forEach(parcel => {
                 const row = document.createElement('tr');
+                row.dataset.tracking = parcel.TrackingNumber || '';
+                row.dataset.matric = parcel.MatricNumber || '';
+                row.dataset.receiverName = parcel.receiverName || '';
+                row.dataset.location = (parcel.deliveryLocation || '').toString();
                 const statusBadge = parcel.status === 'Pending'
                     ? '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Pending</span>'
                     : '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Retrieved</span>';
@@ -1216,8 +1655,12 @@ $is_admin = ($user_role === 'Admin');
                 const formattedTime = parcel.time ? new Date('1970-01-01T' + parcel.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : '';
                 const timeDisplay = parcel.time ? '<br><small class="text-muted">' + formattedTime + '</small>' : '';
 
+                // Shorten delivery location to first line only
+                const locationLines = (parcel.deliveryLocation || 'N/A').split(',');
+                const shortLocation = locationLines.length > 0 ? locationLines[locationLines.length - 1].trim() : 'N/A';
+
                 // Delete button (available for both Staff and Admin)
-                const deleteButton = '<button class="btn btn-outline-danger" onclick="deleteParcel(\'' + parcel.TrackingNumber + '\')" title="Delete">' +
+                const deleteButton = '<button type="button" class="btn btn-outline-danger" onclick="deleteParcel(\'' + parcel.TrackingNumber + '\')" title="Delete">' +
                                         '<i class="fas fa-trash"></i>' +
                                       '</button>';
 
@@ -1225,14 +1668,10 @@ $is_admin = ($user_role === 'Admin');
                     '<td class="px-4 py-3">' +
                         '<span class="fw-bold text-primary">' + parcel.TrackingNumber + '</span>' +
                     '</td>' +
-                    '<td class="px-4 py-3">' + formatICNumber(parcel.ICNumber) + '</td>' +
-                    '<td class="px-4 py-3">' +
-                        '<i class="fas fa-user me-1 text-muted"></i>' +
-                        (parcel.receiverName || 'N/A') +
-                    '</td>' +
+                    '<td class="px-4 py-3">' + formatICNumber(parcel.MatricNumber) + '</td>' +
                     '<td class="px-4 py-3">' +
                         '<i class="fas fa-map-marker-alt me-1 text-muted"></i>' +
-                        (parcel.deliveryLocation || 'N/A') +
+                        '<small>' + shortLocation + '</small>' +
                     '</td>' +
                     '<td class="px-4 py-3">' +
                         '<div>' +
@@ -1243,13 +1682,13 @@ $is_admin = ($user_role === 'Admin');
                     '<td class="px-4 py-3">' + statusBadge + '</td>' +
                     '<td class="px-4 py-3">' +
                         '<div class="btn-group btn-group-sm" role="group">' +
-                            '<button class="btn btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                            '<button type="button" class="btn btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
                             '</button>' +
-                            '<button class="btn btn-outline-warning" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
+                            '<button type="button" class="btn btn-outline-warning" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
                                 '<i class="fas fa-edit"></i>' +
                             '</button>' +
-                            '<button class="btn btn-outline-info" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
+                            '<button type="button" class="btn btn-outline-info" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
                                 '<i class="fas fa-qrcode"></i>' +
                             '</button>' +
                             deleteButton +
@@ -1257,6 +1696,15 @@ $is_admin = ($user_role === 'Admin');
                     '</td>';
                 tbody.appendChild(row);
             });
+
+            // Re-apply client-side search if input has value
+            try {
+                const _si = document.getElementById('parcelListSearchInput');
+                if (_si && _si.value.trim()) {
+                    applyStaffListSearch();
+                }
+            } catch (e) { /* no-op */ }
+
 
             // Update pagination info and controls
             updatePaginationInfo(startIndex + 1, endIndex, totalItems);
@@ -1514,6 +1962,9 @@ $is_admin = ($user_role === 'Admin');
                     Swal.fire({
                         title: '<div style="font-size: 1.25rem; font-weight: 600; color: #1f2937;">Logging out...</div>',
                         html: '<div style="color: #6b7280; font-size: 0.9rem;">Securing your session</div>',
+
+
+
                         icon: null,
                         iconHtml: '<div style="width: 60px; height: 60px; background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 20px rgba(106, 27, 154, 0.4);"><div class="spinner-border text-white" style="width: 1.8rem; height: 1.8rem; border-width: 3px;" role="status"></div></div>',
                         timer: 1200,
@@ -1531,6 +1982,83 @@ $is_admin = ($user_role === 'Admin');
                 }
             });
         }
+
+        // --- Client-side Search (Staff) ---
+        function normalizeStr(v){ return (v ?? '').toString().toLowerCase().trim(); }
+        function matchesQuery(parcel, q){
+            const query = normalizeStr(q);
+            if (!query) return true;
+            return [parcel.TrackingNumber, parcel.MatricNumber, parcel.receiverName, parcel.deliveryLocation, parcel.name]
+                .some(val => normalizeStr(val).includes(query));
+        }
+
+        // Debounce timer for search
+        let searchDebounceTimer = null;
+        function basePendingParcels() { return (allParcels || []).filter(p => normalizeStr(p.status) === 'pending'); }
+        function baseRetrievedHistory() { return (allParcelHistory || []); }
+
+        function applyStaffListSearch(){
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                const input = document.getElementById('parcelListSearchInput');
+                const noResults = document.getElementById('parcelListNoResults');
+                if (!input) return;
+                const q = input.value || '';
+                const base = basePendingParcels();
+                const result = q.trim() ? base.filter(p => matchesQuery(p, q)) : base;
+                currentPage = 1;
+                displayParcels(result);
+                if (noResults) noResults.classList.toggle('d-none', result.length !== 0);
+            }, 300);
+        }
+
+        function applyStaffHistorySearch(){
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                const input = document.getElementById('historySearchInput');
+                const noResults = document.getElementById('historyNoResults');
+                if (!input) return;
+                const q = input.value || '';
+                const base = baseRetrievedHistory();
+                const result = q.trim() ? base.filter(p => matchesQuery(p, q)) : base;
+                currentHistoryPage = 1;
+                displayParcelHistory(result);
+                if (noResults) noResults.classList.toggle('d-none', result.length !== 0);
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            const listInput = document.getElementById('parcelListSearchInput');
+            if (listInput){
+                listInput.addEventListener('input', applyStaffListSearch);
+            }
+            const histInput = document.getElementById('historySearchInput');
+            if (histInput){
+                histInput.addEventListener('input', applyStaffHistorySearch);
+            }
+
+            // Reset/clear search when switching tabs and enforce base status on each tab
+            const staffTabs = document.getElementById('staffTabs');
+            if (staffTabs){
+                staffTabs.addEventListener('shown.bs.tab', function(ev){
+                    const target = ev.target && ev.target.getAttribute('data-bs-target');
+                    if (target === '#parcel-list'){
+                        const other = document.getElementById('historySearchInput');
+                        if (other){ other.value=''; }
+                        const noRes = document.getElementById('historyNoResults');
+                        if (noRes) noRes.classList.add('d-none');
+                        displayParcels(basePendingParcels());
+                    } else if (target === '#parcel-history'){
+                        const other = document.getElementById('parcelListSearchInput');
+                        if (other){ other.value=''; }
+                        const noRes = document.getElementById('parcelListNoResults');
+                        if (noRes) noRes.classList.add('d-none');
+                        displayParcelHistory(baseRetrievedHistory());
+                    }
+                });
+            }
+        });
+
 
         // Refresh parcels
         function refreshParcels() {
@@ -1560,7 +2088,8 @@ $is_admin = ($user_role === 'Admin');
 
             fetch('../php/staff-add-parcel.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
@@ -1615,7 +2144,7 @@ $is_admin = ($user_role === 'Admin');
 
             // Populate modal with parcel details
             document.getElementById('viewTrackingNumber').textContent = parcel.TrackingNumber;
-            document.getElementById('viewReceiverIC').textContent = formatICNumber(parcel.ICNumber);
+            document.getElementById('viewReceiverIC').textContent = formatICNumber(parcel.MatricNumber);
             document.getElementById('viewReceiverName').textContent = parcel.receiverName || 'N/A';
             document.getElementById('viewParcelWeight').textContent = parcel.weight ? (parcel.weight + ' kg') : 'N/A';
             document.getElementById('viewDeliveryLocation').textContent = parcel.deliveryLocation || 'N/A';
@@ -1635,32 +2164,43 @@ $is_admin = ($user_role === 'Admin');
             document.getElementById('viewDateAdded').textContent = parcel.date || 'N/A';
             document.getElementById('viewParcelName').textContent = parcel.name || 'Package';
 
-            // Generate QR code for viewing with loading state
+            // Check if QR has been generated by staff
             const qrContainer = document.getElementById('viewQRCode');
-            qrContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Generating QR Code...</div>';
 
-            setTimeout(() => {
-                qrContainer.innerHTML = '';
+            if (!parcel.qrGenerated) {
+                qrContainer.innerHTML = '<div class="text-center text-warning p-3"><i class="fas fa-hourglass-half fa-2x mb-2"></i><br><strong>QR Code Not Yet Generated</strong><br><small>Click "Generate QR" button to create the verification QR code</small></div>';
+                console.log('⏳ QR code not yet generated for parcel:', trackingNumber);
+            } else {
+                // Generate scannable QR code for parcel view
+                qrContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading QR Code...</div>';
+
                 try {
-                    QRCode.toCanvas(qrContainer, trackingNumber, {
-                        width: 150,
-                        height: 150,
-                        colorDark: '#6A1B9A',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.M
-                    }, function (error) {
-                        if (error) {
-                            console.error('QR Code generation error:', error);
-                            qrContainer.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> QR Code generation failed</div>';
-                        } else {
-                            console.log('QR Code generated successfully');
-                        }
-                    });
+                    // Build QR payload in scannable format
+                    const qrPayload = "PPMS|" +
+                                     trackingNumber + "|" +
+                                     parcel.MatricNumber + "|" +
+                                     (parcel.receiverName || 'N/A') + "|" +
+                                     (parcel.deliveryLocation || 'N/A') + "|" +
+                                     (parcel.status || 'Pending');
+
+                    console.log('QR Payload:', qrPayload);
+
+                    // Generate QR code URL using api.qrserver.com
+                    const encodedPayload = encodeURIComponent(qrPayload);
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodedPayload}`;
+
+                    console.log('QR Code URL:', qrCodeUrl);
+
+                    // Display the QR code image
+                    qrContainer.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`;
+
+                    console.log('✅ Scannable QR code generated successfully!');
+
                 } catch (error) {
-                    console.error('QR Code library error:', error);
-                    qrContainer.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> QR Code library not available</div>';
+                    console.error('QR Generation Exception:', error);
+                    qrContainer.innerHTML = '<div class="text-danger text-center p-3"><i class="fas fa-times-circle fa-2x mb-2"></i><br>QR Generation Failed<br><small>Please try again</small></div>';
                 }
-            }, 300);
+            }
 
             // Show modal with animation and debugging
             console.log('Attempting to show modal...');
@@ -1713,7 +2253,7 @@ $is_admin = ($user_role === 'Admin');
 
             document.getElementById('editParcelId').value = parcel.TrackingNumber;
             document.getElementById('editTrackingNumber').value = parcel.TrackingNumber;
-            document.getElementById('editReceiverIC').value = parcel.ICNumber;
+            document.getElementById('editReceiverIC').value = parcel.MatricNumber;
             document.getElementById('editParcelWeight').value = parcel.weight || '';
             document.getElementById('editDeliveryLocation').value = parcel.deliveryLocation || '';
             document.getElementById('editParcelName').value = parcel.name || '';
@@ -1741,7 +2281,8 @@ $is_admin = ($user_role === 'Admin');
 
             fetch('../php/staff-update-parcel.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
@@ -1794,7 +2335,8 @@ $is_admin = ($user_role === 'Admin');
 
                     fetch('../php/admin-delete-parcel.php', {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        credentials: 'include'
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -1826,6 +2368,216 @@ $is_admin = ($user_role === 'Admin');
                     });
                 }
             });
+        }
+
+        // ===== PARCEL HISTORY FUNCTIONS =====
+        let allParcelHistory = [];
+        let filteredParcelHistory = [];
+        let currentHistoryPage = 1;
+        let historyItemsPerPage = 10;
+
+        // Load parcel history (retrieved parcels only)
+        function loadParcelHistory() {
+            fetch('../php/staff-get-parcel-history.php', {
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allParcelHistory = data.parcels;
+                        currentHistoryPage = 1;
+                        // Show all statuses in Parcel History tab by default
+                        displayParcelHistory(allParcelHistory);
+                    } else {
+                        console.error('Error loading parcel history:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading parcel history:', error);
+                });
+        }
+
+        // Display parcel history in table with pagination
+        function displayParcelHistory(parcels) {
+            filteredParcelHistory = parcels;
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            if (parcels.length === 0) {
+                tbody.innerHTML =
+                    '<tr>' +
+                        '<td colspan="6" class="text-center text-muted py-5">' +
+                            '<i class="fas fa-history fa-3x mb-3" style="opacity: 0.3;"></i><br>' +
+                            '<h5 class="text-muted">No History Found</h5>' +
+                            '<p class="text-muted">Retrieved parcels will appear here.</p>' +
+                        '</td>' +
+                    '</tr>';
+                updateHistoryPaginationInfo(0, 0, 0);
+                updateHistoryPaginationControls(0);
+                return;
+            }
+
+            // Calculate pagination
+            const totalItems = parcels.length;
+            const totalPages = Math.ceil(totalItems / historyItemsPerPage);
+            const startIndex = (currentHistoryPage - 1) * historyItemsPerPage;
+            const endIndex = Math.min(startIndex + historyItemsPerPage, totalItems);
+            const paginatedParcels = parcels.slice(startIndex, endIndex);
+
+            // Display parcels for current page
+            paginatedParcels.forEach(parcel => {
+                const row = document.createElement('tr');
+                row.dataset.tracking = parcel.TrackingNumber || '';
+                row.dataset.matric = parcel.MatricNumber || '';
+                row.dataset.receiverName = parcel.receiverName || '';
+                row.dataset.location = (parcel.deliveryLocation || '').toString();
+
+                // Format date and time
+                const formattedDate = parcel.date ? new Date(parcel.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+                const formattedTime = parcel.time ? new Date('1970-01-01T' + parcel.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : '';
+                const timeDisplay = parcel.time ? '<br><small class="text-muted">' + formattedTime + '</small>' : '';
+
+                // Shorten delivery location to first line only
+                const locationLines = (parcel.deliveryLocation || 'N/A').split(',');
+                const shortLocation = locationLines.length > 0 ? locationLines[locationLines.length - 1].trim() : 'N/A';
+
+                row.innerHTML =
+                    '<td class="px-4 py-3">' +
+                        '<span class="fw-bold text-primary">' + parcel.TrackingNumber + '</span>' +
+                    '</td>' +
+                    '<td class="px-4 py-3">' + formatICNumber(parcel.MatricNumber) + '</td>' +
+                    '<td class="px-4 py-3">' + (parcel.receiverName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3">' +
+                        '<i class="fas fa-map-marker-alt me-1 text-muted"></i>' +
+                        '<small>' + shortLocation + '</small>' +
+                    '</td>' +
+                    '<td class="px-4 py-3">' +
+                        '<div>' +
+                            formattedDate +
+                            timeDisplay +
+                        '</div>' +
+                    '</td>' +
+                    '<td class="px-4 py-3">' +
+                        '<div class="btn-group btn-group-sm" role="group">' +
+                            '<button type="button" class="btn btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                                '<i class="fas fa-eye"></i>' +
+                            '</button>' +
+                        '</div>' +
+                    '</td>';
+                tbody.appendChild(row);
+            });
+
+            // Re-apply client-side search if input has value
+            try {
+                const _hi = document.getElementById('historySearchInput');
+                if (_hi && _hi.value.trim()) {
+                    applyStaffHistorySearch();
+                }
+            } catch (e) { /* no-op */ }
+
+            // Update pagination info and controls
+            updateHistoryPaginationInfo(startIndex + 1, endIndex, totalItems);
+            updateHistoryPaginationControls(totalPages);
+        }
+
+        // Update history pagination info
+        function updateHistoryPaginationInfo(start, end, total) {
+            const infoElement = document.getElementById('historyInfo');
+            if (total === 0) {
+                infoElement.textContent = 'Showing 0 entries';
+            } else {
+                infoElement.textContent = `Showing ${start} to ${end} of ${total} entries`;
+            }
+        }
+
+        // Update history pagination controls
+        function updateHistoryPaginationControls(totalPages) {
+            const controlsContainer = document.getElementById('historyPaginationControls');
+            controlsContainer.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            const prevBtn = document.createElement('li');
+            prevBtn.className = 'page-item ' + (currentHistoryPage === 1 ? 'disabled' : '');
+            prevBtn.innerHTML = '<a class="page-link" href="#" onclick="previousHistoryPage(event)">Previous</a>';
+            controlsContainer.appendChild(prevBtn);
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('li');
+                pageBtn.className = 'page-item ' + (i === currentHistoryPage ? 'active' : '');
+                pageBtn.innerHTML = '<a class="page-link" href="#" onclick="goToHistoryPage(' + i + ', event)">' + i + '</a>';
+                controlsContainer.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('li');
+            nextBtn.className = 'page-item ' + (currentHistoryPage === totalPages ? 'disabled' : '');
+            nextBtn.innerHTML = '<a class="page-link" href="#" onclick="nextHistoryPage(event)">Next</a>';
+            controlsContainer.appendChild(nextBtn);
+        }
+
+        // Pagination functions for history
+        function previousHistoryPage(event) {
+            event.preventDefault();
+            if (currentHistoryPage > 1) {
+                currentHistoryPage--;
+                displayParcelHistory(filteredParcelHistory);
+            }
+        }
+
+        function nextHistoryPage(event) {
+            event.preventDefault();
+            const totalPages = Math.ceil(filteredParcelHistory.length / historyItemsPerPage);
+            if (currentHistoryPage < totalPages) {
+                currentHistoryPage++;
+                displayParcelHistory(filteredParcelHistory);
+            }
+        }
+
+        function goToHistoryPage(page, event) {
+            event.preventDefault();
+            currentHistoryPage = page;
+            displayParcelHistory(filteredParcelHistory);
+        }
+
+        // Change items per page for history
+        function changeHistoryItemsPerPage() {
+            historyItemsPerPage = parseInt(document.getElementById('historyItemsPerPage').value);
+            currentHistoryPage = 1;
+            displayParcelHistory(filteredParcelHistory);
+        }
+
+        // Refresh parcel history
+        function refreshParcelHistory() {
+            loadParcelHistory();
+            Swal.fire({
+                icon: 'success',
+                title: 'Refreshed!',
+                text: 'Parcel history has been refreshed.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        // Sort parcel history
+        function sortParcelHistory(field, order) {
+            if (field === 'tracking') {
+                filteredParcelHistory.sort((a, b) => {
+                    const aVal = a.TrackingNumber.toLowerCase();
+                    const bVal = b.TrackingNumber.toLowerCase();
+                    return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                });
+            } else if (field === 'date') {
+                filteredParcelHistory.sort((a, b) => {
+                    const aDate = new Date(a.date + ' ' + a.time);
+                    const bDate = new Date(b.date + ' ' + b.time);
+                    return order === 'asc' ? aDate - bDate : bDate - aDate;
+                });
+            }
+            currentHistoryPage = 1;
+            displayParcelHistory(filteredParcelHistory);
         }
 
         // Search parcels for QR generation
@@ -1872,7 +2624,7 @@ $is_admin = ($user_role === 'Admin');
             // Filter parcels based on search term and status
             let filteredParcels = allParcels.filter(parcel => {
                 const matchesSearch = parcel.TrackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    parcel.ICNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    parcel.MatricNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                     (parcel.receiverName && parcel.receiverName.toLowerCase().includes(searchTerm.toLowerCase()));
 
                 const matchesStatus = statusFilter === 'all' || parcel.status === statusFilter;
@@ -1912,7 +2664,7 @@ $is_admin = ($user_role === 'Admin');
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <div class="fw-bold text-primary">${parcel.TrackingNumber}</div>
-                                <div class="text-muted small">IC: ${formatICNumber(parcel.ICNumber)}</div>
+                                <div class="text-muted small">Matric: ${formatICNumber(parcel.MatricNumber)}</div>
                                 <div class="text-muted small">Name: ${parcel.receiverName || 'N/A'}</div>
                                 <div class="text-muted small">Location: ${parcel.deliveryLocation || 'N/A'}</div>
                             </div>
@@ -2036,7 +2788,7 @@ $is_admin = ($user_role === 'Admin');
             document.getElementById('parcelTrackingDisplay').textContent = parcel.TrackingNumber;
 
             // Update parcel details
-            document.getElementById('parcelIC').textContent = formatICNumber(parcel.ICNumber);
+            document.getElementById('parcelIC').textContent = formatICNumber(parcel.MatricNumber);
             document.getElementById('parcelReceiverName').textContent = parcel.receiverName || 'N/A';
             document.getElementById('parcelLocation').textContent = parcel.deliveryLocation || 'N/A';
 
@@ -2084,7 +2836,7 @@ $is_admin = ($user_role === 'Admin');
 
             const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
             if (parcel) {
-                document.getElementById('parcelIC').textContent = formatICNumber(parcel.ICNumber);
+                document.getElementById('parcelIC').textContent = formatICNumber(parcel.MatricNumber);
                 document.getElementById('parcelReceiverName').textContent = parcel.receiverName || 'N/A';
                 document.getElementById('parcelLocation').textContent = parcel.deliveryLocation || 'N/A';
 
@@ -2128,13 +2880,14 @@ $is_admin = ($user_role === 'Admin');
                 return;
             }
 
-            // Create verification data object
+            // Create verification data object (matching backend format)
             const verificationData = {
                 tracking: trackingNumber,
-                ic: parcel.ICNumber,
+                matric: parcel.MatricNumber,
                 timestamp: new Date().toISOString(),
                 location: parcel.deliveryLocation,
-                hash: btoa(trackingNumber + parcel.ICNumber + Date.now()) // Simple hash for verification
+                signature: 'pending',  // Will be generated by backend with HMAC-SHA256
+                version: '1.0'
             };
 
             const qrContainer = document.getElementById('qrCodeDisplay');
@@ -2194,116 +2947,55 @@ $is_admin = ($user_role === 'Admin');
                 console.log('QR Container:', qrContainer); // Debug log
                 console.log('QRCode function:', QRCode); // Debug log
 
-                // Try to generate QR with verification data
+                // Generate scannable QR code using API
                 try {
-                    console.log('Attempting QR generation with library:', typeof QRCode);
-                    console.log('QRCode.toCanvas available:', typeof QRCode.toCanvas);
-                    console.log('Verification data:', verificationData);
+                    console.log('Generating scannable QR code for:', trackingNumber);
 
-                    QRCode.toCanvas(qrContainer, JSON.stringify(verificationData), {
-                        width: 220,
-                        height: 220,
-                        margin: 3,
-                        color: {
-                            dark: '#6A1B9A',
-                            light: '#FFFFFF'
-                        },
-                        correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.H : 'H'
-                    }, function (error) {
-                        console.log('QR Generation callback called'); // Debug log
-                        console.log('Error:', error); // Debug log
+                    // Build QR payload in scannable format
+                    const qrPayload = "PPMS|" +
+                                     trackingNumber + "|" +
+                                     parcel.MatricNumber + "|" +
+                                     (parcel.receiverName || 'N/A') + "|" +
+                                     (parcel.deliveryLocation || 'N/A') + "|" +
+                                     (parcel.status || 'Pending');
 
-                        if (error) {
-                            console.error('QR Generation Error:', error);
-                            qrContainer.innerHTML = '<div class="text-danger text-center p-3"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br><small>QR Generation Failed</small></div>';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Generation Failed!',
-                                text: 'Failed to generate QR code: ' + (error.message || error),
-                                confirmButtonColor: '#6A1B9A'
-                            });
-                        } else {
-                            console.log('QR Code generated successfully!'); // Debug log
-                            document.getElementById('qrCodeContainer').style.display = 'block';
-                            document.getElementById('qrCodeInfo').style.display = 'block';
+                    console.log('QR Payload:', qrPayload);
 
-                        // Save QR to database with enhanced data
-                        const canvas = qrContainer.querySelector('canvas');
-                        const qrDataURL = canvas.toDataURL('image/png', 1.0);
+                    // Generate QR code URL using api.qrserver.com
+                    const encodedPayload = encodeURIComponent(qrPayload);
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodedPayload}`;
 
-                        const formData = new FormData();
-                        formData.append('trackingNumber', trackingNumber);
-                        formData.append('qrCode', qrDataURL);
-                        formData.append('verificationData', JSON.stringify(verificationData));
+                    console.log('QR Code URL:', qrCodeUrl);
 
-                        fetch('../php/admin-save-qr.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'QR Code Generated!',
-                                    text: 'Secure verification QR code generated successfully.',
-                                    timer: 2500,
-                                    showConfirmButton: false,
-                                    confirmButtonColor: '#6A1B9A'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error saving QR:', error);
-                        });
-                    }
-                });
-                } catch (error) {
-                    console.error('QR Generation Exception:', error);
-                    console.error('Error details:', {
-                        message: error.message,
-                        stack: error.stack,
-                        qrLibraryType: typeof QRCode,
-                        fallbackAvailable: !!window.SimpleQR
+                    // Display the QR code image
+                    qrContainer.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`;
+
+                    document.getElementById('qrCodeContainer').style.display = 'block';
+                    document.getElementById('qrCodeInfo').style.display = 'block';
+
+                    console.log('✅ Scannable QR code generated successfully!');
+
+                    // Save QR code to database
+                    saveQRCodeToDatabase(trackingNumber, qrCodeUrl, verificationData);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'QR Generated!',
+                        text: 'Scannable QR code generated successfully. You can now scan it with your phone camera!',
+                        timer: 2000,
+                        showConfirmButton: false
                     });
 
-                    qrContainer.innerHTML = '<div class="text-warning text-center p-3"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>QR Generation Error<br><small>Trying alternative method...</small></div>';
+                } catch (error) {
+                    console.error('QR Generation Exception:', error);
+                    qrContainer.innerHTML = '<div class="text-danger text-center p-3"><i class="fas fa-times-circle fa-2x mb-2"></i><br>QR Generation Failed<br><small>Please try again</small></div>';
 
-                    // Try with simplified QR generation for fallback
-                    setTimeout(() => {
-                        try {
-                            console.log('Attempting fallback QR generation with tracking number only');
-                            QRCode.toCanvas(qrContainer, trackingNumber, {
-                                width: 220,
-                                height: 220,
-                                margin: 3,
-                                color: {
-                                    dark: '#6A1B9A',
-                                    light: '#FFFFFF'
-                                }
-                            }, function (error) {
-                                if (error) {
-                                    console.error('Fallback QR generation also failed:', error);
-                                    qrContainer.innerHTML = '<div class="text-danger text-center p-3"><i class="fas fa-times-circle fa-2x mb-2"></i><br>QR Generation Failed<br><small>Please try refreshing the page</small></div>';
-                                } else {
-                                    console.log('Fallback QR generation successful');
-                                    document.getElementById('qrCodeContainer').style.display = 'block';
-                                    document.getElementById('qrCodeInfo').style.display = 'block';
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'QR Generated!',
-                                        text: 'QR code generated using simplified method.',
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    });
-                                }
-                            });
-                        } catch (fallbackError) {
-                            console.error('Fallback method also failed:', fallbackError);
-                            qrContainer.innerHTML = '<div class="text-danger text-center p-3"><i class="fas fa-times-circle fa-2x mb-2"></i><br>QR Generation Failed<br><small>Please refresh the page and try again</small></div>';
-                        }
-                    }, 1000);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Generation Failed!',
+                        text: 'Failed to generate QR code: ' + error.message,
+                        confirmButtonColor: '#6A1B9A'
+                    });
                 }
             }, 800);
         }
@@ -2333,7 +3025,60 @@ $is_admin = ($user_role === 'Admin');
             }, 300);
         }
 
-        // Enhanced download QR code with receiver information
+        // Save QR code to database
+        function saveQRCodeToDatabase(trackingNumber, qrCodeUrl, verificationData) {
+            console.log('Saving QR code to database for:', trackingNumber);
+
+            // Convert image URL to canvas and then to base64
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const qrBase64 = canvas.toDataURL('image/png');
+
+                // Send to backend to save
+                const formData = new FormData();
+                formData.append('trackingNumber', trackingNumber);
+                formData.append('qrCode', qrBase64);
+                formData.append('verificationData', JSON.stringify(verificationData));
+
+                fetch('../php/admin-save-qr.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('✅ QR code saved to database successfully');
+                        // Update the parcel data to reflect QR generation
+                        const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
+                        if (parcel) {
+                            parcel.qrGenerated = true;
+                            parcel.QR = data.qrPath;
+                        }
+                        // Refresh parcel list to ensure UI is updated
+                        loadParcels();
+                    } else {
+                        console.error('Failed to save QR code:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving QR code:', error);
+                });
+            };
+            img.onerror = function() {
+                console.error('Failed to load QR image for saving');
+            };
+            img.src = qrCodeUrl;
+        }
+
+        // Enhanced download QR code - Opens print page
         function downloadQR() {
             // Check for both canvas and image elements
             const canvas = document.querySelector('#qrCodeDisplay canvas');
@@ -2352,82 +3097,155 @@ $is_admin = ($user_role === 'Admin');
             const trackingNumber = window.selectedTrackingNumber;
             const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
 
-            // Create enhanced image with parcel information
-            const enhancedCanvas = document.createElement('canvas');
-            const ctx = enhancedCanvas.getContext('2d');
-
-            // Set canvas size (QR + info area)
-            enhancedCanvas.width = 400;
-            enhancedCanvas.height = 500;
-
-            // White background
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, enhancedCanvas.width, enhancedCanvas.height);
-
-            // Header
-            ctx.fillStyle = '#6A1B9A';
-            ctx.fillRect(0, 0, enhancedCanvas.width, 60);
-
-            // Header text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Perwira Parcel Verification', enhancedCanvas.width / 2, 35);
-
-            // Draw QR code (handle both canvas and image)
-            const qrSize = 220;
-            const qrX = (enhancedCanvas.width - qrSize) / 2;
-            const qrY = 80;
-
+            let qrImageData;
             if (canvas) {
-                ctx.drawImage(canvas, qrX, qrY, qrSize, qrSize);
+                qrImageData = canvas.toDataURL();
             } else if (img) {
-                ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+                qrImageData = img.src;
             }
 
-            // Parcel information
-            ctx.fillStyle = '#2d3748';
-            ctx.font = 'bold 14px Arial';
-            ctx.textAlign = 'left';
-
-            const infoY = qrY + qrSize + 30;
-            const leftMargin = 40;
-
-            ctx.fillText('Tracking Number:', leftMargin, infoY);
-            ctx.font = '12px Arial';
-            ctx.fillText(trackingNumber, leftMargin + 120, infoY);
-
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('Receiver IC:', leftMargin, infoY + 25);
-            ctx.font = '12px Arial';
-            ctx.fillText(formatICNumber(parcel.ICNumber), leftMargin + 120, infoY + 25);
-
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('Location:', leftMargin, infoY + 50);
-            ctx.font = '12px Arial';
-            ctx.fillText(parcel.deliveryLocation || 'N/A', leftMargin + 120, infoY + 50);
-
-            // Instructions
-            ctx.fillStyle = '#64748b';
-            ctx.font = '10px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Present this QR code at the parcel counter for verification', enhancedCanvas.width / 2, infoY + 85);
-            ctx.fillText('Generated: ' + new Date().toLocaleString(), enhancedCanvas.width / 2, infoY + 100);
-
-            // Download enhanced image
-            const link = document.createElement('a');
-            link.download = 'PPMS_Verification_' + trackingNumber + '.png';
-            link.href = enhancedCanvas.toDataURL('image/png', 1.0);
-            link.click();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Downloaded!',
-                text: 'QR verification image downloaded successfully.',
-                timer: 2000,
-                showConfirmButton: false,
-                confirmButtonColor: '#6A1B9A'
-            });
+            // Create print page
+            const printWindow = window.open('', '', 'width=900,height=700');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>QR Code - ${trackingNumber}</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background: #f5f5f5;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        }
+                        .container {
+                            background: white;
+                            padding: 40px;
+                            border-radius: 12px;
+                            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                            text-align: center;
+                            max-width: 600px;
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+                            color: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            margin-bottom: 30px;
+                        }
+                        .header h1 {
+                            margin: 0 0 10px 0;
+                            font-size: 24px;
+                        }
+                        .header p {
+                            margin: 0;
+                            font-size: 14px;
+                            opacity: 0.9;
+                        }
+                        .qr-display {
+                            margin: 30px 0;
+                            padding: 20px;
+                            background: #f8fafc;
+                            border-radius: 8px;
+                        }
+                        .qr-display img {
+                            max-width: 100%;
+                            height: auto;
+                            border: 2px solid #e5e7eb;
+                            border-radius: 8px;
+                        }
+                        .footer {
+                            margin-top: 30px;
+                            padding-top: 20px;
+                            border-top: 1px solid #e5e7eb;
+                            color: #9ca3af;
+                            font-size: 12px;
+                        }
+                        .actions {
+                            margin-top: 30px;
+                            display: flex;
+                            gap: 10px;
+                            justify-content: center;
+                        }
+                        button {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            transition: all 0.3s ease;
+                        }
+                        .btn-print {
+                            background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+                            color: white;
+                        }
+                        .btn-print:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(106, 27, 154, 0.3);
+                        }
+                        .btn-download {
+                            background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                            color: white;
+                        }
+                        .btn-download:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+                        }
+                        @media print {
+                            body {
+                                background: white;
+                                padding: 0;
+                            }
+                            .container {
+                                box-shadow: none;
+                                padding: 20px;
+                            }
+                            .actions {
+                                display: none;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Perwira Parcel Verification</h1>
+                            <p>Tracking Number: <strong>${trackingNumber}</strong></p>
+                        </div>
+                        <div class="qr-display">
+                            <img src="${qrImageData}" alt="QR Code">
+                        </div>
+                        <div class="footer">
+                            <p>QR Code contains encrypted verification data</p>
+                            <p>Generated: ${new Date().toLocaleString()}</p>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-print" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                            <button class="btn-download" onclick="downloadQR()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <script>
+                        function downloadQR() {
+                            const link = document.createElement('a');
+                            link.href = '${qrImageData}';
+                            link.download = 'PPMS_Verification_${trackingNumber}.png';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         // Email QR code to receiver
@@ -2455,7 +3273,7 @@ $is_admin = ($user_role === 'Admin');
                     <div class="text-start">
                         <p><strong>Parcel:</strong> ${trackingNumber}</p>
                         <p><strong>Receiver:</strong> ${parcel.receiverName || 'N/A'}</p>
-                        <p><strong>IC Number:</strong> ${formatICNumber(parcel.ICNumber)}</p>
+                        <p><strong>IC Number:</strong> ${formatICNumber(parcel.MatricNumber)}</p>
                         <hr>
                         <div class="mb-3">
                             <label for="receiverEmail" class="form-label">Receiver's Email:</label>
@@ -2532,7 +3350,8 @@ $is_admin = ($user_role === 'Admin');
 
             fetch('../php/send-qr-email.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
@@ -2649,7 +3468,7 @@ $is_admin = ($user_role === 'Admin');
                     '</div>' +
                     '<table class="info-table">' +
                         '<tr><td>Tracking Number:</td><td>' + trackingNumber + '</td></tr>' +
-                        '<tr><td>Receiver IC:</td><td>' + formatICNumber(parcel.ICNumber) + '</td></tr>' +
+                        '<tr><td>Receiver Matric:</td><td>' + formatICNumber(parcel.MatricNumber) + '</td></tr>' +
                         '<tr><td>Receiver Name:</td><td>' + (parcel.receiverName || 'N/A') + '</td></tr>' +
                         '<tr><td>Pickup Location:</td><td>' + (parcel.deliveryLocation || 'N/A') + '</td></tr>' +
                         '<tr><td>Status:</td><td>' + (parcel.status || 'N/A') + '</td></tr>' +
@@ -2673,13 +3492,161 @@ $is_admin = ($user_role === 'Admin');
             printWindow.document.close();
         }
 
+        // Enlarge QR code in modal - Sleek Modal
+        function enlargeQR() {
+            const canvas = document.querySelector('#qrCodeDisplay canvas');
+            const img = document.querySelector('#qrCodeDisplay img');
+
+            if (!canvas && !img) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No QR Code',
+                    text: 'Please generate a QR code first.',
+                    confirmButtonColor: '#6A1B9A'
+                });
+                return;
+            }
+
+            let qrImageData;
+            if (canvas) {
+                qrImageData = canvas.toDataURL();
+            } else if (img) {
+                qrImageData = img.src;
+                // Upgrade to higher resolution for better quality
+                if (qrImageData.includes('api.qrserver.com')) {
+                    qrImageData = qrImageData.replace(/size=\d+x\d+/, 'size=600x600');
+                }
+            }
+
+            // Create sleek modal with enlarged QR code
+            Swal.fire({
+                html: `
+                    <div style="text-align: center;">
+                        <img src="${qrImageData}"
+                             style="max-width: 90%; max-height: 80vh; height: auto; border: 3px solid white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);"
+                             alt="Enlarged QR Code">
+                        <p style="color: white; margin-top: 20px; font-size: 14px;">Click outside or press ESC to close</p>
+                    </div>
+                `,
+                background: 'transparent',
+                showConfirmButton: false,
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                didOpen: (modal) => {
+                    // Create dark overlay with backdrop blur
+                    const backdrop = document.querySelector('.swal2-container');
+                    if (backdrop) {
+                        backdrop.style.background = 'rgba(0, 0, 0, 0.85)';
+                        backdrop.style.backdropFilter = 'blur(10px)';
+                    }
+
+                    // Create close button with rotation animation
+                    const closeBtn = document.createElement('button');
+                    closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    closeBtn.style.cssText = `
+                        position: fixed;
+                        top: 30px;
+                        right: 30px;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background: white;
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 24px;
+                        color: #1f2937;
+                        z-index: 10000;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    `;
+                    closeBtn.onmouseover = () => {
+                        closeBtn.style.transform = 'scale(1.1) rotate(90deg)';
+                        closeBtn.style.background = '#f0f0f0';
+                    };
+                    closeBtn.onmouseout = () => {
+                        closeBtn.style.transform = 'scale(1) rotate(0deg)';
+                        closeBtn.style.background = 'white';
+                    };
+                    closeBtn.onclick = () => Swal.close();
+                    document.body.appendChild(closeBtn);
+                },
+                willClose: () => {
+                    const closeBtn = document.querySelector('button[style*="position: fixed"]');
+                    if (closeBtn) closeBtn.remove();
+                }
+            });
+        }
+
+        // ========== ADMIN REPORT MODULE ==========
+
+        // Store current report data globally for export
+        let currentReportData = [];
+
+        // Set quick date filter
+        function setQuickFilter(period) {
+            const today = new Date();
+            let startDate, endDate;
+
+            switch(period) {
+                case 'today':
+                    startDate = endDate = formatDateForInput(today);
+                    break;
+                case 'week':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+                    startDate = formatDateForInput(weekStart);
+                    endDate = formatDateForInput(today);
+                    break;
+                case 'month':
+                    startDate = formatDateForInput(new Date(today.getFullYear(), today.getMonth(), 1));
+                    endDate = formatDateForInput(today);
+                    break;
+                case 'year':
+                    startDate = formatDateForInput(new Date(today.getFullYear(), 0, 1));
+                    endDate = formatDateForInput(today);
+                    break;
+                case 'all':
+                    startDate = '';
+                    endDate = '';
+                    break;
+            }
+
+            document.getElementById('reportStartDate').value = startDate;
+            document.getElementById('reportEndDate').value = endDate;
+
+            // Visual feedback
+            document.querySelectorAll('.quick-filters .btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Format date for input field (YYYY-MM-DD)
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('reportStartDate').value = '';
+            document.getElementById('reportEndDate').value = '';
+            document.getElementById('reportStatus').value = '';
+            document.getElementById('reportReceiverIC').value = '';
+            document.querySelectorAll('.quick-filters .btn').forEach(btn => btn.classList.remove('active'));
+        }
+
         // Generate report (Admin only)
         function generateReport() {
             if (!isAdmin) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Access Denied',
-                    text: 'Only administrators can generate reports.'
+                    text: 'Only administrators can generate reports.',
+                    confirmButtonColor: '#6A1B9A'
                 });
                 return;
             }
@@ -2687,172 +3654,501 @@ $is_admin = ($user_role === 'Admin');
             const startDate = document.getElementById('reportStartDate').value;
             const endDate = document.getElementById('reportEndDate').value;
             const status = document.getElementById('reportStatus').value;
-            const staffID = document.getElementById('reportStaffID').value;
             const receiverIC = document.getElementById('reportReceiverIC').value;
+
+            // Show loading
+            Swal.fire({
+                title: 'Generating Report...',
+                html: '<i class="fas fa-spinner fa-spin fa-2x"></i>',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
 
             const formData = new FormData();
             formData.append('startDate', startDate);
             formData.append('endDate', endDate);
             formData.append('status', status);
-            formData.append('staffID', staffID);
             formData.append('receiverIC', receiverIC);
 
             fetch('../php/admin-generate-report.php', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
+                Swal.close();
                 if (data.success) {
+                    currentReportData = data.report;
                     displayReportResults(data.report);
+                    enableExportButtons(true);
+
+                    // Success toast
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: `Report generated: ${data.report.length} records found`,
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#fff',
+                        showClass: { popup: 'swal2-show' },
+                        hideClass: { popup: 'swal2-hide' }
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: data.message || 'Failed to generate report.'
+                        text: data.message || 'Failed to generate report.',
+                        confirmButtonColor: '#6A1B9A'
                     });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                Swal.close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'An error occurred while generating the report.'
+                    text: 'An error occurred while generating the report.',
+                    confirmButtonColor: '#6A1B9A'
                 });
             });
         }
 
-        // Display report results
+        // Enable/disable export buttons
+        function enableExportButtons(enable) {
+            document.getElementById('btnExportExcel').disabled = !enable;
+            document.getElementById('btnExportCSV').disabled = !enable;
+            document.getElementById('btnPrintReport').disabled = !enable;
+        }
+
+        // Display report results in new format
         function displayReportResults(reportData) {
             const resultsDiv = document.getElementById('reportResults');
+            const tableBody = document.getElementById('reportTableBody');
 
-            let html = `
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0">Report Results</h6>
-                        <button class="btn btn-sm btn-outline-primary" onclick="printReport()">
-                            <i class="fas fa-print me-1"></i>Print Report
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped" id="reportTable">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Retrieval ID</th>
-                                        <th>Tracking Number</th>
-                                        <th>Receiver IC</th>
-                                        <th>Receiver Name</th>
-                                        <th>Staff ID</th>
-                                        <th>Retrieve Date</th>
-                                        <th>Retrieve Time</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-            `;
+            // Update result count
+            document.getElementById('resultCount').textContent = reportData.length + ' records';
 
-            reportData.forEach(item => {
-                html += `
+            // Update generated info
+            document.getElementById('reportGeneratedDate').textContent = new Date().toLocaleString();
+            document.getElementById('reportGeneratedBy').textContent = userName + ' (' + userID + ')';
+
+            // Clear and populate table
+            tableBody.innerHTML = '';
+
+            if (reportData.length === 0) {
+                tableBody.innerHTML = `
                     <tr>
-                        <td>${item.retrievalID || 'N/A'}</td>
-                        <td>${item.TrackingNumber}</td>
-                        <td>${formatICNumber(item.ICNumber)}</td>
-                        <td>${item.receiverName || 'N/A'}</td>
-                        <td>${item.staffID || 'N/A'}</td>
-                        <td>${item.retrieveDate || 'N/A'}</td>
-                        <td>${item.retrieveTime || 'N/A'}</td>
-                        <td>
-                            <span class="badge ${item.status === 'Pending' ? 'bg-warning text-dark' : 'bg-success'}">
- the delete button is missing u                                ${item.status}
-                            </span>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0">No records found matching your criteria</p>
                         </td>
                     </tr>
                 `;
-            });
+            } else {
+                reportData.forEach((item, index) => {
+                    const statusClass = item.status === 'Pending' ? 'badge-pending' : 'badge-retrieved';
+                    // Combine date and time into timestamp
+                    const timestamp = (item.retrieveDate && item.retrieveTime)
+                        ? `${item.retrieveDate} ${item.retrieveTime}`
+                        : (item.retrieveDate || item.retrieveTime || 'N/A');
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td class="text-center">${index + 1}</td>
+                            <td class="text-center"><strong>${item.retrievalID || 'N/A'}</strong></td>
+                            <td><code>${item.TrackingNumber}</code></td>
+                            <td>${item.receiverName || 'N/A'}</td>
+                            <td>${formatICNumber(item.MatricNumber)}</td>
+                            <td>${timestamp}</td>
+                            <td><span class="${statusClass}">${item.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
 
-            html += `
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                Total Records: ${reportData.length} |
-                                Generated on: ${new Date().toLocaleString()} |
-                                Generated by: ${userName} (${userID})
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            resultsDiv.innerHTML = html;
             resultsDiv.style.display = 'block';
+
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Export report to Excel
-        function exportReport() {
-            if (!isAdmin) {
+        // Export to Excel (XLSX format using SheetJS)
+        function exportToExcel() {
+            if (!isAdmin || currentReportData.length === 0) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Access Denied',
-                    text: 'Only administrators can export reports.'
+                    icon: 'warning',
+                    title: 'No Data',
+                    text: 'Please generate a report first.',
+                    confirmButtonColor: '#6A1B9A'
                 });
                 return;
             }
 
+            // Prepare data for Excel
+            const excelData = currentReportData.map((item, index) => {
+                const timestamp = (item.retrieveDate && item.retrieveTime)
+                    ? `${item.retrieveDate} ${item.retrieveTime}`
+                    : (item.retrieveDate || item.retrieveTime || 'N/A');
+                return {
+                    'No': index + 1,
+                    'Retrieval ID': item.retrievalID || 'N/A',
+                    'Tracking Number': item.TrackingNumber,
+                    'Receiver Name': item.receiverName || 'N/A',
+                    'Matric Number': item.MatricNumber,
+                    'Timestamp': timestamp,
+                    'Status': item.status
+                };
+            });
+
+            // Create workbook and worksheet
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 5 },  // No
+                { wch: 12 }, // Retrieval ID
+                { wch: 20 }, // Tracking Number
+                { wch: 25 }, // Receiver Name
+                { wch: 15 }, // Matric Number
+                { wch: 20 }, // Timestamp
+                { wch: 10 }  // Status
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Retrieval Report');
+
+            // Generate filename with date
+            const today = new Date();
+            const filename = `PPMS_Report_${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}.xlsx`;
+
+            // Download
+            XLSX.writeFile(wb, filename);
+
             Swal.fire({
-                icon: 'info',
-                title: 'Export Feature',
-                text: 'Excel export functionality will be implemented soon.',
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Excel file downloaded!',
+                showConfirmButton: false,
                 timer: 2000,
-                showConfirmButton: false
+                background: '#fff',
+                showClass: { popup: 'swal2-show' },
+                hideClass: { popup: 'swal2-hide' }
             });
         }
 
-        // Print report
+        // Export to CSV
+        function exportToCSV() {
+            if (!isAdmin || currentReportData.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Data',
+                    text: 'Please generate a report first.',
+                    confirmButtonColor: '#6A1B9A'
+                });
+                return;
+            }
+
+            // Prepare CSV content
+            const headers = ['No', 'Retrieval ID', 'Tracking Number', 'Receiver Name', 'Matric Number', 'Timestamp', 'Status'];
+            let csvContent = headers.join(',') + '\n';
+
+            currentReportData.forEach((item, index) => {
+                const timestamp = (item.retrieveDate && item.retrieveTime)
+                    ? `${item.retrieveDate} ${item.retrieveTime}`
+                    : (item.retrieveDate || item.retrieveTime || 'N/A');
+                const row = [
+                    index + 1,
+                    item.retrievalID || 'N/A',
+                    item.TrackingNumber,
+                    `"${(item.receiverName || 'N/A').replace(/"/g, '""')}"`, // Handle quotes in names
+                    item.MatricNumber,
+                    timestamp,
+                    item.status
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Create download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            const today = new Date();
+            const filename = `PPMS_Report_${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}.csv`;
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'CSV file downloaded!',
+                showConfirmButton: false,
+                timer: 2000,
+                background: '#fff',
+                showClass: { popup: 'swal2-show' },
+                hideClass: { popup: 'swal2-hide' }
+            });
+        }
+
+        // Print report with professional layout
         function printReport() {
-            const reportTable = document.getElementById('reportTable');
-            if (!reportTable) {
+            if (currentReportData.length === 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'No Report',
-                    text: 'Please generate a report first.'
+                    text: 'Please generate a report first.',
+                    confirmButtonColor: '#6A1B9A'
                 });
                 return;
             }
 
             const printWindow = window.open('', '_blank');
             const currentDate = new Date().toLocaleString();
-            const reportHTML = reportTable.outerHTML;
 
-            printWindow.document.write(
-                '<html>' +
-                    '<head>' +
-                        '<title>PPMS Admin Report</title>' +
-                        '<link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">' +
-                        '<style>' +
-                            '@media print { .no-print { display: none !important; } }' +
-                            'body { font-size: 12px; }' +
-                            '.header { text-align: center; margin-bottom: 20px; }' +
-                        '</style>' +
-                    '</head>' +
-                    '<body>' +
-                        '<div class="container">' +
-                            '<div class="header">' +
-                                '<h3>Perwira Parcel Management System</h3>' +
-                                '<h5>Admin Report - Retrieval Records</h5>' +
-                                '<p>Generated on: ' + currentDate + '</p>' +
-                                '<p>Generated by: ' + userName + ' (' + userID + ')</p>' +
-                            '</div>' +
-                            reportHTML +
-                        '</div>' +
-                    '</body>' +
-                '</html>'
-            );
+            // Calculate stats for print
+            const total = currentReportData.length;
+            const retrieved = currentReportData.filter(item => item.status === 'Retrieved').length;
+            const pending = currentReportData.filter(item => item.status === 'Pending').length;
+            const rate = total > 0 ? ((retrieved / total) * 100).toFixed(1) : 0;
+
+            // Build table rows
+            let tableRows = '';
+            currentReportData.forEach((item, index) => {
+                const timestamp = (item.retrieveDate && item.retrieveTime)
+                    ? `${item.retrieveDate} ${item.retrieveTime}`
+                    : (item.retrieveDate || item.retrieveTime || 'N/A');
+                tableRows += `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td class="text-center">${item.retrievalID || 'N/A'}</td>
+                        <td>${item.TrackingNumber}</td>
+                        <td>${item.receiverName || 'N/A'}</td>
+                        <td>${item.MatricNumber}</td>
+                        <td>${timestamp}</td>
+                        <td class="${item.status === 'Retrieved' ? 'status-retrieved' : 'status-pending'}">${item.status}</td>
+                    </tr>
+                `;
+            });
+
+            // Get filter info
+            const startDate = document.getElementById('reportStartDate').value || 'All';
+            const endDate = document.getElementById('reportEndDate').value || 'All';
+            const statusFilter = document.getElementById('reportStatus').value || 'All';
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>PPMS Admin Report</title>
+                    <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+                    <style>
+                        /* Page setup for landscape printing */
+                        @page {
+                            size: landscape;
+                            margin: 15mm;
+                        }
+
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; }
+
+                        .header { text-align: center; margin-bottom: 25px; border-bottom: 3px solid #6A1B9A; padding-bottom: 15px; }
+                        .header h1 { color: #6A1B9A; font-size: 22px; margin-bottom: 5px; }
+                        .header h2 { color: #666; font-size: 14px; font-weight: normal; }
+                        .header .logo { width: 50px; height: 50px; margin-bottom: 8px; }
+
+                        .meta-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 11px; color: #666; }
+
+                        .stats-row { display: flex; justify-content: space-around; margin-bottom: 20px; }
+                        .stat-box { text-align: center; padding: 12px 25px; border-radius: 6px; }
+                        .stat-box.total { background: #f3e5f5; border: 2px solid #6A1B9A; }
+                        .stat-box.retrieved { background: #e8f5e9; border: 2px solid #43e97b; }
+                        .stat-box.pending { background: #fff3e0; border: 2px solid #FF9800; }
+                        .stat-box.rate { background: #ede7f6; border: 2px solid #667eea; }
+                        .stat-box h3 { font-size: 20px; margin-bottom: 3px; }
+                        .stat-box p { font-size: 10px; color: #666; }
+
+                        table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 20px; }
+
+                        /* Screen styles for table header */
+                        th { background: #6A1B9A; color: white; padding: 10px 8px; text-align: left; font-weight: 600; }
+                        th.text-center { text-align: center; }
+
+                        td { padding: 7px 8px; border-bottom: 1px solid #ddd; }
+                        td.text-center { text-align: center; }
+                        tr:nth-child(odd) { background: #ffffff; }
+                        tr:nth-child(even) { background: #f8f8f8; }
+
+                        .status-retrieved { color: #2e7d32; font-weight: 600; }
+                        .status-pending { color: #ef6c00; font-weight: 600; }
+
+                        .footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 10px; color: #999; }
+                        .filter-info { background: #f5f5f5; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px; font-size: 10px; }
+                        .sort-icon { font-size: 9px; margin-right: 3px; }
+
+                        /* Signature block - hidden on screen, visible on print */
+                        .signature-block {
+                            display: none;
+                        }
+
+                        /* Print-specific styles */
+                        @media print {
+                            body { padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+                            /* Ink-saving table header: white background with border */
+                            th {
+                                background: #ffffff !important;
+                                color: #333 !important;
+                                border-bottom: 2px solid #6A1B9A !important;
+                                border-top: 1px solid #333 !important;
+                            }
+
+                            /* Subtle zebra striping for print */
+                            tr:nth-child(even) { background: #f5f5f5 !important; }
+
+                            /* Hide filter info box on print */
+                            .filter-info { display: none !important; }
+
+                            /* Hide stats row on print to save space/ink */
+                            .stats-row { display: none !important; }
+
+                            .stat-box { padding: 8px 15px; }
+
+                            /* Ensure table header repeats on multiple pages */
+                            thead { display: table-header-group; }
+                            tbody { display: table-row-group; }
+                            tr { page-break-inside: avoid; }
+
+                            /* Show signature block on print */
+                            .signature-block {
+                                display: flex !important;
+                                justify-content: space-between;
+                                margin-top: 60px;
+                                padding: 0 40px;
+                                page-break-inside: avoid;
+                            }
+
+                            .signature-box {
+                                text-align: center;
+                                width: 250px;
+                            }
+
+                            .signature-line {
+                                border-top: 1px solid #333;
+                                margin-top: 60px;
+                                padding-top: 8px;
+                            }
+
+                            .signature-label {
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: #333;
+                            }
+
+                            .signature-title {
+                                font-size: 9px;
+                                color: #666;
+                                margin-top: 3px;
+                            }
+
+                            /* Ensure footer stays at bottom */
+                            .footer {
+                                margin-top: 20px;
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <img src="../assets/Icon Web.ico" alt="PPMS Logo" class="logo">
+                        <h1>Perwira Parcel Management System</h1>
+                        <h2>Admin Report - Parcel Retrieval Records</h2>
+                    </div>
+
+                    <div class="meta-info">
+                        <div><strong>Generated:</strong> ${currentDate}</div>
+                        <div><strong>Generated by:</strong> ${userName} (${userID})</div>
+                    </div>
+
+                    <div class="filter-info">
+                        <strong>Filters Applied:</strong>
+                        Date Range: ${startDate} to ${endDate} |
+                        Status: ${statusFilter}
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-box total">
+                            <h3>${total}</h3>
+                            <p>Total Records</p>
+                        </div>
+                        <div class="stat-box retrieved">
+                            <h3>${retrieved}</h3>
+                            <p>Retrieved</p>
+                        </div>
+                        <div class="stat-box pending">
+                            <h3>${pending}</h3>
+                            <p>Pending</p>
+                        </div>
+                        <div class="stat-box rate">
+                            <h3>${rate}%</h3>
+                            <p>Retrieval Rate</p>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 35px;">#</th>
+                                <th class="text-center" style="width: 80px;">Retrieval ID</th>
+                                <th>Tracking Number</th>
+                                <th>Receiver</th>
+                                <th>Matric No</th>
+                                <th><span class="sort-icon">▼</span>Timestamp</th>
+                                <th style="width: 70px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+
+                    <!-- Signature Block (Print Only) -->
+                    <div class="signature-block">
+                        <div class="signature-box">
+                            <div class="signature-line">
+                                <div class="signature-label">Prepared By</div>
+                                <div class="signature-title">Staff / Administrator</div>
+                            </div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line">
+                                <div class="signature-label">Verified By</div>
+                                <div class="signature-title">Supervisor / Management</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <p>Perwira Parcel Management System (PPMS) - Kolej Kediaman Perwira, UTHM</p>
+                        <p>This report was auto-generated. For queries, contact the system administrator.</p>
+                    </div>
+
+                    <scr` + `ipt>
+                        window.onload = function() { setTimeout(function() { window.print(); }, 300); }
+                    </scr` + `ipt>
+                </body>
+                </html>
+            `);
             printWindow.document.close();
-            printWindow.print();
         }
 
         // Show profile
@@ -3461,15 +4757,16 @@ $is_admin = ($user_role === 'Admin');
     // Initialize carousel when page loads
     document.addEventListener('DOMContentLoaded', initializeCarousel);
 
-    // Function to format IC number with dashes
-    function formatICNumber(icNumber) {
-        if (!icNumber || icNumber.length !== 12) {
-            return icNumber; // Return as-is if not 12 digits
+    // Function to format Matric number (8 digits, no formatting needed)
+    function formatICNumber(matricNumber) {
+        if (!matricNumber || matricNumber.length !== 8) {
+            return matricNumber; // Return as-is if not 8 digits
         }
 
-        // Format as 123456-78-9012
-        return icNumber.substring(0, 6) + '-' + icNumber.substring(6, 8) + '-' + icNumber.substring(8, 12);
+        // Matric numbers are displayed as-is (8 digits)
+        return matricNumber;
     }
+
     </script>
 </body>
 </html>

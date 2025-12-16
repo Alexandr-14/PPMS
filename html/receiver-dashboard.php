@@ -3,12 +3,12 @@ session_start();
 require_once '../php/db_connect.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['receiver_ic']) || empty($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
     header("Location: receiver-login.html");
     exit();
 }
 
-$receiverIC = $_SESSION['receiver_ic'];
+$receiverIC = $_SESSION['receiver_matric'];
 $receiverName = $_SESSION['receiver_name'] ?? 'User';
 ?>
 <!DOCTYPE html>
@@ -32,6 +32,39 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-navbar-buttons.css?v=<?php echo time(); ?>">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+    <style>
+        /* Row hover effect for parcel tables (Receiver) - Same as Staff */
+        #historyTable tbody tr {
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #historyTable tbody tr:hover {
+            background-color: rgba(106, 27, 154, 0.06); /* purple tint - same as staff */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hide native browser clear (X) for our custom clear button */
+        #receiverHistorySearchInput::-ms-clear, #receiverHistorySearchInput::-ms-reveal { display: none; width:0; height:0; }
+        #receiverHistorySearchInput::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+        /* Override CSS for search input - remove borders */
+        #receiverHistorySearchInput {
+            border: none !important;
+            border-radius: 50px !important;
+            background: white !important;
+            padding: 12px 20px 12px 20px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #receiverHistorySearchInput:focus {
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(25, 135, 84, 0.2) !important;
+            outline: none !important;
+        }
+
+    </style>
+
 </head>
 <body>
     <!-- Modern Enhanced Navbar -->
@@ -53,7 +86,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <i class="fas fa-bell"></i>
                         <?php
                         // Count unread notifications
-                        $unreadStmt = $conn->prepare("SELECT COUNT(*) as unread_count FROM Notification WHERE ICNumber = ? AND isRead = 0");
+                        $unreadStmt = $conn->prepare("SELECT COUNT(*) as unread_count FROM Notification WHERE MatricNumber = ? AND isRead = 0");
                         $unreadStmt->bind_param("s", $receiverIC);
                         $unreadStmt->execute();
                         $unreadResult = $unreadStmt->get_result();
@@ -79,7 +112,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <div class="notification-dropdown-body">
                             <?php
                             // Fetch recent 5 notifications for dropdown
-                            $recentStmt = $conn->prepare("SELECT * FROM Notification WHERE ICNumber = ? ORDER BY sentTimestamp DESC LIMIT 5");
+                            $recentStmt = $conn->prepare("SELECT * FROM Notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC LIMIT 5");
                             $recentStmt->bind_param("s", $receiverIC);
                             $recentStmt->execute();
                             $recentResult = $recentStmt->get_result();
@@ -193,6 +226,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     <svg class="me-1" style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Parcel History
                 </button>
             </li>
+
         </ul>
 
         <!-- Tab Content -->
@@ -201,7 +235,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             <div class="tab-pane fade show active" id="tracking" role="tabpanel">
                 <h4 class="text-engaging">Track Your Parcel</h4>
                 <p class="welcome-text">Enter your tracking number to see the status of your parcel.</p>
-                
+
                 <form method="post" action="../php/track-parcel.php" class="mt-4" style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; border: 1px solid #e9ecef;">
                     <div class="mb-3">
                         <label for="trackingNumber" class="form-label" style="font-weight: 700 !important; color: #2d3748 !important; font-size: 1rem !important; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem !important;">
@@ -276,78 +310,98 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             </div>
                         </div>
 
-                        <!-- Main Details Grid -->
-                        <div class="parcel-details-grid">
-                            <!-- Date & Time Card -->
-                            <div class="detail-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/></svg>
+                        <!-- Modern Two-Column Layout -->
+                        <div class="parcel-details-grid-modern">
+                            <!-- Left Column: Package Details Card -->
+                            <div class="package-details-card">
+                                <div class="package-details-header">
+                                    <h3 class="package-details-title">Package Details</h3>
                                 </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">Received Date</div>
-                                    <div class="detail-value">
-                                        <?php echo date('F d, Y', strtotime($parcel['date'])); ?>
-                                        <?php if (!empty($parcel['time'])): ?>
-                                            <div class="detail-subvalue">at <?php echo date('h:i A', strtotime($parcel['time'])); ?></div>
-                                        <?php endif; ?>
+
+                                <!-- Date & Weight Row -->
+                                <div class="details-row">
+                                    <div class="detail-item-modern">
+                                        <div class="detail-item-icon">
+                                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                        <div class="detail-item-content">
+                                            <div class="detail-item-label">Received Date</div>
+                                            <div class="detail-item-value">
+                                                <?php echo date('F d, Y', strtotime($parcel['date'])); ?>
+                                                <?php if (!empty($parcel['time'])): ?>
+                                                    <div class="detail-item-subvalue">at <?php echo date('h:i A', strtotime($parcel['time'])); ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-item-modern">
+                                        <div class="detail-item-icon">
+                                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                        </div>
+                                        <div class="detail-item-content">
+                                            <div class="detail-item-label">Package Weight</div>
+                                            <div class="detail-item-value"><?php echo htmlspecialchars($parcel['weight']); ?> kg</div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Delivery Location -->
+                                <div class="details-row">
+                                    <div class="detail-item-modern full-width">
+                                        <div class="detail-item-icon">
+                                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                        <div class="detail-item-content">
+                                            <div class="detail-item-label">Delivery Location</div>
+                                            <div class="detail-item-value"><?php echo htmlspecialchars($parcel['deliveryLocation'] ?? 'Not specified'); ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Receiver Matric Number (Prominent) -->
+                                <div class="details-row">
+                                    <div class="detail-item-modern full-width">
+                                        <div class="detail-item-icon">
+                                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                        <div class="detail-item-content">
+                                            <div class="detail-item-label">Receiver Matric Number</div>
+                                            <div class="detail-item-value-prominent" id="receiverICDisplay"><?php echo htmlspecialchars($parcel['MatricNumber']); ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Package Description (if available) -->
+                                <?php if (!empty($parcel['name'])): ?>
+                                <div class="details-row">
+                                    <div class="detail-item-modern full-width">
+                                        <div class="detail-item-icon">
+                                            <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2"/><polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="currentColor" stroke-width="2"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                        <div class="detail-item-content">
+                                            <div class="detail-item-label">Package Description</div>
+                                            <div class="detail-item-value"><?php echo htmlspecialchars($parcel['name']); ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
                             </div>
 
-                            <!-- Weight Card -->
-                            <div class="detail-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <!-- Right Column: QR Code Card -->
+                            <div class="qr-card-modern">
+                                <div class="qr-card-header">
+                                    <h3 class="qr-card-title">QR Code</h3>
                                 </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">Package Weight</div>
-                                    <div class="detail-value"><?php echo htmlspecialchars($parcel['weight']); ?> kg</div>
-                                </div>
-                            </div>
-
-                            <!-- Location Card -->
-                            <div class="detail-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
-                                </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">Delivery Location</div>
-                                    <div class="detail-value"><?php echo htmlspecialchars($parcel['deliveryLocation'] ?? 'Not specified'); ?></div>
-                                </div>
-                            </div>
-
-                            <!-- Receiver Card -->
-                            <div class="detail-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
-                                </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">Receiver IC Number</div>
-                                    <div class="detail-value" id="receiverICDisplay"><?php echo htmlspecialchars($parcel['ICNumber']); ?></div>
-                                </div>
-                            </div>
-
-                            <!-- Parcel Name Card (if available) -->
-                            <?php if (!empty($parcel['name'])): ?>
-                            <div class="detail-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2"/><polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="currentColor" stroke-width="2"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2"/></svg>
-                                </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">Package Description</div>
-                                    <div class="detail-value"><?php echo htmlspecialchars($parcel['name']); ?></div>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-
-                            <!-- QR Code Card -->
-                            <div class="detail-card qr-card">
-                                <div class="detail-icon">
-                                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="5" height="5" stroke="currentColor" stroke-width="2"/><rect x="3" y="16" width="5" height="5" stroke="currentColor" stroke-width="2"/><rect x="16" y="3" width="5" height="5" stroke="currentColor" stroke-width="2"/><rect x="11" y="11" width="2" height="2" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="2" height="2" stroke="currentColor" stroke-width="2"/><rect x="11" y="16" width="2" height="2" stroke="currentColor" stroke-width="2"/><rect x="16" y="11" width="2" height="2" stroke="currentColor" stroke-width="2"/><rect x="18" y="16" width="2" height="2" stroke="currentColor" stroke-width="2"/><rect x="16" y="18" width="2" height="2" stroke="currentColor" stroke-width="2"/></svg>
-                                </div>
-                                <div class="detail-content">
-                                    <div class="detail-label">QR Code</div>
-                                    <div class="qr-code-container" id="parcelQRCode"></div>
+                                <div class="qr-code-container-modern" id="parcelQRCode"></div>
+                                <small class="qr-code-note">QR Code contains encrypted verification data</small>
+                                <div class="qr-buttons-container">
+                                    <button type="button" class="btn-qr btn-qr-download" onclick="downloadReceiverQR()">
+                                        <i class="fas fa-download me-2"></i>Download QR Image
+                                    </button>
+                                    <button type="button" class="btn-qr btn-qr-enlarge" onclick="enlargeReceiverQR()">
+                                        <i class="fas fa-expand me-2"></i>Enlarge QR Code
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -394,38 +448,18 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <h4 class="text-engaging mb-1">Parcel History</h4>
                         <p class="welcome-text mb-0">View and manage all your parcel records.</p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-sort me-1"></i> Sort By
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'desc')">
-                                    <i class="fas fa-calendar me-2"></i>Date (Newest First)
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'asc')">
-                                    <i class="fas fa-calendar me-2"></i>Date (Oldest First)
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterHistory('all')">
-                                    <i class="fas fa-list me-2"></i>Show All
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterHistory('Pending')">
-                                    <i class="fas fa-clock me-2"></i>Pending Only
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="filterHistory('Retrieved')">
-                                    <i class="fas fa-check me-2"></i>Retrieved Only
-                                </a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-outline-success" onclick="refreshHistory()">
-                            <i class="fas fa-sync-alt me-1"></i> Refresh
-                        </button>
-                    </div>
                 </div>
 
                 <?php
-                $stmt = $conn->prepare("SELECT * FROM Parcel WHERE ICNumber = ? ORDER BY date DESC, time DESC");
+                $stmt = $conn->prepare("
+                    SELECT
+                        p.*,
+                        r.name as receiverName
+                    FROM Parcel p
+                    LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+                    WHERE p.MatricNumber = ?
+                    ORDER BY p.date DESC, p.time DESC
+                ");
                 $stmt->bind_param("s", $receiverIC);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -463,7 +497,46 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         </div>
                     </div>
 
-                    <div class="card border-0 shadow-sm">
+                        <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                            <div class="input-group" style="width: 100%; max-width: 450px;">
+                                <input type="text" id="receiverHistorySearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(25, 135, 84, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
+                                <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
+                                    <i class="fas fa-search" style="color: #43e97b; font-size: 1.1rem;"></i>
+                                </span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                                        <i class="fas fa-sort me-1"></i> Sort By
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'desc')">
+                                            <i class="fas fa-calendar me-2"></i>Date (Newest First)
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'asc')">
+                                            <i class="fas fa-calendar me-2"></i>Date (Oldest First)
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('all')">
+                                            <i class="fas fa-list me-2"></i>Show All
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('Pending')">
+                                            <i class="fas fa-clock me-2"></i>Pending Only
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('Retrieved')">
+                                            <i class="fas fa-check me-2"></i>Retrieved Only
+                                        </a></li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-outline-success" onclick="refreshHistory()">
+                                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div id="receiverHistoryNoResults" class="text-muted small mb-3 d-none">No parcels match your search</div>
+
+                        <div class="card border-0 shadow-sm table-card">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" id="historyTable">
                                 <thead class="table-light">
@@ -482,7 +555,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                     $result->data_seek(0);
                                     while ($row = $result->fetch_assoc()):
                                     ?>
-                                    <tr data-status="<?php echo htmlspecialchars($row['status'], ENT_QUOTES); ?>" data-date="<?php echo htmlspecialchars($row['date'], ENT_QUOTES); ?>">
+                                    <tr data-status="<?php echo htmlspecialchars($row['status'], ENT_QUOTES); ?>" data-date="<?php echo htmlspecialchars($row['date'], ENT_QUOTES); ?>" data-tracking="<?php echo htmlspecialchars($row['TrackingNumber'], ENT_QUOTES); ?>" data-matric="<?php echo htmlspecialchars($row['MatricNumber'], ENT_QUOTES); ?>" data-receiver-name="<?php echo htmlspecialchars($row['receiverName'] ?? 'N/A', ENT_QUOTES); ?>" data-location="<?php echo htmlspecialchars($row['deliveryLocation'] ?? 'N/A', ENT_QUOTES); ?>">
                                             <td class="px-4 py-3">
                                                 <span class="fw-bold text-primary"><?php echo htmlspecialchars($row['TrackingNumber'], ENT_QUOTES); ?></span>
                                             </td>
@@ -521,11 +594,13 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                                 <button class="btn btn-sm btn-outline-primary eye-button"
                                                         data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
                                                         data-status="<?php echo htmlspecialchars($row['status']); ?>"
-                                                        data-ic="<?php echo htmlspecialchars($row['ICNumber']); ?>"
+                                                        data-ic="<?php echo htmlspecialchars($row['MatricNumber']); ?>"
+                                                        data-receiver-name="<?php echo htmlspecialchars($row['receiverName'] ?? 'N/A'); ?>"
                                                         data-weight="<?php echo htmlspecialchars($row['weight'] ?? 'N/A'); ?>"
                                                         data-location="<?php echo htmlspecialchars($row['deliveryLocation'] ?? 'N/A'); ?>"
                                                         data-date="<?php echo htmlspecialchars($row['date']); ?>"
-                                                        data-time="<?php echo htmlspecialchars($row['time']); ?>">
+                                                        data-time="<?php echo htmlspecialchars($row['time']); ?>"
+                                                        data-name="<?php echo htmlspecialchars($row['name'] ?? 'Package'); ?>">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                             </td>
@@ -564,7 +639,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 <div class="notification-list">
                     <?php
                     // Fetch all notifications for the current receiver
-                    $allNotificationStmt = $conn->prepare("SELECT * FROM Notification WHERE ICNumber = ? ORDER BY sentTimestamp DESC");
+                    $allNotificationStmt = $conn->prepare("SELECT * FROM Notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC");
                     $allNotificationStmt->bind_param("s", $receiverIC);
                     $allNotificationStmt->execute();
                     $allNotificationResult = $allNotificationStmt->get_result();
@@ -654,6 +729,8 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     <?php endif; ?>
                 </div>
             </div>
+
+
         </div>
     </div>
 
@@ -912,15 +989,110 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         </div>
     </footer>
 
+    <!-- View Parcel Details Modal -->
+    <div class="modal fade" id="viewParcelModal" tabindex="-1" aria-labelledby="viewParcelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewParcelModalLabel">
+                        <i class="fas fa-eye me-2"></i>Parcel Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tracking Number:</label>
+                                <p id="viewTrackingNumber" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status:</label>
+                                <p id="viewStatus" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Receiver Matric:</label>
+                                <p id="viewReceiverIC" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Receiver Name:</label>
+                                <p id="viewReceiverName" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Weight:</label>
+                                <p id="viewParcelWeight" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Delivery Location:</label>
+                                <p id="viewDeliveryLocation" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Date Added:</label>
+                                <p id="viewDateAdded" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Time Added:</label>
+                                <p id="viewTimeAdded" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Parcel Description:</label>
+                                <p id="viewParcelName" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">QR Code:</label>
+                                <div id="viewQRCode" class="text-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- QR Code Generator - Primary CDN -->
+    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Local QR Code Fallback -->
+    <script src="../js/qrcode-simple.js"></script>
+    <!-- PPMS QR Code Configuration -->
+    <script src="../js/qr-config.js"></script>
 
     <script>
-    // SIMPLE Eye Button Handler - Step by Step
+    // Eye Button Handler - Show Parcel Details Modal
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Starting eye button setup...');
 
@@ -939,20 +1111,231 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 const tracking = this.getAttribute('data-tracking');
                 const status = this.getAttribute('data-status');
                 const ic = this.getAttribute('data-ic');
+                const receiverName = this.getAttribute('data-receiver-name');
                 const weight = this.getAttribute('data-weight');
                 const location = this.getAttribute('data-location');
                 const date = this.getAttribute('data-date');
                 const time = this.getAttribute('data-time');
+                const name = this.getAttribute('data-name');
 
-                console.log('📦 Parcel data:', {tracking, status, ic, weight, location, date, time});
+                console.log('📦 Parcel data:', {tracking, status, ic, receiverName, weight, location, date, time, name});
 
-                // Show simple alert first to test
-                alert('Eye button works!\nTracking: ' + tracking + '\nStatus: ' + status);
-
-                // TODO: Add modal later
+                // Fetch verification data from server
+                fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.parcel) {
+                            // Store verification data globally for QR generation
+                            if (data.parcel.verificationData) {
+                                window.parcelVerificationData = data.parcel.verificationData;
+                                console.log('✅ Verification data loaded for QR code');
+                            } else {
+                                console.warn('⚠️ No verification data available');
+                                window.parcelVerificationData = null;
+                            }
+                        }
+                        // Show parcel details modal
+                        showParcelDetailsModal({
+                            TrackingNumber: tracking,
+                            status: status,
+                            ic: ic,
+                            receiverName: receiverName,
+                            weight: weight,
+                            deliveryLocation: location,
+                            date: date,
+                            time: time,
+                            name: name,
+                            qrGenerated: data.success ? data.parcel.qrGenerated : false,
+                            verificationData: data.success ? data.parcel.verificationData : null
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching verification data:', error);
+                        // Show modal anyway
+                        showParcelDetailsModal({
+                            TrackingNumber: tracking,
+                            status: status,
+                            ic: ic,
+                            receiverName: receiverName,
+                            weight: weight,
+                            deliveryLocation: location,
+                            date: date,
+                            time: time,
+                            name: name,
+                            qrGenerated: false,
+                            verificationData: null
+                        });
+                    });
             });
         });
     });
+
+    // Function to show parcel details modal
+    function showParcelDetailsModal(parcel) {
+        console.log('Showing parcel modal for:', parcel.TrackingNumber);
+
+        // Populate modal with parcel details
+        document.getElementById('viewTrackingNumber').textContent = parcel.TrackingNumber || 'N/A';
+
+        // Enhanced status display with color coding
+        const statusElement = document.getElementById('viewStatus');
+        statusElement.textContent = parcel.status || 'N/A';
+        statusElement.className = 'form-control-plaintext';
+        if (parcel.status === 'Pending') {
+            statusElement.style.color = '#f6ad55';
+            statusElement.style.fontWeight = '600';
+        } else if (parcel.status === 'Retrieved') {
+            statusElement.style.color = '#48bb78';
+            statusElement.style.fontWeight = '600';
+        }
+
+        // Receiver information
+        document.getElementById('viewReceiverIC').textContent = parcel.ic || 'N/A';
+        document.getElementById('viewReceiverName').textContent = parcel.receiverName || 'N/A';
+
+        document.getElementById('viewParcelWeight').textContent = parcel.weight ? (parcel.weight + ' kg') : 'N/A';
+        document.getElementById('viewDeliveryLocation').textContent = parcel.deliveryLocation || 'N/A';
+        document.getElementById('viewDateAdded').textContent = parcel.date || 'N/A';
+        document.getElementById('viewTimeAdded').textContent = parcel.time ? formatTime(parcel.time) : 'N/A';
+        document.getElementById('viewParcelName').textContent = parcel.name || 'Package';
+
+        // Generate QR code for viewing with loading state
+        const qrContainer = document.getElementById('viewQRCode');
+
+        // Check if QR has been generated by staff
+        if (!parcel.qrGenerated) {
+            qrContainer.innerHTML = '<div class="text-center text-warning p-3"><i class="fas fa-hourglass-half fa-2x mb-2"></i><br><strong>QR Code Not Yet Generated</strong><br><small>Staff will generate the QR code for this parcel</small></div>';
+            console.log('⏳ QR code not yet generated by staff for parcel:', parcel.TrackingNumber);
+            return;
+        }
+
+        qrContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Generating QR Code...</div>';
+
+        setTimeout(() => {
+            qrContainer.innerHTML = '';
+
+            // Check if QRCode library is available
+            if (typeof QRCode === 'undefined') {
+                console.warn('QRCode library not immediately available, attempting to load...');
+
+                // Try to load QR library dynamically
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+                script.onload = function() {
+                    console.log('QRCode library loaded dynamically, retrying generation...');
+                    setTimeout(() => generateReceiverQR(qrContainer, parcel), 500);
+                };
+                script.onerror = function() {
+                    console.log('CDN failed, using local fallback');
+                    qrContainer.innerHTML = '<div class="text-center text-warning"><i class="fas fa-exclamation-circle"></i> QR Code unavailable</div>';
+                };
+                document.head.appendChild(script);
+                return;
+            }
+
+            generateReceiverQR(qrContainer, parcel);
+        }, 300);
+
+        // Helper function to generate scannable QR code
+        function generateReceiverQR(container, parcelData) {
+            try {
+                // Build QR payload in scannable format
+                const qrPayload = "PPMS|" +
+                                 parcelData.TrackingNumber + "|" +
+                                 parcelData.MatricNumber + "|" +
+                                 (parcelData.receiverName || 'N/A') + "|" +
+                                 (parcelData.deliveryLocation || 'N/A') + "|" +
+                                 (parcelData.status || 'Pending');
+
+                console.log('QR Payload:', qrPayload);
+
+                // Generate QR code URL using api.qrserver.com
+                const encodedPayload = encodeURIComponent(qrPayload);
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodedPayload}`;
+
+                console.log('QR Code URL:', qrCodeUrl);
+
+                // Display the QR code image
+                container.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`;
+
+                console.log('✅ Scannable QR code generated successfully!');
+
+            } catch (error) {
+                console.error('❌ QR Code generation error:', error);
+                container.innerHTML = '<div class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> QR Code generation failed</div>';
+            }
+        }
+
+        // Generate scannable QR code for parcel details card (after modal is shown)
+        setTimeout(() => {
+            const parcelQRContainer = document.getElementById('parcelQRCode');
+            if (parcelQRContainer) {
+                // Check if QR has been generated by staff
+                if (!parcel.qrGenerated) {
+                    parcelQRContainer.innerHTML = '<div class="text-center text-warning p-2"><i class="fas fa-hourglass-half"></i><br><small>QR not yet generated</small></div>';
+                    console.log('⏳ QR code not yet generated by staff');
+                    return;
+                }
+
+                try {
+                    // Build QR payload in scannable format
+                    const qrPayload = "PPMS|" +
+                                     parcel.TrackingNumber + "|" +
+                                     parcel.MatricNumber + "|" +
+                                     (parcel.receiverName || 'N/A') + "|" +
+                                     (parcel.deliveryLocation || 'N/A') + "|" +
+                                     (parcel.status || 'Pending');
+
+                    // Generate QR code URL using api.qrserver.com
+                    const encodedPayload = encodeURIComponent(qrPayload);
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedPayload}`;
+
+                    // Display the QR code image
+                    parcelQRContainer.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto; border-radius: 8px;">`;
+
+                    console.log('✅ Parcel details QR generated successfully');
+                } catch (error) {
+                    console.error('Parcel details QR generation error:', error);
+                    parcelQRContainer.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
+                }
+            }
+        }, 500);
+
+        // Show modal with animation and debugging
+        console.log('Attempting to show modal...');
+        const modalElement = document.getElementById('viewParcelModal');
+        console.log('Modal element found:', modalElement);
+
+        if (modalElement) {
+            try {
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                console.log('Modal instance created:', modal);
+                modal.show();
+                console.log('Modal show() called');
+            } catch (error) {
+                console.error('Error showing modal:', error);
+            }
+        } else {
+            console.error('Modal element not found!');
+        }
+    }
+
+    // Helper function to format time
+    function formatTime(timeString) {
+        if (!timeString) return 'N/A';
+        try {
+            const date = new Date('1970-01-01T' + timeString);
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        } catch (e) {
+            return timeString;
+        }
+    }
 
     // Consolidated DOMContentLoaded event listener for better performance
     document.addEventListener('DOMContentLoaded', function() {
@@ -997,66 +1380,59 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             });
         }
 
-        // 2. Generate QR Code for parcel details (with error handling)
-        const qrContainer = document.getElementById('parcelQRCode');
-        if (qrContainer) {
-            // Get tracking number from the page
-            const trackingElement = document.querySelector('.tracking-number');
-            if (trackingElement) {
-                const trackingNumber = trackingElement.textContent.trim();
+        // 2. Generate scannable QR on Parcel Details tab
+        (function generateDetailsTabQR() {
+            const detailsQR = document.getElementById('parcelQRCode');
+            const trackingEl = document.querySelector('.tracking-number');
+            if (!detailsQR || !trackingEl) return;
 
-                // Check if QRCode library is available
-                if (typeof QRCode !== 'undefined') {
-                    try {
-                        // Generate QR code
-                        QRCode.toCanvas(qrContainer, trackingNumber, {
-                            width: 120,
-                            height: 120,
-                            color: {
-                                dark: '#1f2937',
-                                light: '#ffffff'
-                            },
-                            margin: 2
-                        }, function (error) {
-                            if (error) {
-                                console.error('QR Code generation error:', error);
-                                qrContainer.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
-                            }
-                        });
-                    } catch (error) {
-                        console.error('QR Code library error:', error);
-                        qrContainer.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
-                    }
-                } else {
-                    console.warn('QRCode library not loaded');
-                    qrContainer.innerHTML = '<div class="text-muted small">QR Code loading...</div>';
+            const tracking = trackingEl.textContent.trim();
+            detailsQR.innerHTML = '<div class="text-muted small">Loading QR...</div>';
 
-                    // Try to load QR code after a delay
-                    setTimeout(() => {
-                        if (typeof QRCode !== 'undefined') {
-                            QRCode.toCanvas(qrContainer, trackingNumber, {
-                                width: 120,
-                                height: 120,
-                                color: {
-                                    dark: '#1f2937',
-                                    light: '#ffffff'
-                                },
-                                margin: 2
-                            }, function (error) {
-                                if (error) {
-                                    console.error('QR Code generation error (delayed):', error);
-                                    qrContainer.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
-                                }
-                            });
-                        } else {
-                            qrContainer.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
+            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+                credentials: 'include'
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success && data.parcel) {
+                        const parcel = data.parcel;
+
+                        // Check if QR has been generated by staff
+                        if (!parcel.qrGenerated) {
+                            detailsQR.innerHTML = '<div class="text-center text-warning p-2"><i class="fas fa-hourglass-half"></i><br><small>QR not yet generated by staff</small></div>';
+                            console.log('⏳ Details tab: QR code not yet generated by staff');
+                            return;
                         }
-                    }, 1000);
-                }
-            }
-        }
+
+                        // Build QR payload in scannable format
+                        const qrPayload = "PPMS|" +
+                                         tracking + "|" +
+                                         parcel.MatricNumber + "|" +
+                                         (parcel.receiverName || 'N/A') + "|" +
+                                         (parcel.deliveryLocation || 'N/A') + "|" +
+                                         (parcel.status || 'Pending');
+
+                        // Generate QR code URL using api.qrserver.com
+                        const encodedPayload = encodeURIComponent(qrPayload);
+                        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedPayload}`;
+
+                        // Display the QR code image
+                        detailsQR.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" style="max-width: 100%; height: auto; border-radius: 8px;">`;
+
+                        console.log('✅ Details tab: scannable QR generated successfully');
+                    } else {
+                        console.warn('⚠️ Details tab: could not fetch parcel data');
+                        detailsQR.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Details tab QR fetch error:', err);
+                    detailsQR.innerHTML = '<div class="text-muted small">QR Code unavailable</div>';
+                });
+        })();
 
         // 3. Mark individual notification as read when clicked
+        // 2. Mark individual notification as read when clicked
         document.querySelectorAll('.notification-item.unread').forEach(item => {
             item.addEventListener('click', function() {
                 const notificationId = this.dataset.notificationId;
@@ -1077,9 +1453,10 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         action: 'mark_single_read',
-                        notification_id: notificationId
+                        notificationId: notificationId
                     })
                 })
                 .then(response => response.json())
@@ -1229,156 +1606,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
     // Print function removed as per user request
 
-    // History sorting function
-    function sortHistory(column, order) {
-        const table = document.getElementById('historyTable');
-        if (!table) return;
 
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-
-        rows.sort((a, b) => {
-            let aVal, bVal;
-
-            if (column === 'date') {
-                aVal = new Date(a.dataset.date);
-                bVal = new Date(b.dataset.date);
-            }
-
-            if (order === 'asc') {
-                return aVal > bVal ? 1 : -1;
-            } else {
-                return aVal < bVal ? 1 : -1;
-            }
-        });
-
-        tbody.innerHTML = '';
-        rows.forEach(row => tbody.appendChild(row));
-
-        // Update button text
-        document.getElementById('sortDropdown').innerHTML =
-            `<i class="fas fa-sort me-1"></i> ${order === 'desc' ? 'Date (Newest)' : 'Date (Oldest)'}`;
-    }
-
-    // History filtering function
-    function filterHistory(status) {
-        const table = document.getElementById('historyTable');
-        if (!table) return;
-
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            if (status === 'all' || row.dataset.status === status) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        updateStatistics();
-
-        // Update button text
-        const filterText = status === 'all' ? 'Show All' :
-                          status === 'Pending' ? 'Pending Only' : 'Retrieved Only';
-        document.getElementById('sortDropdown').innerHTML =
-            `<i class="fas fa-filter me-1"></i> ${filterText}`;
-    }
-
-    // Refresh history
-    function refreshHistory() {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
-        btn.disabled = true;
-
-        // Use AJAX to refresh only the parcel history data
-        fetch(window.location.href, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            // Parse the response and extract the history table
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newHistoryTable = doc.querySelector('#historyTable tbody');
-            const newStatistics = doc.querySelector('.statistics-cards');
-
-            if (newHistoryTable) {
-                // Update the table content
-                const currentTable = document.querySelector('#historyTable tbody');
-                if (currentTable) {
-                    currentTable.innerHTML = newHistoryTable.innerHTML;
-                }
-            }
-
-            if (newStatistics) {
-                // Update statistics
-                const currentStats = document.querySelector('.statistics-cards');
-                if (currentStats) {
-                    currentStats.innerHTML = newStatistics.innerHTML;
-                }
-            }
-
-            // Also refresh real-time statistics
-            loadReceiverStats();
-
-            // Reset button
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            // Show success message
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.innerHTML = '<i class="fas fa-check-circle me-2"></i>History refreshed successfully!';
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                font-weight: 500;
-            `;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        })
-        .catch(error => {
-            console.error('Error refreshing history:', error);
-            // Reset button on error
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            // Show error message
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Failed to refresh. Please try again.';
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #dc3545;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                font-weight: 500;
-            `;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        });
-    }
 
     // View parcel details
     function viewParcelDetails(trackingNumber) {
@@ -1433,23 +1661,13 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
     function filterHistory(status) {
         console.log('Filtering history by', status);
-        const table = document.getElementById('historyTable');
-        if (!table) return;
-
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            if (status === 'all' || row.dataset.status === status) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        updateStatistics();
+        currentStatusFilter = status; // Update the global status filter
+        applyReceiverHistorySearch(); // Re-apply search with new filter
     }
 
     function refreshHistory() {
         console.log('Refreshing history');
+
         // Show loading toast
         Swal.fire({
             toast: true,
@@ -1460,10 +1678,176 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             timer: 1500
         });
 
-        // Reload the page after a short delay
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
+        // Fetch fresh history data via AJAX
+        fetch('../php/receiver-get-history.php', {
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Refresh response:', data);
+            if (data.success) {
+                // Update table with fresh data
+                const table = document.getElementById('historyTable');
+                if (table) {
+                    const tbody = table.querySelector('tbody');
+                    tbody.innerHTML = '';
+
+                    // Rebuild table rows
+                    data.parcels.forEach(parcel => {
+                        try {
+                            const row = document.createElement('tr');
+
+                            const statusBadge = parcel.status === 'Pending'
+                                ? '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Pending</span>'
+                                : parcel.status === 'Retrieved'
+                                ? '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Retrieved</span>'
+                                : `<span class="badge bg-secondary">${parcel.status}</span>`;
+
+                            const dateTime = new Date(parcel.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+                            const timeStr = parcel.time ? new Date('2000-01-01 ' + parcel.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : '';
+
+                            row.innerHTML = `
+                                <td class="px-4 py-3"><span class="fw-bold text-primary">${parcel.TrackingNumber}</span></td>
+                                <td class="px-4 py-3">
+                                    <div>${dateTime}${timeStr ? '<br><small class="text-muted">' + timeStr + '</small>' : ''}</div>
+                                </td>
+                                <td class="px-4 py-3">${statusBadge}</td>
+                                <td class="px-4 py-3"><i class="fas fa-weight-hanging me-1 text-muted"></i>${parcel.weight} kg</td>
+                                <td class="px-4 py-3"><i class="fas fa-map-marker-alt me-1 text-muted"></i>${parcel.deliveryLocation || 'Not specified'}</td>
+                                <td class="px-4 py-3">
+                                    <button class="btn btn-sm btn-outline-primary eye-button"
+                                            data-tracking="${parcel.TrackingNumber}"
+                                            data-status="${parcel.status}"
+                                            data-ic="${parcel.MatricNumber}"
+                                            data-receiver-name="${parcel.receiverName || 'N/A'}"
+                                            data-weight="${parcel.weight || 'N/A'}"
+                                            data-location="${parcel.deliveryLocation || 'N/A'}"
+                                            data-date="${parcel.date}"
+                                            data-time="${parcel.time}"
+                                            data-name="${parcel.name || 'Description only'}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            `;
+
+                            // Set data attributes AFTER innerHTML to preserve them
+                            row.setAttribute('data-status', parcel.status);
+                            row.setAttribute('data-date', parcel.date);
+                            row.setAttribute('data-tracking', parcel.TrackingNumber);
+                            row.setAttribute('data-matric', parcel.MatricNumber);
+                            row.setAttribute('data-receiver-name', parcel.receiverName || 'N/A');
+                            row.setAttribute('data-location', parcel.deliveryLocation || 'N/A');
+
+                            tbody.appendChild(row);
+                        } catch(rowError) {
+                            console.error('Error creating row for parcel:', parcel, rowError);
+                        }
+                    });
+                }
+
+                // Update statistics
+                try { updateStatistics(); } catch(e){ console.error('Error updating statistics:', e); }
+
+                // Re-attach event listeners to new eye buttons
+                try {
+                    const eyeButtons = document.querySelectorAll('.eye-button');
+                    eyeButtons.forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            const tracking = this.getAttribute('data-tracking');
+                            const status = this.getAttribute('data-status');
+                            const ic = this.getAttribute('data-ic');
+                            const receiverName = this.getAttribute('data-receiver-name');
+                            const weight = this.getAttribute('data-weight');
+                            const location = this.getAttribute('data-location');
+                            const date = this.getAttribute('data-date');
+                            const time = this.getAttribute('data-time');
+                            const name = this.getAttribute('data-name');
+
+                            // Fetch verification data from server
+                            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+                                credentials: 'include'
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success && data.parcel) {
+                                        if (data.parcel.verificationData) {
+                                            window.parcelVerificationData = data.parcel.verificationData;
+                                        } else {
+                                            window.parcelVerificationData = null;
+                                        }
+                                    }
+                                    // Show parcel details modal
+                                    showParcelDetailsModal({
+                                        TrackingNumber: tracking,
+                                        status: status,
+                                        ic: ic,
+                                        receiverName: receiverName,
+                                        weight: weight,
+                                        deliveryLocation: location,
+                                        date: date,
+                                        time: time,
+                                        name: name,
+                                        qrGenerated: data.success ? data.parcel.qrGenerated : false,
+                                        verificationData: data.success ? data.parcel.verificationData : null
+                                    });
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching verification data:', error);
+                                    // Show modal anyway
+                                    showParcelDetailsModal({
+                                        TrackingNumber: tracking,
+                                        status: status,
+                                        ic: ic,
+                                        receiverName: receiverName,
+                                        weight: weight,
+                                        deliveryLocation: location,
+                                        date: date,
+                                        time: time,
+                                        name: name,
+                                        qrGenerated: false,
+                                        verificationData: null
+                                    });
+                                });
+                        });
+                    });
+                } catch(e) { console.error('Error attaching eye button listeners:', e); }
+
+                // Reset search and filter
+                const searchInput = document.getElementById('receiverHistorySearchInput');
+                if (searchInput) searchInput.value = '';
+                currentStatusFilter = 'all';
+
+                // Show success message
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Refreshed!',
+                    text: 'Parcel history has been refreshed.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                throw new Error(data.message || 'Failed to refresh');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing history:', error);
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to refresh. Please try again.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        });
     }
 
 
@@ -1487,6 +1871,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ action: 'mark_all_read' })
                 })
                 .then(response => response.json())
@@ -1553,7 +1938,9 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
     // Load real-time receiver statistics
     function loadReceiverStats() {
-        fetch('../php/receiver-get-stats.php')
+        fetch('../php/receiver-get-stats.php', {
+            credentials: 'include'
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1621,6 +2008,71 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         if (retrievedElement) retrievedElement.textContent = retrievedCount;
     }
 
+    // Debounce timer for receiver search
+    let receiverSearchDebounceTimer = null;
+    let currentStatusFilter = 'all'; // Track current status filter
+
+    // --- Client-side Search (Receiver History) ---
+    function applyReceiverHistorySearch(){
+        clearTimeout(receiverSearchDebounceTimer);
+        receiverSearchDebounceTimer = setTimeout(() => {
+            const input = document.getElementById('receiverHistorySearchInput');
+            const noResults = document.getElementById('receiverHistoryNoResults');
+            const table = document.getElementById('historyTable');
+            if (!input || !table) return;
+
+            const q = (input.value || '').toLowerCase().trim();
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            let anyVisible = false;
+            rows.forEach(row => {
+                const tracking = (row.dataset.tracking || '').toLowerCase();
+                const matric = (row.dataset.matric || '').toLowerCase();
+                const receiverName = (row.dataset['receiver-name'] || '').toLowerCase();
+                const location = (row.dataset.location || '').toLowerCase();
+                const name = (row.querySelector('[data-name]')?.getAttribute('data-name') || '').toLowerCase();
+                const status = row.dataset.status || '';
+
+                // Check if matches search query
+                const matchesSearch = !q || [tracking, matric, receiverName, location, name].some(v => v.includes(q));
+
+                // Check if matches status filter
+                const matchesStatus = currentStatusFilter === 'all' || status === currentStatusFilter;
+
+                // Show row only if it matches both search and status filter
+                const shouldShow = matchesSearch && matchesStatus;
+                row.style.display = shouldShow ? '' : 'none';
+                if (shouldShow) anyVisible = true;
+            });
+
+            // Update stats and no-results message
+            try { updateStatistics(); } catch(e){}
+            if (noResults) noResults.classList.toggle('d-none', anyVisible);
+        }, 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        const si = document.getElementById('receiverHistorySearchInput');
+        if (si){ si.addEventListener('input', applyReceiverHistorySearch); }
+
+        const historyTabBtn = document.getElementById('history-tab');
+        if (historyTabBtn){
+            historyTabBtn.addEventListener('shown.bs.tab', function(){
+                const inp = document.getElementById('receiverHistorySearchInput');
+                if (inp) inp.value = '';
+                const noRes = document.getElementById('receiverHistoryNoResults');
+                if (noRes) noRes.classList.add('d-none');
+                try { filterHistory('all'); } catch(e){}
+            });
+        }
+
+        // If history is already the active tab on load, default to showing all statuses
+        const historyPane = document.getElementById('history');
+        if (historyPane && historyPane.classList.contains('active')){
+            try { filterHistory('all'); } catch(e){}
+        }
+    });
+
     // Form submission handling is now in the consolidated DOMContentLoaded listener above
 
     // Mark individual notification as read from dropdown
@@ -1663,6 +2115,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'mark_single_read',
                 notificationId: notificationId
@@ -1714,6 +2167,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'mark_single_read',
                 notificationId: notificationId
@@ -1789,6 +2243,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         notificationId: notificationId
                     })
@@ -2046,24 +2501,445 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     // Initialize carousel when page loads
     document.addEventListener('DOMContentLoaded', initializeCarousel);
 
-    // Function to format IC number with dashes
-    function formatICNumber(icNumber) {
-        if (!icNumber || icNumber.length !== 12) {
-            return icNumber; // Return as-is if not 12 digits
+    // Function to format Matric number (8 digits, no formatting needed)
+    function formatICNumber(matricNumber) {
+        if (!matricNumber || matricNumber.length !== 8) {
+            return matricNumber; // Return as-is if not 8 digits
         }
 
-        // Format as 123456-78-9012
-        return icNumber.substring(0, 6) + '-' + icNumber.substring(6, 8) + '-' + icNumber.substring(8, 12);
+        // Matric numbers are displayed as-is (8 digits)
+        return matricNumber;
     }
 
-    // Format IC numbers on page load
+    // Format Matric numbers on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const icDisplay = document.getElementById('receiverICDisplay');
-        if (icDisplay) {
-            const icNumber = icDisplay.textContent.trim();
-            icDisplay.textContent = formatICNumber(icNumber);
+        const matricDisplay = document.getElementById('receiverICDisplay');
+        if (matricDisplay) {
+            const matricNumber = matricDisplay.textContent.trim();
+            matricDisplay.textContent = formatICNumber(matricNumber);
         }
+
     });
+
+    // Enlarge QR code for receiver - Sleek Modal
+    function enlargeReceiverQR() {
+        const qrContainer = document.getElementById('parcelQRCode');
+        if (!qrContainer) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'QR Container Not Found',
+                text: 'QR code container is not available.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        const img = qrContainer.querySelector('img');
+
+        if (!img) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No QR Code',
+                text: 'QR code is not available for this parcel.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        // Get higher resolution QR code for enlargement
+        let qrImageData = img.src;
+
+        // If using api.qrserver.com, upgrade to larger size for better quality
+        if (qrImageData.includes('api.qrserver.com')) {
+            qrImageData = qrImageData.replace(/size=\d+x\d+/, 'size=600x600');
+        }
+
+        // Create sleek modal with enlarged QR code
+        Swal.fire({
+            html: `
+                <div style="text-align: center;">
+                    <img src="${qrImageData}"
+                         style="max-width: 90%; max-height: 80vh; height: auto; border: 3px solid white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);"
+                         alt="Enlarged QR Code">
+                    <p style="color: white; margin-top: 20px; font-size: 14px;">Click outside or press ESC to close</p>
+                </div>
+            `,
+            background: 'transparent',
+            showConfirmButton: false,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            customClass: {
+                popup: 'enlarged-qr-popup'
+            },
+            didOpen: (modal) => {
+                // Create dark overlay
+                const backdrop = document.querySelector('.swal2-container');
+                if (backdrop) {
+                    backdrop.style.background = 'rgba(0, 0, 0, 0.9)';
+                    backdrop.style.backdropFilter = 'blur(5px)';
+                }
+
+                // Style the popup
+                modal.style.background = 'transparent';
+                modal.style.boxShadow = 'none';
+
+                // Create close button
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.setAttribute('aria-label', 'Close');
+                closeBtn.style.cssText = `
+                    position: fixed;
+                    top: 30px;
+                    right: 30px;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background: white;
+                    border: none;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: #1f2937;
+                    z-index: 10000;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+                closeBtn.onmouseover = () => {
+                    closeBtn.style.transform = 'scale(1.1) rotate(90deg)';
+                    closeBtn.style.background = '#f87171';
+                    closeBtn.style.color = 'white';
+                };
+                closeBtn.onmouseout = () => {
+                    closeBtn.style.transform = 'scale(1) rotate(0deg)';
+                    closeBtn.style.background = 'white';
+                    closeBtn.style.color = '#1f2937';
+                };
+                closeBtn.onclick = () => Swal.close();
+                document.body.appendChild(closeBtn);
+            },
+            willClose: () => {
+                const closeBtn = document.querySelector('button[style*="position: fixed"]');
+                if (closeBtn) closeBtn.remove();
+            }
+        });
+    }
+
+    // Download/Print QR code for receiver - Opens print page
+    function downloadReceiverQR() {
+        const qrContainer = document.getElementById('parcelQRCode');
+        if (!qrContainer) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'QR Container Not Found',
+                text: 'QR code container is not available.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        const img = qrContainer.querySelector('img');
+
+        if (!img) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No QR Code',
+                text: 'QR code is not available for this parcel.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        // Get tracking number
+        const trackingNumber = document.querySelector('.tracking-number')?.textContent.trim() || 'QR_Code';
+
+        // Store the image source
+        const qrImageSrc = img.src;
+
+        // Create print page
+        const printWindow = window.open('', '', 'width=900,height=700');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Code - ${trackingNumber}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 20px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        background: #f5f5f5;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    }
+                    .container {
+                        background: white;
+                        padding: 40px;
+                        border-radius: 12px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                        text-align: center;
+                        max-width: 600px;
+                    }
+                    .header {
+                        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                        color: white;
+                        padding: 20px;
+                        border-radius: 8px;
+                        margin-bottom: 30px;
+                    }
+                    .header h1 {
+                        margin: 0 0 10px 0;
+                        font-size: 24px;
+                    }
+                    .header p {
+                        margin: 0;
+                        font-size: 14px;
+                        opacity: 0.9;
+                    }
+                    .qr-display {
+                        margin: 30px 0;
+                        padding: 20px;
+                        background: #f8fafc;
+                        border-radius: 8px;
+                    }
+                    .qr-display img {
+                        max-width: 100%;
+                        height: auto;
+                        border: 2px solid #e5e7eb;
+                        border-radius: 8px;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #e5e7eb;
+                        color: #9ca3af;
+                        font-size: 12px;
+                    }
+                    .actions {
+                        margin-top: 30px;
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+                    }
+                    button {
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                    }
+                    .btn-print {
+                        background: linear-gradient(135deg, #38d9a9 0%, #2dd4bf 100%);
+                        color: white;
+                    }
+                    .btn-print:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(56, 217, 169, 0.3);
+                    }
+                    .btn-download {
+                        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                        color: white;
+                    }
+                    .btn-download:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+                    }
+                    @media print {
+                        body {
+                            background: white;
+                            padding: 0;
+                        }
+                        .container {
+                            box-shadow: none;
+                            padding: 20px;
+                        }
+                        .actions {
+                            display: none;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Perwira Parcel Verification</h1>
+                        <p>Tracking Number: <strong>${trackingNumber}</strong></p>
+                    </div>
+                    <div class="qr-display">
+                        <img src="${qrImageSrc}" alt="QR Code">
+                    </div>
+                    <div class="footer">
+                        <p>QR Code contains encrypted verification data</p>
+                        <p>Generated: ${new Date().toLocaleString()}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-print" onclick="window.print()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <button class="btn-download" onclick="downloadQRImage()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                <script>
+                    function downloadQRImage() {
+                        const qrImageUrl = '${qrImageSrc}';
+                        const fileName = 'PPMS_Verification_${trackingNumber}.png';
+
+                        // Create a temporary link and trigger download
+                        fetch(qrImageUrl)
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = fileName;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                            })
+                            .catch(error => {
+                                console.error('Download failed:', error);
+                                // Fallback: try direct download
+                                const link = document.createElement('a');
+                                link.href = qrImageUrl;
+                                link.download = fileName;
+                                link.target = '_blank';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            });
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+    // Print QR code for receiver - Opens print window
+    function printReceiverQR() {
+        const qrContainer = document.getElementById('parcelQRCode');
+        if (!qrContainer) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'QR Container Not Found',
+                text: 'QR code container is not available.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        const img = qrContainer.querySelector('img');
+
+        if (!img) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No QR Code',
+                text: 'QR code is not available for this parcel.',
+                confirmButtonColor: '#43e97b'
+            });
+            return;
+        }
+
+        // Get tracking number
+        const trackingNumberElement = document.querySelector('.tracking-number');
+        const trackingNumber = trackingNumberElement ? trackingNumberElement.textContent.trim() : 'QR_Code';
+
+        // Store the image source
+        const qrImageSrc = img.src;
+
+        // Create print window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print QR Code - ${trackingNumber}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        padding: 20px;
+                        background: white;
+                        margin: 0;
+                    }
+                    .header {
+                        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                        color: white;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        border-radius: 8px;
+                    }
+                    .qr-container {
+                        margin: 20px 0;
+                        padding: 20px;
+                        border: 2px dashed #43e97b;
+                        border-radius: 12px;
+                    }
+                    .qr-container img {
+                        max-width: 250px;
+                        border: 2px solid #e5e7eb;
+                        border-radius: 8px;
+                    }
+                    .info {
+                        margin: 20px 0;
+                        padding: 15px;
+                        background: #f8fafc;
+                        border-radius: 8px;
+                    }
+                    .instructions {
+                        background: #f8f9fa;
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #64748b;
+                    }
+                    @media print {
+                        body {
+                            margin: 0;
+                        }
+                        .no-print {
+                            display: none;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h2>Perwira Parcel Management System</h2>
+                    <h3>Parcel Verification QR Code</h3>
+                </div>
+                <div class="qr-container">
+                    <img src="${qrImageSrc}" alt="QR Code">
+                </div>
+                <div class="info">
+                    <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
+                    <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                </div>
+                <div class="instructions">
+                    <strong>Instructions:</strong><br>
+                    1. Present this QR code at the parcel counter for verification<br>
+                    2. Staff will scan the code to confirm parcel details<br>
+                    3. QR code is unique to this parcel and receiver
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() { window.print(); }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
     </script>
 </body>
 </html>

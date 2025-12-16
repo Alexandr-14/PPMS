@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // Update receiver password
-        $stmt = $conn->prepare("UPDATE Receiver SET password = ? WHERE ICNumber = ?");
+        $stmt = $conn->prepare("UPDATE Receiver SET password = ? WHERE MatricNumber = ?");
         $stmt->bind_param("ss", $hashed_password, $token_data['user_id']);
         $update_success = $stmt->execute();
         $stmt->close();

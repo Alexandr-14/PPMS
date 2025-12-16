@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Set default description if empty
     if (empty($name)) {
-        $name = 'Package'; // Default description
+        $name = 'Description only'; // Default description
     }
 
     // Validate weight is numeric
@@ -47,15 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Check if receiver IC exists in receivers table
-        $receiverQuery = "SELECT ICNumber FROM Receiver WHERE ICNumber = ?";
+        // Check if receiver Matric exists in receivers table
+        $receiverQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
         $receiverStmt = $conn->prepare($receiverQuery);
         $receiverStmt->bind_param("s", $receiverIC);
         $receiverStmt->execute();
         $receiverResult = $receiverStmt->get_result();
 
         if ($receiverResult->num_rows === 0) {
-            echo json_encode(['success' => false, 'message' => 'Receiver IC number not found. Please ensure the receiver is registered.']);
+            echo json_encode(['success' => false, 'message' => 'Receiver Matric Number not found. Please ensure the receiver is registered.']);
             exit();
         }
 
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             // Update parcel information INCLUDING STATUS
-            $updateQuery = "UPDATE Parcel SET ICNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
+            $updateQuery = "UPDATE Parcel SET MatricNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->bind_param("sssdss", $receiverIC, $name, $deliveryLocation, $weight, $status, $trackingNumber);
             $updateStmt->execute();
@@ -80,14 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($retrievalCheckResult->num_rows === 0) {
                     // Insert new retrieval record
-                    $insertRetrievalQuery = "INSERT INTO retrievalrecord (trackingNumber, ICNumber, staffID, retrieveDate, retrieveTime, status) VALUES (?, ?, ?, CURDATE(), CURTIME(), 'Retrieved')";
+                    $insertRetrievalQuery = "INSERT INTO retrievalrecord (trackingNumber, MatricNumber, staffID, retrieveDate, retrieveTime, status) VALUES (?, ?, ?, CURDATE(), CURTIME(), 'Retrieved')";
                     $insertRetrievalStmt = $conn->prepare($insertRetrievalQuery);
                     $staffID = $_SESSION['staff_id'];
                     $insertRetrievalStmt->bind_param("sss", $trackingNumber, $receiverIC, $staffID);
                     $insertRetrievalStmt->execute();
                 } else {
                     // Update existing retrieval record
-                    $updateRetrievalQuery = "UPDATE retrievalrecord SET ICNumber = ?, status = 'Retrieved', retrieveDate = CURDATE(), retrieveTime = CURTIME() WHERE trackingNumber = ?";
+                    $updateRetrievalQuery = "UPDATE retrievalrecord SET MatricNumber = ?, status = 'Retrieved', retrieveDate = CURDATE(), retrieveTime = CURTIME() WHERE trackingNumber = ?";
                     $updateRetrievalStmt = $conn->prepare($updateRetrievalQuery);
                     $updateRetrievalStmt->bind_param("ss", $receiverIC, $trackingNumber);
                     $updateRetrievalStmt->execute();

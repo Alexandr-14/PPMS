@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 require_once 'db_connect.php';
 
 // Check if user is logged in as receiver
-if (!isset($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric'])) {
     echo json_encode([
         'success' => false,
         'message' => 'Access denied. Please log in.'
@@ -22,13 +22,13 @@ if (!isset($_GET['trackingNumber'])) {
 
 try {
     $trackingNumber = $_GET['trackingNumber'];
-    $receiverIC = $_SESSION['receiver_ic'];
-    
+    $receiverMatric = $_SESSION['receiver_matric'];
+
     // Get parcel details with QR code - only for the logged-in receiver
     $query = "
-        SELECT 
+        SELECT
             p.TrackingNumber,
-            p.ICNumber,
+            p.MatricNumber,
             p.date,
             p.time,
             p.name,
@@ -39,12 +39,12 @@ try {
             p.qr_verification_data,
             r.name as receiverName
         FROM Parcel p
-        LEFT JOIN Receiver r ON p.ICNumber = r.ICNumber
-        WHERE p.TrackingNumber = ? AND p.ICNumber = ?
+        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        WHERE p.TrackingNumber = ? AND p.MatricNumber = ?
     ";
-    
+
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $trackingNumber, $receiverIC);
+    $stmt->bind_param("ss", $trackingNumber, $receiverMatric);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -74,7 +74,7 @@ try {
         'success' => true,
         'parcel' => [
             'TrackingNumber' => $parcel['TrackingNumber'],
-            'ICNumber' => $parcel['ICNumber'],
+            'MatricNumber' => $parcel['MatricNumber'],
             'receiverName' => $parcel['receiverName'],
             'name' => $parcel['name'],
             'deliveryLocation' => $parcel['deliveryLocation'],
@@ -84,7 +84,9 @@ try {
             'time' => $parcel['time'],
             'qrExists' => $qrExists,
             'qrPath' => $qrPath,
-            'hasVerificationData' => !empty($parcel['qr_verification_data'])
+            'qrGenerated' => !empty($parcel['QR']), // Flag: true if staff has generated QR
+            'hasVerificationData' => !empty($parcel['qr_verification_data']),
+            'verificationData' => $parcel['qr_verification_data'] // Return the actual verification data for QR generation
         ]
     ]);
 

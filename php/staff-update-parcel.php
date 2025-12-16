@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 session_start();
 require_once 'db_connect.php';
 require_once 'notification-helper.php';
@@ -19,18 +20,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate required fields (name/description is optional)
     if (empty($trackingNumber) || empty($receiverIC) || empty($deliveryLocation) || $weight <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Tracking number, receiver IC, delivery location are required and weight must be greater than 0.']);
+        echo json_encode(['success' => false, 'message' => 'Tracking number, receiver Matric, delivery location are required and weight must be greater than 0.']);
         exit();
     }
 
     // Set default description if empty
     if (empty($name)) {
-        $name = 'Package'; // Default description
+        $name = 'Description only'; // Default description
     }
 
-    // Validate IC Number format (12 digits)
-    if (!preg_match('/^\d{12}$/', $receiverIC)) {
-        echo json_encode(['success' => false, 'message' => 'IC Number must be exactly 12 digits.']);
+    // Validate Matric Number format (2 letters + 6 digits)
+    if (!preg_match('/^[A-Z]{2}\d{6}$/', $receiverIC)) {
+        echo json_encode(['success' => false, 'message' => 'Matric Number must be 2 letters followed by 6 digits (e.g., CI230010).']);
         exit();
     }
 
@@ -48,14 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Check if receiver exists
-        $receiverCheckQuery = "SELECT ICNumber FROM Receiver WHERE ICNumber = ?";
+        $receiverCheckQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
         $receiverCheckStmt = $conn->prepare($receiverCheckQuery);
         $receiverCheckStmt->bind_param("s", $receiverIC);
         $receiverCheckStmt->execute();
         $receiverCheckResult = $receiverCheckStmt->get_result();
 
         if ($receiverCheckResult->num_rows === 0) {
-            echo json_encode(['success' => false, 'message' => 'Receiver with this IC Number does not exist.']);
+            echo json_encode(['success' => false, 'message' => 'Receiver with this Matric Number does not exist.']);
             exit();
         }
 
@@ -64,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             // Update parcel information INCLUDING STATUS
-            $updateQuery = "UPDATE Parcel SET ICNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
+            $updateQuery = "UPDATE Parcel SET MatricNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->bind_param("sssdss", $receiverIC, $name, $deliveryLocation, $weight, $status, $trackingNumber);
             $updateStmt->execute();
@@ -80,13 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($retrievalCheckResult->num_rows === 0) {
                     // Insert new retrieval record
-                    $insertRetrievalQuery = "INSERT INTO retrievalrecord (trackingNumber, ICNumber, retrieveDate, retrieveTime, status) VALUES (?, ?, CURDATE(), CURTIME(), 'Retrieved')";
+                    $insertRetrievalQuery = "INSERT INTO retrievalrecord (trackingNumber, MatricNumber, retrieveDate, retrieveTime, status) VALUES (?, ?, CURDATE(), CURTIME(), 'Retrieved')";
                     $insertRetrievalStmt = $conn->prepare($insertRetrievalQuery);
                     $insertRetrievalStmt->bind_param("ss", $trackingNumber, $receiverIC);
                     $insertRetrievalStmt->execute();
                 } else {
                     // Update existing retrieval record
-                    $updateRetrievalQuery = "UPDATE retrievalrecord SET ICNumber = ?, retrieveDate = CURDATE(), retrieveTime = CURTIME(), status = 'Retrieved' WHERE trackingNumber = ?";
+                    $updateRetrievalQuery = "UPDATE retrievalrecord SET MatricNumber = ?, retrieveDate = CURDATE(), retrieveTime = CURTIME(), status = 'Retrieved' WHERE trackingNumber = ?";
                     $updateRetrievalStmt = $conn->prepare($updateRetrievalQuery);
                     $updateRetrievalStmt->bind_param("ss", $receiverIC, $trackingNumber);
                     $updateRetrievalStmt->execute();

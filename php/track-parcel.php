@@ -3,7 +3,7 @@ session_start();
 require_once 'db_connect.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['receiver_ic']) || empty($_SESSION['receiver_ic'])) {
+if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
     header("Location: ../html/receiver-login.html");
     exit();
 }
@@ -17,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Get current receiver's IC number
-        $receiverIC = $_SESSION['receiver_ic'] ?? '';
+        // Get current receiver's Matric number
+        $receiverMatric = $_SESSION['receiver_matric'] ?? '';
 
         // Query the database for the parcel
         $stmt = $conn->prepare("SELECT * FROM Parcel WHERE TrackingNumber = ?");
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $parcel = $result->fetch_assoc();
 
             // Check if this parcel belongs to the current receiver
-            if ($parcel['ICNumber'] !== $receiverIC) {
+            if ($parcel['MatricNumber'] !== $receiverMatric) {
                 // Parcel exists but belongs to different receiver
                 header("Location: ../html/receiver-dashboard.php?tab=tracking&tracking_result=unauthorized");
                 exit();

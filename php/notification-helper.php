@@ -25,7 +25,7 @@ function sendParcelArrivalNotification($icNumber, $trackingNumber, $parcelName, 
         // Insert notification into database
         $stmt = $conn->prepare("
             INSERT INTO Notification (
-                ICNumber,
+                MatricNumber,
                 TrackingNumber,
                 notificationType,
                 messageContent,
@@ -70,7 +70,7 @@ function sendParcelRetrievedNotification($icNumber, $trackingNumber, $parcelName
         // Insert notification into database
         $stmt = $conn->prepare("
             INSERT INTO Notification (
-                ICNumber,
+                MatricNumber,
                 TrackingNumber,
                 notificationType,
                 messageContent,
@@ -116,7 +116,7 @@ function sendParcelReadyNotification($icNumber, $trackingNumber, $parcelName, $d
         // Insert notification into database
         $stmt = $conn->prepare("
             INSERT INTO Notification (
-                ICNumber,
+                MatricNumber,
                 TrackingNumber,
                 notificationType,
                 messageContent,
@@ -145,19 +145,19 @@ function sendParcelReadyNotification($icNumber, $trackingNumber, $parcelName, $d
 }
 
 /**
- * Get receiver name by IC number
- * @param string $icNumber - Receiver's IC number
+ * Get receiver name by Matric number
+ * @param string $matricNumber - Receiver's Matric number
  * @return string - Receiver's name or 'Unknown'
  */
-function getReceiverName($icNumber) {
+function getReceiverName($matricNumber) {
     global $conn;
-    
+
     try {
-        $stmt = $conn->prepare("SELECT name FROM Receiver WHERE ICNumber = ?");
-        $stmt->bind_param("s", $icNumber);
+        $stmt = $conn->prepare("SELECT name FROM Receiver WHERE MatricNumber = ?");
+        $stmt->bind_param("s", $matricNumber);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         if ($row = $result->fetch_assoc()) {
             $stmt->close();
             return $row['name'];
@@ -165,7 +165,7 @@ function getReceiverName($icNumber) {
             $stmt->close();
             return 'Unknown';
         }
-        
+
     } catch (Exception $e) {
         error_log("Error getting receiver name: " . $e->getMessage());
         return 'Unknown';
@@ -174,22 +174,22 @@ function getReceiverName($icNumber) {
 
 /**
  * Check if receiver exists
- * @param string $icNumber - Receiver's IC number
+ * @param string $matricNumber - Receiver's Matric number
  * @return bool - True if receiver exists
  */
-function receiverExists($icNumber) {
+function receiverExists($matricNumber) {
     global $conn;
-    
+
     try {
-        $stmt = $conn->prepare("SELECT ICNumber FROM Receiver WHERE ICNumber = ?");
-        $stmt->bind_param("s", $icNumber);
+        $stmt = $conn->prepare("SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?");
+        $stmt->bind_param("s", $matricNumber);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         $exists = $result->num_rows > 0;
         $stmt->close();
         return $exists;
-        
+
     } catch (Exception $e) {
         error_log("Error checking receiver existence: " . $e->getMessage());
         return false;

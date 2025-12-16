@@ -24,25 +24,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Set default description if empty
     if (empty($name)) {
-        $name = 'Package'; // Default description
+        $name = 'Description only'; // Default description
     }
 
-    // Validate IC Number format (12 digits)
-    if (!preg_match('/^\d{12}$/', $receiverIC)) {
-        echo json_encode(['success' => false, 'message' => 'IC Number must be exactly 12 digits.']);
+    // Validate Matric Number format (2 letters + 6 digits)
+    if (!preg_match('/^[A-Z]{2}[0-9]{6}$/', $receiverIC)) {
+        echo json_encode(['success' => false, 'message' => 'Matric Number must be 2 letters followed by 6 digits (e.g., CI230010).']);
         exit();
     }
 
     try {
         // Check if receiver exists
-        $receiverCheckQuery = "SELECT ICNumber FROM Receiver WHERE ICNumber = ?";
+        $receiverCheckQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
         $receiverCheckStmt = $conn->prepare($receiverCheckQuery);
         $receiverCheckStmt->bind_param("s", $receiverIC);
         $receiverCheckStmt->execute();
         $receiverCheckResult = $receiverCheckStmt->get_result();
 
         if ($receiverCheckResult->num_rows === 0) {
-            echo json_encode(['success' => false, 'message' => 'Receiver with this IC Number does not exist. Please register the receiver first.']);
+            echo json_encode(['success' => false, 'message' => 'Receiver with this Matric Number does not exist. Please register the receiver first.']);
             exit();
         }
 
@@ -58,10 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Insert new parcel with default status 'Pending'
-        $insertQuery = "INSERT INTO Parcel (TrackingNumber, ICNumber, date, time, name, deliveryLocation, weight, status) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending')";
+        // Get staff ID who is adding this parcel
+        $addedBy = $_SESSION['staff_id'] ?? 'UNKNOWN';
+
+        // Insert new parcel with default status 'Pending' and track who added it
+        $insertQuery = "INSERT INTO Parcel (TrackingNumber, MatricNumber, date, time, name, deliveryLocation, weight, status, addedBy) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending', ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssssd", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight);
+        $insertStmt->bind_param("ssssds", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight, $addedBy);
 
         if ($insertStmt->execute()) {
             // Send notification to receiver about new parcel arrival
