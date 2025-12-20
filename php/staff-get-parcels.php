@@ -25,8 +25,8 @@ try {
             r.name as receiverName,
             ret.retrieveDate,
             ret.retrieveTime
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         LEFT JOIN retrievalrecord ret ON p.TrackingNumber = ret.trackingNumber
         ORDER BY p.date DESC, p.time DESC
     ";

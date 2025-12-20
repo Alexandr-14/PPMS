@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_exists = false;
     $user_name = '';
 
-    $stmt = $conn->prepare("SELECT name FROM Receiver WHERE MatricNumber = ?");
+    $stmt = $conn->prepare("SELECT name FROM receiver WHERE MatricNumber = ?");
     $stmt->bind_param("s", $matric_number);
     $stmt->execute();
     $result = $stmt->get_result();

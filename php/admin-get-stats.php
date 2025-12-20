@@ -9,13 +9,13 @@ if (!isset($_SESSION['staff_role']) || $_SESSION['staff_role'] !== 'Admin') {
 }
 
 try {
-    // Get total parcels from Parcel table
-    $totalQuery = "SELECT COUNT(*) as total FROM Parcel";
+    // Get total parcels from parcel table
+    $totalQuery = "SELECT COUNT(*) as total FROM parcel";
     $totalResult = $conn->query($totalQuery);
     $totalParcels = $totalResult->fetch_assoc()['total'];
 
     // Get pending parcels (parcels not yet retrieved)
-    $pendingQuery = "SELECT COUNT(*) as pending FROM Parcel WHERE TrackingNumber NOT IN (SELECT trackingNumber FROM retrievalrecord WHERE status = 'Retrieved')";
+    $pendingQuery = "SELECT COUNT(*) as pending FROM parcel WHERE TrackingNumber NOT IN (SELECT trackingNumber FROM retrievalrecord WHERE status = 'Retrieved')";
     $pendingResult = $conn->query($pendingQuery);
     $pendingParcels = $pendingResult->fetch_assoc()['pending'];
 
@@ -25,7 +25,7 @@ try {
     $retrievedParcels = $retrievedResult->fetch_assoc()['retrieved'];
 
     // Get total receivers
-    $receiversQuery = "SELECT COUNT(*) as total FROM Receiver";
+    $receiversQuery = "SELECT COUNT(*) as total FROM receiver";
     $receiversResult = $conn->query($receiversQuery);
     $totalReceivers = $receiversResult->fetch_assoc()['total'];
 

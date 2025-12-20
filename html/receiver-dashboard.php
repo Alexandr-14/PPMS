@@ -30,6 +30,8 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-dashboard-overrides.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-notifications.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-navbar-buttons.css?v=<?php echo time(); ?>">
+    <!-- Mobile Responsive Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=<?php echo time(); ?>">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
     <style>
@@ -86,7 +88,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <i class="fas fa-bell"></i>
                         <?php
                         // Count unread notifications
-                        $unreadStmt = $conn->prepare("SELECT COUNT(*) as unread_count FROM Notification WHERE MatricNumber = ? AND isRead = 0");
+                        $unreadStmt = $conn->prepare("SELECT COUNT(*) as unread_count FROM notification WHERE MatricNumber = ? AND isRead = 0");
                         $unreadStmt->bind_param("s", $receiverIC);
                         $unreadStmt->execute();
                         $unreadResult = $unreadStmt->get_result();
@@ -112,7 +114,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <div class="notification-dropdown-body">
                             <?php
                             // Fetch recent 5 notifications for dropdown
-                            $recentStmt = $conn->prepare("SELECT * FROM Notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC LIMIT 5");
+                            $recentStmt = $conn->prepare("SELECT * FROM notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC LIMIT 5");
                             $recentStmt->bind_param("s", $receiverIC);
                             $recentStmt->execute();
                             $recentResult = $recentStmt->get_result();
@@ -455,8 +457,8 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     SELECT
                         p.*,
                         r.name as receiverName
-                    FROM Parcel p
-                    LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+                    FROM parcel p
+                    LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
                     WHERE p.MatricNumber = ?
                     ORDER BY p.date DESC, p.time DESC
                 ");
@@ -639,7 +641,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 <div class="notification-list">
                     <?php
                     // Fetch all notifications for the current receiver
-                    $allNotificationStmt = $conn->prepare("SELECT * FROM Notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC");
+                    $allNotificationStmt = $conn->prepare("SELECT * FROM notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC");
                     $allNotificationStmt->bind_param("s", $receiverIC);
                     $allNotificationStmt->execute();
                     $allNotificationResult = $allNotificationStmt->get_result();
@@ -790,95 +792,6 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         <div class="carousel-viewport">
                             <div class="carousel-track" id="modernCarouselTrack">
                                 <!-- Partner Cards - First Set -->
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/posMalaysia.png" alt="Pos Malaysia" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Pos Malaysia</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Pos Malaysia</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/gdex.png" alt="GDEX" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>GDEX</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">GDEX</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/flashexpress.png" alt="Flash Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Flash Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Flash Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/shopeeExpress.jpeg" alt="Shopee Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Shopee Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Shopee Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/JNT.webp" alt="J&T Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>J&T Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">J&T Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/dhl.png" alt="DHL" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>DHL</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">DHL</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/fedex.png" alt="FedEx" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>FedEx</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">FedEx</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/ninjavan.png" alt="Ninja Van" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Ninja Van</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Ninja Van</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Duplicate Set for Infinite Scroll -->
                                 <div class="partner-card">
                                     <div class="partner-card-inner">
                                         <div class="partner-logo-container">
@@ -2354,148 +2267,89 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
 
     <script>
-    // Modern Carousel with Infinite Scroll
-    let currentCarouselIndex = 0;
-    let isAutoSliding = true;
-    let autoSlideInterval;
-    let cardsPerView = 3;
-    let isTransitioning = false;
-    let originalCardsCount = 8; // Number of unique cards
+    // CSS Scroll Snap Carousel with Indicator Updates and Keyboard Navigation
+    let carouselIndicatorUpdateTimer;
+    const originalCardsCount = 8; // Number of unique cards
 
     function initializeCarousel() {
-        const track = document.getElementById('modernCarouselTrack');
-        if (!track) return;
+        const viewport = document.querySelector('.carousel-viewport');
+        if (!viewport) return;
 
-        // Calculate cards per view based on screen size
-        updateCardsPerView();
+        // Update indicators on scroll
+        viewport.addEventListener('scroll', updateCarouselIndicators, { passive: true });
 
-        // Start auto-slide
-        startAutoSlide();
+        // Keyboard navigation support
+        document.addEventListener('keydown', handleCarouselKeyboard);
 
-        // Pause on hover
-        const container = document.querySelector('.modern-carousel-container');
-        container.addEventListener('mouseenter', () => {
-            isAutoSliding = false;
-            clearInterval(autoSlideInterval);
-        });
-
-        // Resume on mouse leave
-        container.addEventListener('mouseleave', () => {
-            isAutoSliding = true;
-            startAutoSlide();
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            updateCardsPerView();
-            updateCarouselPosition();
-        });
-    }
-
-    function updateCardsPerView() {
-        const width = window.innerWidth;
-        if (width < 480) {
-            cardsPerView = 1;
-        } else if (width < 768) {
-            cardsPerView = 2;
-        } else if (width < 1024) {
-            cardsPerView = 2;
-        } else {
-            cardsPerView = 3;
-        }
-    }
-
-    function startAutoSlide() {
-        if (!isAutoSliding) return;
-
-        autoSlideInterval = setInterval(() => {
-            moveCarousel('next');
-        }, 4000);
-    }
-
-    function moveCarousel(direction) {
-        if (isTransitioning) return;
-
-        const track = document.getElementById('modernCarouselTrack');
-
-        if (direction === 'next') {
-            currentCarouselIndex++;
-            updateCarouselPosition();
-
-            // Check if we've reached the end of original cards
-            if (currentCarouselIndex >= originalCardsCount) {
-                isTransitioning = true;
-                setTimeout(() => {
-                    // Reset to beginning without animation
-                    currentCarouselIndex = 0;
-                    track.style.transition = 'none';
-                    updateCarouselPosition(false);
-
-                    // Re-enable transition after a brief moment
-                    setTimeout(() => {
-                        track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                        isTransitioning = false;
-                    }, 50);
-                }, 500);
-            }
-        } else {
-            if (currentCarouselIndex <= 0) {
-                // Jump to end of original set
-                isTransitioning = true;
-                currentCarouselIndex = originalCardsCount - 1;
-                track.style.transition = 'none';
-                updateCarouselPosition(false);
-
-                setTimeout(() => {
-                    track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    isTransitioning = false;
-                }, 50);
-            } else {
-                currentCarouselIndex--;
-                updateCarouselPosition();
-            }
-        }
-
+        // Set initial indicator
         updateCarouselIndicators();
-    }
-
-    function goToSlide(index) {
-        if (isTransitioning) return;
-
-        currentCarouselIndex = index;
-        updateCarouselPosition();
-        updateCarouselIndicators();
-
-        // Reset auto-slide
-        if (isAutoSliding) {
-            clearInterval(autoSlideInterval);
-            startAutoSlide();
-        }
-    }
-
-    function updateCarouselPosition(animate = true) {
-        const track = document.getElementById('modernCarouselTrack');
-        const cards = track.children;
-
-        if (cards.length === 0) return;
-
-        const cardWidth = cards[0].offsetWidth;
-        const gap = 24; // 1.5rem gap
-        const offset = currentCarouselIndex * (cardWidth + gap);
-
-        if (animate) {
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        }
-        track.style.transform = `translateX(-${offset}px)`;
     }
 
     function updateCarouselIndicators() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
         const indicators = document.querySelectorAll('.carousel-indicator');
-        const currentPage = Math.floor((currentCarouselIndex % originalCardsCount) / Math.max(1, Math.floor(originalCardsCount / indicators.length)));
 
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentPage);
+        if (!viewport || cards.length === 0 || indicators.length === 0) return;
+
+        // Calculate which card is in the center of the viewport
+        const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
+        let closestCard = 0;
+        let closestDistance = Infinity;
+
+        cards.forEach((card, index) => {
+            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+            const distance = Math.abs(viewportCenter - cardCenter);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestCard = index;
+            }
         });
+
+        // Map card index to indicator index (8 cards, 3 indicators)
+        const indicatorIndex = Math.floor((closestCard % originalCardsCount) / Math.max(1, Math.floor(originalCardsCount / indicators.length)));
+
+        // Update active indicator
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === indicatorIndex);
+        });
+    }
+
+    function goToSlide(index) {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+
+        if (!viewport || !cards[index]) return;
+
+        // Scroll to the card smoothly
+        cards[index].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+        });
+    }
+
+    function handleCarouselKeyboard(event) {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+
+        if (!viewport || cards.length === 0) return;
+
+        // Only handle arrow keys when carousel is in focus or nearby
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            viewport.scrollBy({
+                left: -150,
+                behavior: 'smooth'
+            });
+        } else if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            viewport.scrollBy({
+                left: 150,
+                behavior: 'smooth'
+            });
+        }
     }
 
     // Initialize carousel when page loads

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Check if parcel exists
-        $checkQuery = "SELECT TrackingNumber FROM Parcel WHERE TrackingNumber = ?";
+        $checkQuery = "SELECT TrackingNumber FROM parcel WHERE TrackingNumber = ?";
         $checkStmt = $conn->prepare($checkQuery);
         $checkStmt->bind_param("s", $trackingNumber);
         $checkStmt->execute();
@@ -46,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $deleteRetrievalStmt->bind_param("s", $trackingNumber);
             $deleteRetrievalStmt->execute();
 
-            // Delete from Parcel table last
-            $deleteParcelQuery = "DELETE FROM Parcel WHERE TrackingNumber = ?";
+            // Delete from parcel table last
+            $deleteParcelQuery = "DELETE FROM parcel WHERE TrackingNumber = ?";
             $deleteParcelStmt = $conn->prepare($deleteParcelQuery);
             $deleteParcelStmt->bind_param("s", $trackingNumber);
             $deleteParcelStmt->execute();

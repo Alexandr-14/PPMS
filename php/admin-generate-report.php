@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 p.date as parcelDate,
                 p.addedBy
             FROM retrievalrecord ret
-            LEFT JOIN Receiver r ON ret.MatricNumber = r.MatricNumber
-            LEFT JOIN Parcel p ON ret.trackingNumber = p.TrackingNumber
+            LEFT JOIN receiver r ON ret.MatricNumber = r.MatricNumber
+            LEFT JOIN parcel p ON ret.trackingNumber = p.TrackingNumber
             WHERE 1=1
         ";
 

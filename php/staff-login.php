@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Check staff table for regular staff
-    $stmt = $conn->prepare("SELECT * FROM Staff WHERE staffID = ?");
+    $stmt = $conn->prepare("SELECT * FROM staff WHERE staffID = ?");
     $stmt->bind_param("s", $staffId);
     $stmt->execute();
     $result = $stmt->get_result();

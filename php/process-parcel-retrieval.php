@@ -14,7 +14,7 @@ header('Content-Type: application/json');
 session_start();
 
 // Include database connection
-require_once 'db-connection.php';
+require_once 'db_connect.php';
 
 // Security: Verify staff is logged in
 if (!isset($_SESSION['staff_id'])) {
@@ -47,8 +47,8 @@ try {
             p.status,
             p.name,
             r.name as receiverName
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         WHERE p.TrackingNumber = ?
     ";
 
@@ -77,7 +77,7 @@ try {
 
     try {
         // Update parcel status to Retrieved
-        $updateQuery = "UPDATE Parcel SET status = 'Retrieved' WHERE TrackingNumber = ?";
+        $updateQuery = "UPDATE parcel SET status = 'Retrieved' WHERE TrackingNumber = ?";
         $updateStmt = $conn->prepare($updateQuery);
         
         if (!$updateStmt) {
@@ -132,7 +132,7 @@ try {
 
         // Create notification for receiver
         $notificationQuery = "
-            INSERT INTO Notification (
+            INSERT INTO notification (
                 MatricNumber,
                 TrackingNumber,
                 notificationType,

@@ -144,14 +144,14 @@ body {
 .nav-tabs .nav-link:hover:not(.active) {
     background: rgba(67, 233, 123, 0.15);
     color: #43e97b;
-    transform: translateY(-1px);
+    transform: none !important;
 }
 
 .nav-tabs .nav-link.active {
     background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
     color: var(--text-white);
     box-shadow: 0 4px 15px rgba(67, 233, 123, 0.5);
-    transform: translateY(-2px);
+    transform: none !important;
 }
 
 .nav-tabs .nav-link.active::before {
@@ -483,26 +483,80 @@ select:focus {
         margin: var(--spacing-md);
         padding: var(--spacing-xl);
     }
-    
+
     .navbar-custom {
         padding: var(--spacing-md);
-        flex-direction: column;
-        gap: var(--spacing-md);
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
     }
-    
-    .nav-tabs .nav-link {
-        padding: var(--spacing-sm) var(--spacing-md);
-        font-size: var(--font-size-sm);
+
+    /* Force horizontal scrollable tabs on mobile */
+    .nav-tabs,
+    ul.nav-tabs,
+    #myTab {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
+        background: #f8f9fa !important;
+        border-radius: 12px !important;
+        margin-bottom: 1rem !important;
     }
-    
+
+    .nav-tabs::-webkit-scrollbar,
+    #myTab::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-tabs .nav-item,
+    #myTab .nav-item {
+        flex-shrink: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .nav-tabs .nav-link,
+    #myTab .nav-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+        margin-right: 0 !important;
+        border-radius: 8px !important;
+        background: white !important;
+        border: 1px solid #e9ecef !important;
+        color: #64748b !important;
+    }
+
+    .nav-tabs .nav-link.active,
+    #myTab .nav-link.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%) !important;
+        color: white !important;
+        border-color: transparent !important;
+        box-shadow: 0 2px 8px rgba(67, 233, 123, 0.3) !important;
+    }
+
+    .nav-tabs .nav-link svg,
+    #myTab .nav-link svg {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0.25rem !important;
+    }
+
     .welcome-section {
         padding: var(--spacing-xl);
     }
-    
+
     .welcome-title {
         font-size: var(--font-size-2xl);
     }
-    
+
     .welcome-subtitle {
         font-size: var(--font-size-base);
     }
@@ -1006,51 +1060,65 @@ select:focus {
     }
 }
 
-/* === CLEAN MODERN CAROUSEL === */
+/* === CLEAN MODERN CAROUSEL WITH CSS SCROLL SNAP === */
 .modern-carousel-container {
     position: relative;
     max-width: 100%;
     margin: 0 auto;
-    padding: 2rem 0;
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, rgba(34, 197, 94, 0.03) 100%);
-    border-radius: 20px;
+    padding: 1.25rem 0.75rem;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
     overflow: hidden;
 }
 
 .carousel-viewport {
-    overflow: hidden;
-    padding: 0 3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0.5rem;
     margin: 0 auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.carousel-viewport::-webkit-scrollbar {
+    display: none;
 }
 
 .carousel-track {
     display: flex;
-    gap: 1.5rem;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    padding: 1rem 0;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    margin: 0;
 }
 
 .partner-card {
-    flex: 0 0 220px;
+    flex: 0 0 120px;
     background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+    border: 1px solid rgba(226, 232, 240, 0.8);
     overflow: hidden;
     cursor: pointer;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
 }
 
 .partner-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-    border-color: rgba(139, 69, 19, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(67, 233, 123, 0.3);
 }
 
 .partner-card-inner {
-    padding: 1.5rem 1rem;
+    padding: 0.875rem 0.5rem;
     text-align: center;
     height: 100%;
+    min-height: 85px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1058,48 +1126,49 @@ select:focus {
 }
 
 .partner-logo-container {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 1rem;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 8px;
+    padding: 6px;
+    transition: all 0.25s ease;
 }
 
 .partner-card:hover .partner-logo-container {
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
     transform: scale(1.05);
 }
 
 .partner-logo {
-    max-width: 45px;
-    max-height: 45px;
+    max-width: 30px;
+    max-height: 30px;
     object-fit: contain;
-    filter: grayscale(30%) brightness(0.95);
-    transition: all 0.3s ease;
+    filter: none;
+    transition: all 0.25s ease;
 }
 
 .partner-card:hover .partner-logo {
-    filter: grayscale(0%) brightness(1.1);
-    transform: scale(1.1);
+    filter: brightness(1.05);
+    transform: scale(1.08);
 }
 
 .partner-logo-placeholder {
-    width: 45px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-    border-radius: 10px;
-    font-size: 0.65rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    font-size: 0.5rem;
     font-weight: 600;
-    color: rgba(139, 69, 19, 0.8);
+    color: white;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .partner-info {
@@ -1107,211 +1176,136 @@ select:focus {
 }
 
 .partner-name {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #1a202c;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #374151;
     margin: 0;
-    letter-spacing: -0.02em;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
-/* Aesthetic Navigation Arrows */
+/* Hide Navigation Arrows - Use scroll snap instead */
 .carousel-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-    z-index: 10;
-    opacity: 0;
-    transform: translateY(-50%) scale(0.9);
-    color: white;
+    display: none !important;
 }
 
-.modern-carousel-container:hover .carousel-nav {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-}
-
-.carousel-nav-prev {
-    left: 1rem;
-}
-
+.carousel-nav-prev,
 .carousel-nav-next {
-    right: 1rem;
+    display: none !important;
 }
 
-.carousel-nav:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 24px rgba(118, 75, 162, 0.4);
-}
-
-.carousel-nav i {
-    font-size: 0.9rem;
-    transition: transform 0.2s ease;
-}
-
-.carousel-nav:hover i {
-    transform: scale(1.1);
-}
-
-/* Aesthetic Indicators */
+/* Show Indicators - Pagination Dots */
 .carousel-indicators {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    margin-top: 1.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 25px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
 }
 
 .carousel-indicator {
+    display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
+    background: rgba(107, 114, 128, 0.3);
     border: none;
-    background: rgba(139, 69, 19, 0.25);
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-}
-
-.carousel-indicator::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
-    transform: scale(0);
-    transition: transform 0.3s ease;
-}
-
-.carousel-indicator.active::before,
-.carousel-indicator:hover::before {
-    transform: scale(1);
-}
-
-.carousel-indicator.active {
-    background: rgba(255, 255, 255, 0.9);
-    transform: scale(1.4);
-    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+    transition: all 0.3s ease;
+    padding: 0;
 }
 
 .carousel-indicator:hover {
+    background: rgba(107, 114, 128, 0.6);
     transform: scale(1.2);
-    background: rgba(255, 255, 255, 0.7);
+}
+
+.carousel-indicator.active {
+    background: linear-gradient(135deg, #43E97B 0%, #667EEA 100%);
+    width: 24px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(67, 233, 123, 0.3);
 }
 
 /* Carousel Responsive Design */
-@media (max-width: 1024px) {
-    .partner-card {
-        flex: 0 0 200px;
-    }
-
-    .carousel-viewport {
-        padding: 0 2rem;
-    }
-}
-
 @media (max-width: 768px) {
     .modern-carousel-container {
-        padding: 1.5rem 0;
+        padding: 0.875rem 0.5rem;
+        border-radius: 10px;
     }
 
     .carousel-viewport {
-        padding: 0 1rem;
+        padding: 0 0.25rem;
+    }
+
+    .carousel-track {
+        gap: 0.5rem;
     }
 
     .partner-card {
-        flex: 0 0 180px;
+        flex: 0 0 75px;
+        min-width: 75px;
     }
 
     .partner-card-inner {
-        padding: 1.25rem 0.75rem;
+        padding: 0.5rem 0.375rem;
+        min-height: 65px;
     }
 
     .partner-logo-container {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 0.75rem;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 0.375rem;
+        border-radius: 6px;
+        padding: 4px;
     }
 
     .partner-logo {
-        max-width: 38px;
-        max-height: 38px;
+        max-width: 22px;
+        max-height: 22px;
     }
 
     .partner-logo-placeholder {
-        width: 38px;
-        height: 38px;
-        font-size: 0.6rem;
+        width: 22px;
+        height: 22px;
+        font-size: 0.4rem;
+        border-radius: 4px;
     }
 
     .partner-name {
-        font-size: 1rem;
-    }
-
-    .carousel-nav {
-        width: 36px;
-        height: 36px;
-    }
-
-    .carousel-nav i {
-        font-size: 0.8rem;
-    }
-
-    .carousel-indicator {
-        width: 6px;
-        height: 6px;
+        font-size: 0.55rem;
+        line-height: 1.2;
     }
 }
 
 @media (max-width: 480px) {
     .partner-card {
-        flex: 0 0 150px;
+        flex: 0 0 68px;
+        min-width: 68px;
     }
 
     .carousel-track {
-        gap: 1rem;
+        gap: 0.375rem;
     }
 
     .partner-card-inner {
-        padding: 1rem 0.5rem;
+        padding: 0.4rem 0.25rem;
+        min-height: 58px;
     }
 
     .partner-logo-container {
-        width: 45px;
-        height: 45px;
+        width: 28px;
+        height: 28px;
+        margin-bottom: 0.25rem;
     }
 
     .partner-logo {
-        max-width: 32px;
-        max-height: 32px;
+        max-width: 18px;
+        max-height: 18px;
     }
 
     .partner-name {
-        font-size: 0.95rem;
+        font-size: 0.5rem;
     }
 }

@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Check if tracking number already exists
-        $checkQuery = "SELECT TrackingNumber FROM Parcel WHERE TrackingNumber = ?";
+        $checkQuery = "SELECT TrackingNumber FROM parcel WHERE TrackingNumber = ?";
         $checkStmt = $conn->prepare($checkQuery);
         $checkStmt->bind_param("s", $trackingNumber);
         $checkStmt->execute();
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Check if receiver Matric exists in receivers table
-        $receiverQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
+        $receiverQuery = "SELECT MatricNumber FROM receiver WHERE MatricNumber = ?";
         $receiverStmt = $conn->prepare($receiverQuery);
         $receiverStmt->bind_param("s", $receiverIC);
         $receiverStmt->execute();
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $addedBy = $_SESSION['staff_id'] ?? 'ADMIN';
 
         // Insert new parcel with default status 'Pending' and track who added it
-        $insertQuery = "INSERT INTO Parcel (TrackingNumber, MatricNumber, date, time, name, deliveryLocation, weight, status, addedBy) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending', ?)";
+        $insertQuery = "INSERT INTO parcel (TrackingNumber, MatricNumber, date, time, name, deliveryLocation, weight, status, addedBy) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending', ?)";
         $insertStmt = $conn->prepare($insertQuery);
         $insertStmt->bind_param("ssssds", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight, $addedBy);
 

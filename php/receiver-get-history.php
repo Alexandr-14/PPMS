@@ -17,8 +17,8 @@ try {
         SELECT
             p.*,
             r.name as receiverName
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         WHERE p.MatricNumber = ?
         ORDER BY p.date DESC, p.time DESC
     ");

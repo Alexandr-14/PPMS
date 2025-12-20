@@ -32,7 +32,7 @@ $action = $input['action'];
 try {
     if ($action === 'mark_all_read') {
         // Mark all notifications as read for this receiver
-        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE MatricNumber = ? AND isRead = 0");
+        $stmt = $conn->prepare("UPDATE notification SET isRead = 1 WHERE MatricNumber = ? AND isRead = 0");
         $stmt->bind_param("s", $receiverMatric);
 
         if ($stmt->execute()) {
@@ -58,7 +58,7 @@ try {
         $notificationId = $input['notificationId'];
 
         // Mark single notification as read (ensure it belongs to this receiver)
-        $stmt = $conn->prepare("UPDATE Notification SET isRead = 1 WHERE notificationID = ? AND MatricNumber = ?");
+        $stmt = $conn->prepare("UPDATE notification SET isRead = 1 WHERE notificationID = ? AND MatricNumber = ?");
         $stmt->bind_param("is", $notificationId, $receiverMatric);
         
         if ($stmt->execute()) {

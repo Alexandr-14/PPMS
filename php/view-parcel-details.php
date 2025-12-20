@@ -19,7 +19,7 @@ $receiverMatric = $_SESSION['receiver_matric'];
 
 try {
     // Query the database for the parcel, ensuring it belongs to the logged-in user
-    $stmt = $conn->prepare("SELECT * FROM Parcel WHERE TrackingNumber = ? AND MatricNumber = ?");
+    $stmt = $conn->prepare("SELECT * FROM parcel WHERE TrackingNumber = ? AND MatricNumber = ?");
     $stmt->bind_param("ss", $trackingNumber, $receiverMatric);
     $stmt->execute();
     $result = $stmt->get_result();

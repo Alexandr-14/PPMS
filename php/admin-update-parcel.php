@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Check if parcel exists
-        $checkQuery = "SELECT TrackingNumber FROM Parcel WHERE TrackingNumber = ?";
+        $checkQuery = "SELECT TrackingNumber FROM parcel WHERE TrackingNumber = ?";
         $checkStmt = $conn->prepare($checkQuery);
         $checkStmt->bind_param("s", $trackingNumber);
         $checkStmt->execute();
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Check if receiver Matric exists in receivers table
-        $receiverQuery = "SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?";
+        $receiverQuery = "SELECT MatricNumber FROM receiver WHERE MatricNumber = ?";
         $receiverStmt = $conn->prepare($receiverQuery);
         $receiverStmt->bind_param("s", $receiverIC);
         $receiverStmt->execute();
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             // Update parcel information INCLUDING STATUS
-            $updateQuery = "UPDATE Parcel SET MatricNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
+            $updateQuery = "UPDATE parcel SET MatricNumber = ?, name = ?, deliveryLocation = ?, weight = ?, status = ? WHERE TrackingNumber = ?";
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->bind_param("sssdss", $receiverIC, $name, $deliveryLocation, $weight, $status, $trackingNumber);
             $updateStmt->execute();

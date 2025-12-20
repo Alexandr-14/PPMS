@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $receiverMatric = $_SESSION['receiver_matric'] ?? '';
 
         // Query the database for the parcel
-        $stmt = $conn->prepare("SELECT * FROM Parcel WHERE TrackingNumber = ?");
+        $stmt = $conn->prepare("SELECT * FROM parcel WHERE TrackingNumber = ?");
         $stmt->bind_param("s", $trackingNumber);
         $stmt->execute();
         $result = $stmt->get_result();

@@ -31,7 +31,7 @@ $notificationId = $input['notificationId'];
 
 try {
     // Delete notification (ensure it belongs to this receiver)
-    $stmt = $conn->prepare("DELETE FROM Notification WHERE notificationID = ? AND MatricNumber = ?");
+    $stmt = $conn->prepare("DELETE FROM notification WHERE notificationID = ? AND MatricNumber = ?");
     $stmt->bind_param("is", $notificationId, $receiverMatric);
     
     if ($stmt->execute()) {

@@ -13,7 +13,7 @@ header('Content-Type: application/json');
 session_start();
 
 // Include database connection
-require_once 'db-connection.php';
+require_once 'db_connect.php';
 
 // Security: Verify staff is logged in
 if (!isset($_SESSION['staff_id'])) {
@@ -93,8 +93,8 @@ try {
             p.time,
             r.name as receiverName,
             r.phoneNumber
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         WHERE p.TrackingNumber = ?
     ";
 

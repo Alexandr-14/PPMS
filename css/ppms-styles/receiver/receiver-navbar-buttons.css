@@ -82,6 +82,12 @@ body > nav:first-of-type {
     position: relative !important;
 }
 
+/* Ensure dropdown menu appears above all content */
+.dropdown-menu.show {
+    z-index: 10000 !important;
+    position: fixed !important;
+}
+
 /* Prevent overflow issues and remove default spacing */
 body {
     overflow-x: visible !important;

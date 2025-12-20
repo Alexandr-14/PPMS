@@ -325,7 +325,7 @@
     background: rgba(255, 255, 255, 0.98) !important;
     padding: 0 !important;
     margin-top: 8px !important;
-    z-index: 9999 !important;
+    z-index: 10000 !important;
     position: absolute !important;
     right: 0 !important;
     left: auto !important;
@@ -334,7 +334,7 @@
 
 /* Fix dropdown positioning */
 .dropdown-menu.show {
-    z-index: 9999 !important;
+    z-index: 10000 !important;
 }
 
 .notification-dropdown-header {

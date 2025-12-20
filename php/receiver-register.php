@@ -117,7 +117,7 @@ if (!empty($matchErrors)) {
 }
 
 // Check if Matric number already exists
-$stmt = $conn->prepare("SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?");
+$stmt = $conn->prepare("SELECT MatricNumber FROM receiver WHERE MatricNumber = ?");
 $stmt->bind_param("s", $matricnumber);
 $stmt->execute();
 $stmt->store_result();
@@ -134,7 +134,7 @@ $stmt->close();
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Insert new receiver
-$stmt = $conn->prepare("INSERT INTO Receiver (MatricNumber, name, phoneNumber, password) VALUES (?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO receiver (MatricNumber, name, phoneNumber, password) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $matricnumber, $name, $phone, $hashed_password);
 
 if ($stmt->execute()) {

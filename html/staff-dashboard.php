@@ -42,6 +42,8 @@ $is_admin = ($user_role === 'Admin');
     <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-refined.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-overrides.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/ppms-styles/staff/staff-navbar-buttons.css?v=<?php echo time(); ?>">
+    <!-- Mobile Responsive Styles -->
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=<?php echo time(); ?>">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
     <style>
@@ -141,6 +143,15 @@ $is_admin = ($user_role === 'Admin');
             background: linear-gradient(135deg, rgba(106, 27, 154, 0.05) 0%, rgba(255, 152, 0, 0.05) 100%);
             border-radius: 12px;
             border-left: 4px solid #6A1B9A;
+        }
+
+        .report-header h4 {
+            color: #1f2937 !important;
+            font-weight: 700;
+        }
+
+        .report-header p {
+            color: #6b7280 !important;
         }
 
         .report-badge .badge {
@@ -3248,169 +3259,7 @@ $is_admin = ($user_role === 'Admin');
             printWindow.document.close();
         }
 
-        // Email QR code to receiver
-        function emailQR() {
-            // Check for both canvas and image elements
-            const canvas = document.querySelector('#qrCodeDisplay canvas');
-            const img = document.querySelector('#qrCodeDisplay img');
 
-            if (!canvas && !img) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No QR Code',
-                    text: 'Please generate a QR code first.',
-                    confirmButtonColor: '#6A1B9A'
-                });
-                return;
-            }
-
-            const trackingNumber = window.selectedTrackingNumber;
-            const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
-
-            Swal.fire({
-                title: 'Email QR Code',
-                html: `
-                    <div class="text-start">
-                        <p><strong>Parcel:</strong> ${trackingNumber}</p>
-                        <p><strong>Receiver:</strong> ${parcel.receiverName || 'N/A'}</p>
-                        <p><strong>IC Number:</strong> ${formatICNumber(parcel.MatricNumber)}</p>
-                        <hr>
-                        <div class="mb-3">
-                            <label for="receiverEmail" class="form-label">Receiver's Email:</label>
-                            <input type="email" class="form-control" id="receiverEmail" placeholder="Enter receiver's email address">
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailMessage" class="form-label">Additional Message (Optional):</label>
-                            <textarea class="form-control" id="emailMessage" rows="3" placeholder="Add a personal message..."></textarea>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fas fa-envelope me-2"></i>Send Email',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#6A1B9A',
-                preConfirm: () => {
-                    const email = document.getElementById('receiverEmail').value;
-                    const message = document.getElementById('emailMessage').value;
-
-                    if (!email) {
-                        Swal.showValidationMessage('Please enter receiver\'s email address');
-                        return false;
-                    }
-
-                    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-                        Swal.showValidationMessage('Please enter a valid email address');
-                        return false;
-                    }
-
-                    return { email, message };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sendQREmail(trackingNumber, result.value.email, result.value.message);
-                }
-            });
-        }
-
-        // Send QR email
-        function sendQREmail(trackingNumber, email, message) {
-            const canvas = document.querySelector('#qrCodeDisplay canvas');
-            const img = document.querySelector('#qrCodeDisplay img');
-
-            let qrDataURL;
-            if (canvas) {
-                qrDataURL = canvas.toDataURL('image/png', 1.0);
-            } else if (img) {
-                qrDataURL = img.src;
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'QR code not found.',
-                    confirmButtonColor: '#6A1B9A'
-                });
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('trackingNumber', trackingNumber);
-            formData.append('receiverEmail', email);
-            formData.append('qrImage', qrDataURL);
-            formData.append('additionalMessage', message);
-
-            Swal.fire({
-                title: 'Sending Email...',
-                text: 'Please wait while we send the QR code to the receiver.',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            fetch('../php/send-qr-email.php', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '📧 Email Sent Successfully!',
-                        html: `
-                            <div class="text-start">
-                                <p><i class="fas fa-check-circle text-success me-2"></i><strong>QR verification sent!</strong></p>
-                                <p>${data.message}</p>
-                                <hr>
-                                <p><small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    QR code delivered with pickup instructions.
-                                </small></p>
-                            </div>
-                        `,
-                        confirmButtonColor: '#6A1B9A'
-                    });
-                } else {
-                    // Check if it's a recent email duplicate
-                    if (data.message && data.message.includes('already sent recently')) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Email Recently Sent',
-                            html: `
-                                <div class="text-start">
-                                    <p><i class="fas fa-clock text-warning me-2"></i><strong>QR email was already sent recently</strong></p>
-                                    <p>Please wait 5 minutes before sending another QR email for this parcel.</p>
-                                    <hr>
-                                    <p><small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        This prevents spam and ensures receivers don't get duplicate emails.
-                                    </small></p>
-                                </div>
-                            `,
-                            confirmButtonColor: '#6A1B9A'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Email Failed',
-                            text: data.message || 'Failed to send email. Please try again.',
-                            confirmButtonColor: '#6A1B9A'
-                        });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error sending email:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Email Error',
-                    text: 'An error occurred while sending the email.',
-                    confirmButtonColor: '#6A1B9A'
-                });
-            });
-        }
 
         // Print QR code
         function printQR() {
@@ -4291,50 +4140,53 @@ $is_admin = ($user_role === 'Admin');
         margin-bottom: 1rem;
     }
 
+    /* === CLEAN MODERN CAROUSEL === */
     .modern-carousel-container {
         position: relative;
         max-width: 100%;
         margin: 0 auto;
-        padding: 2rem 0;
-        background: linear-gradient(135deg, rgba(106, 27, 154, 0.03) 0%, rgba(255, 152, 0, 0.03) 100%);
-        border-radius: 20px;
+        padding: 1.25rem 0.75rem;
+        background: linear-gradient(135deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.6);
         overflow: hidden;
     }
 
     .carousel-viewport {
         overflow: hidden;
-        padding: 0 3rem;
+        padding: 0 0.5rem;
         margin: 0 auto;
     }
 
     .carousel-track {
         display: flex;
-        gap: 1.5rem;
-        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        padding: 1rem 0;
+        gap: 0.75rem;
+        transition: transform 0.5s ease-out;
+        padding: 0.5rem 0;
     }
 
     .partner-card {
-        flex: 0 0 220px;
+        flex: 0 0 120px;
         background: #ffffff;
-        border-radius: 14px;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        border: 1px solid rgba(0, 0, 0, 0.04);
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        transition: all 0.25s ease;
+        border: 1px solid rgba(226, 232, 240, 0.8);
         overflow: hidden;
         cursor: pointer;
     }
 
     .partner-card:hover {
-        transform: translateY(-6px) scale(1.02);
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-        border-color: rgba(106, 27, 154, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        border-color: rgba(106, 27, 154, 0.3);
     }
 
     .partner-card-inner {
-        padding: 1.5rem 1rem;
+        padding: 0.875rem 0.5rem;
         text-align: center;
         height: 100%;
+        min-height: 85px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -4342,15 +4194,16 @@ $is_admin = ($user_role === 'Admin');
     }
 
     .partner-logo-container {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 1rem;
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(106, 27, 154, 0.05) 0%, rgba(255, 152, 0, 0.05) 100%);
-        border-radius: 12px;
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 8px;
+        padding: 6px;
+        transition: all 0.25s ease;
     }
 
     .partner-card:hover .partner-logo-container {
@@ -4359,31 +4212,31 @@ $is_admin = ($user_role === 'Admin');
     }
 
     .partner-logo {
-        max-width: 45px;
-        max-height: 45px;
+        max-width: 30px;
+        max-height: 30px;
         object-fit: contain;
-        filter: grayscale(30%) brightness(0.95);
-        transition: all 0.3s ease;
+        filter: none;
+        transition: all 0.25s ease;
     }
 
     .partner-card:hover .partner-logo {
-        filter: grayscale(0%) brightness(1.1);
-        transform: scale(1.1);
+        filter: brightness(1.05);
+        transform: scale(1.08);
     }
 
     .partner-logo-placeholder {
-        width: 45px;
-        height: 45px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(106, 27, 154, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
-        border-radius: 10px;
-        font-size: 0.65rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 6px;
+        font-size: 0.5rem;
         font-weight: 600;
-        color: rgba(106, 27, 154, 0.8);
+        color: white;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .partner-info {
@@ -4391,220 +4244,120 @@ $is_admin = ($user_role === 'Admin');
     }
 
     .partner-name {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #1a202c;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #374151;
         margin: 0;
-        letter-spacing: -0.02em;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.3;
     }
 
-    /* Aesthetic Navigation Arrows */
+    /* Hide Navigation Arrows - Use auto-scroll instead */
     .carousel-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        box-shadow: 0 4px 16px rgba(240, 147, 251, 0.3);
-        z-index: 10;
-        opacity: 0;
-        transform: translateY(-50%) scale(0.9);
-        color: white;
+        display: none;
     }
 
     .modern-carousel-container:hover .carousel-nav {
-        opacity: 1;
-        transform: translateY(-50%) scale(1);
+        display: none;
     }
 
-    .carousel-nav-prev {
-        left: 1rem;
-    }
-
+    .carousel-nav-prev,
     .carousel-nav-next {
-        right: 1rem;
+        display: none;
     }
 
-    .carousel-nav:hover {
-        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-        transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 6px 24px rgba(245, 87, 108, 0.4);
-    }
-
-    .carousel-nav i {
-        font-size: 0.9rem;
-        transition: transform 0.2s ease;
-    }
-
-    .carousel-nav:hover i {
-        transform: scale(1.1);
-    }
-
-    /* Aesthetic Indicators */
+    /* Hide Indicators - Cleaner look */
     .carousel-indicators {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-        padding: 0.75rem 1.25rem;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 25px;
-        width: fit-content;
-        margin-left: auto;
-        margin-right: auto;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(10px);
+        display: none;
     }
 
     .carousel-indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        border: none;
-        background: rgba(106, 27, 154, 0.25);
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        position: relative;
-        overflow: hidden;
+        display: none;
     }
 
-    .carousel-indicator::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        border-radius: 50%;
-        transform: scale(0);
-        transition: transform 0.3s ease;
-    }
-
-    .carousel-indicator.active::before,
-    .carousel-indicator:hover::before {
-        transform: scale(1);
-    }
-
-    .carousel-indicator.active {
-        background: rgba(255, 255, 255, 0.9);
-        transform: scale(1.4);
-        box-shadow: 0 2px 8px rgba(106, 27, 154, 0.2);
-    }
-
-    .carousel-indicator:hover {
-        transform: scale(1.2);
-        background: rgba(255, 255, 255, 0.7);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-        .partner-card {
-            flex: 0 0 200px;
-        }
-
-        .carousel-viewport {
-            padding: 0 2rem;
-        }
-    }
-
+    /* Carousel Responsive Design */
     @media (max-width: 768px) {
         .modern-carousel-container {
-            padding: 1.5rem 0;
+            padding: 0.875rem 0.5rem;
+            border-radius: 10px;
         }
 
         .carousel-viewport {
-            padding: 0 1rem;
+            padding: 0 0.25rem;
+        }
+
+        .carousel-track {
+            gap: 0.5rem;
         }
 
         .partner-card {
-            flex: 0 0 180px;
+            flex: 0 0 75px;
+            min-width: 75px;
         }
 
         .partner-card-inner {
-            padding: 1.25rem 0.75rem;
+            padding: 0.5rem 0.375rem;
+            min-height: 65px;
         }
 
         .partner-logo-container {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 0.75rem;
+            width: 32px;
+            height: 32px;
+            margin-bottom: 0.375rem;
+            border-radius: 6px;
+            padding: 4px;
         }
 
         .partner-logo {
-            max-width: 38px;
-            max-height: 38px;
+            max-width: 22px;
+            max-height: 22px;
         }
 
         .partner-logo-placeholder {
-            width: 38px;
-            height: 38px;
-            font-size: 0.6rem;
+            width: 22px;
+            height: 22px;
+            font-size: 0.4rem;
+            border-radius: 4px;
         }
 
         .partner-name {
-            font-size: 1rem;
+            font-size: 0.55rem;
+            line-height: 1.2;
         }
 
         .partner-description {
-            font-size: 0.75rem;
-        }
-
-        .carousel-nav {
-            width: 36px;
-            height: 36px;
-        }
-
-        .carousel-nav i {
-            font-size: 0.8rem;
-        }
-
-        .carousel-indicator {
-            width: 6px;
-            height: 6px;
+            display: none;
         }
     }
 
     @media (max-width: 480px) {
         .partner-card {
-            flex: 0 0 150px;
+            flex: 0 0 68px;
+            min-width: 68px;
         }
 
         .carousel-track {
-            gap: 1rem;
+            gap: 0.375rem;
         }
 
         .partner-card-inner {
-            padding: 1rem 0.5rem;
+            padding: 0.4rem 0.25rem;
+            min-height: 58px;
         }
 
         .partner-logo-container {
-            width: 45px;
-            height: 45px;
+            width: 28px;
+            height: 28px;
+            margin-bottom: 0.25rem;
         }
 
         .partner-logo {
-            max-width: 32px;
-            max-height: 32px;
+            max-width: 18px;
+            max-height: 18px;
         }
 
         .partner-name {
-            font-size: 0.95rem;
-        }
-
-        .partner-description {
-            font-size: 0.7rem;
+            font-size: 0.5rem;
         }
     }
     </style>

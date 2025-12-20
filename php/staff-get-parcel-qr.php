@@ -48,7 +48,7 @@ try {
             status,
             QR,
             qr_verification_data
-        FROM Parcel
+        FROM parcel
         WHERE TrackingNumber = ?
     ";
 

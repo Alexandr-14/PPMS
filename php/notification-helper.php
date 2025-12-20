@@ -24,7 +24,7 @@ function sendParcelArrivalNotification($icNumber, $trackingNumber, $parcelName, 
 
         // Insert notification into database
         $stmt = $conn->prepare("
-            INSERT INTO Notification (
+            INSERT INTO notification (
                 MatricNumber,
                 TrackingNumber,
                 notificationType,
@@ -69,7 +69,7 @@ function sendParcelRetrievedNotification($icNumber, $trackingNumber, $parcelName
 
         // Insert notification into database
         $stmt = $conn->prepare("
-            INSERT INTO Notification (
+            INSERT INTO notification (
                 MatricNumber,
                 TrackingNumber,
                 notificationType,
@@ -115,7 +115,7 @@ function sendParcelReadyNotification($icNumber, $trackingNumber, $parcelName, $d
 
         // Insert notification into database
         $stmt = $conn->prepare("
-            INSERT INTO Notification (
+            INSERT INTO notification (
                 MatricNumber,
                 TrackingNumber,
                 notificationType,
@@ -153,7 +153,7 @@ function getReceiverName($matricNumber) {
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT name FROM Receiver WHERE MatricNumber = ?");
+        $stmt = $conn->prepare("SELECT name FROM receiver WHERE MatricNumber = ?");
         $stmt->bind_param("s", $matricNumber);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -181,7 +181,7 @@ function receiverExists($matricNumber) {
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT MatricNumber FROM Receiver WHERE MatricNumber = ?");
+        $stmt = $conn->prepare("SELECT MatricNumber FROM receiver WHERE MatricNumber = ?");
         $stmt->bind_param("s", $matricNumber);
         $stmt->execute();
         $result = $stmt->get_result();

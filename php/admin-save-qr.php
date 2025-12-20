@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 TrackingNumber,
                 MatricNumber,
                 deliveryLocation
-            FROM Parcel
+            FROM parcel
             WHERE TrackingNumber = ?
         ";
         $checkStmt = $conn->prepare($checkQuery);
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Update parcel with QR code path and secure verification data
-        $updateQuery = "UPDATE Parcel SET QR = ?, qr_verification_data = ? WHERE TrackingNumber = ?";
+        $updateQuery = "UPDATE parcel SET QR = ?, qr_verification_data = ? WHERE TrackingNumber = ?";
         $updateStmt = $conn->prepare($updateQuery);
         $qrRelativePath = 'assets/qr-codes/' . $qrFileName;
         $updateStmt->bind_param("sss", $qrRelativePath, $secureVerificationData, $trackingNumber);
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Log QR generation activity (optional - don't fail if this fails)
             try {
                 $logStmt = $conn->prepare("
-                    INSERT INTO Notification (
+                    INSERT INTO notification (
                         MatricNumber, TrackingNumber, notificationType, messageContent,
                         sentTimestamp, notificationStatus, isRead, deliveryMethod
                     ) VALUES (

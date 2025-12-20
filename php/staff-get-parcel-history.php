@@ -22,8 +22,8 @@ try {
             p.status,
             r.name as receiverName,
             r.phoneNumber as receiverPhone
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         WHERE p.status = 'Retrieved'
         ORDER BY p.date DESC, p.time DESC
     ";

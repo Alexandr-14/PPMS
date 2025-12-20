@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM Receiver WHERE MatricNumber = ?");
+    $stmt = $conn->prepare("SELECT * FROM receiver WHERE MatricNumber = ?");
     $stmt->bind_param("s", $matric_number);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -29,9 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
             // Login successful
-            $_SESSION['receiver_id'] = $row['id'];
+            $_SESSION['receiver_id'] = $row['MatricNumber'];
             $_SESSION['receiver_name'] = $row['name'];
-            $_SESSION['receiver_matric'] = $row['MatricNumber']; // Add this line to set the Matric number
+            $_SESSION['receiver_matric'] = $row['MatricNumber'];
             header("Location: ../html/receiver-dashboard.php?login=success");
             exit();
         } else {

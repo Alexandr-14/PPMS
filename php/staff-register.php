@@ -61,7 +61,7 @@ if (!empty($matchErrors)) {
 }
 
 // Check if Staff ID already exists
-$stmt = $conn->prepare("SELECT staffID FROM Staff WHERE staffID = ?");
+$stmt = $conn->prepare("SELECT staffID FROM staff WHERE staffID = ?");
 $stmt->bind_param("s", $staffId);
 $stmt->execute();
 $stmt->store_result();
@@ -78,7 +78,7 @@ $stmt->close();
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Insert new staff with default role 'Staff'
-$stmt = $conn->prepare("INSERT INTO Staff (staffID, role, name, phoneNumber, password) VALUES (?, 'Staff', ?, '', ?)");
+$stmt = $conn->prepare("INSERT INTO staff (staffID, role, name, phoneNumber, password) VALUES (?, 'Staff', ?, '', ?)");
 $stmt->bind_param("sss", $staffId, $name, $hashed_password);
 
 if ($stmt->execute()) {

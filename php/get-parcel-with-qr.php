@@ -38,8 +38,8 @@ try {
             p.QR,
             p.qr_verification_data,
             r.name as receiverName
-        FROM Parcel p
-        LEFT JOIN Receiver r ON p.MatricNumber = r.MatricNumber
+        FROM parcel p
+        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         WHERE p.TrackingNumber = ? AND p.MatricNumber = ?
     ";
 

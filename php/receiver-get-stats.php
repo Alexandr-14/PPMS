@@ -12,7 +12,7 @@ $receiverMatric = $_SESSION['receiver_matric'];
 
 try {
     // Get total parcels for this receiver
-    $totalQuery = "SELECT COUNT(*) as total FROM Parcel WHERE MatricNumber = ?";
+    $totalQuery = "SELECT COUNT(*) as total FROM parcel WHERE MatricNumber = ?";
     $totalStmt = $conn->prepare($totalQuery);
     $totalStmt->bind_param("s", $receiverMatric);
     $totalStmt->execute();
@@ -20,7 +20,7 @@ try {
     $totalParcels = $totalResult->fetch_assoc()['total'];
 
     // Get pending parcels (not yet retrieved)
-    $pendingQuery = "SELECT COUNT(*) as pending FROM Parcel p
+    $pendingQuery = "SELECT COUNT(*) as pending FROM parcel p
                      WHERE p.MatricNumber = ?
                      AND p.TrackingNumber NOT IN (
                          SELECT trackingNumber FROM retrievalrecord
@@ -34,7 +34,7 @@ try {
 
     // Get retrieved parcels
     $retrievedQuery = "SELECT COUNT(*) as retrieved FROM retrievalrecord r
-                       JOIN Parcel p ON r.trackingNumber = p.TrackingNumber
+                       JOIN parcel p ON r.trackingNumber = p.TrackingNumber
                        WHERE p.MatricNumber = ? AND r.status = 'Retrieved'";
     $retrievedStmt = $conn->prepare($retrievedQuery);
     $retrievedStmt->bind_param("s", $receiverMatric);
