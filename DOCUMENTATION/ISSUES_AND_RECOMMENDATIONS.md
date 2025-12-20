@@ -40,37 +40,37 @@ if ($staffId === $default_admin_id && password_verify($password, $default_admin_
 
 ### 2. Database Credentials Hardcoded
 **File:** `php/db_connect.php`
+**Status:** ✅ FIXED
+
+**Previous Issue:** Credentials were hardcoded in source code.
+
+**Solution Implemented:**
+- Created `.env` file for sensitive credentials
+- Updated `db_connect.php` to load from environment variables
+- Added `.gitignore` to prevent `.env` from being committed
+- Created `.env.example` as template
+
 ```php
-$user = "myppmsco_ppms";
-$pass = "cM@IjCvdBAe%EcGi";
-```
-
-**Risk:** Credentials visible in source code.
-
-**Recommendation:** Use `.env` file with `php-dotenv` library:
-```php
-require_once __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
-$host = $_ENV['DB_HOST'];
-$user = $_ENV['DB_USER'];
-$pass = $_ENV['DB_PASS'];
-$db = $_ENV['DB_NAME'];
+// Now loads from .env file
+$host = $_ENV['DB_HOST'] ?? 'localhost';
+$user = $_ENV['DB_USER'] ?? 'myppmsco_ppms';
+$pass = $_ENV['DB_PASS'] ?? '';
+$db = $_ENV['DB_NAME'] ?? 'myppmsco_ppms';
 ```
 
 ---
 
 ### 3. Email Credentials Hardcoded
-**File:** `php/smtp-config.php` (Line 124)
-```php
-'gmail_email' => 'iskandardzulqarnain0104@gmail.com',
-'app_password' => 'khfroloeubtuyvgb',
-```
+**File:** `php/smtp-config.php` (DELETED)
+**Status:** ✅ FIXED
 
-**Risk:** Gmail credentials exposed in source code.
+**Previous Issue:** Gmail credentials were exposed in source code.
 
-**Recommendation:** Move to `.env` file:
+**Solution Implemented:**
+- Deleted `smtp-config.php` file (email feature removed)
+- Email functionality is no longer used
+- If email is needed in future, use `.env` file:
+
 ```php
 function getEmailConfig() {
     return [

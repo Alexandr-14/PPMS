@@ -19,10 +19,11 @@
 
 ### Connection File: `php/db_connect.php`
 ```php
-$host = "localhost";
-$user = "myppmsco_ppms";
-$pass = "cM@IjCvdBAe%EcGi";
-$db   = "myppmsco_ppms";
+// Credentials are now loaded from .env file for security
+$host = $_ENV['DB_HOST'] ?? 'localhost';
+$user = $_ENV['DB_USER'] ?? 'myppmsco_ppms';
+$pass = $_ENV['DB_PASS'] ?? '';
+$db   = $_ENV['DB_NAME'] ?? 'myppmsco_ppms';
 $conn = new mysqli($host, $user, $pass, $db);
 ```
 
