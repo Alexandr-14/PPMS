@@ -1,0 +1,179 @@
+================================================================================
+                    QUICK UPLOAD GUIDE - cPanel File Manager
+================================================================================
+
+TOTAL FILES TO UPLOAD: 23 files
+
+================================================================================
+STEP 1: DOWNLOAD FROM GITHUB
+================================================================================
+1. Go to: https://github.com/Alexandr-14/PPMS
+2. Click: Code → Download ZIP
+3. Extract ZIP to your computer
+
+================================================================================
+STEP 2: LOGIN TO cPANEL
+================================================================================
+1. Open: yourdomain.com:2083
+2. Login with your credentials
+3. Click: File Manager
+
+================================================================================
+STEP 3: UPLOAD FILES (IN THIS ORDER)
+================================================================================
+
+⭐ MOST IMPORTANT - Upload this FIRST:
+   Path: /public_html/css/ppms-styles/shared/
+   File: mobile-responsive.css (NEW FILE - 1,474 lines)
+
+CSS FILES (6 more files):
+   Path: /public_html/css/ppms-styles/auth/
+   File: login.css
+   
+   Path: /public_html/css/ppms-styles/
+   File: landing.css
+   
+   Path: /public_html/css/ppms-styles/receiver/
+   Files: receiver-dashboard.css
+          receiver-navbar-buttons.css
+          receiver-notifications.css
+   
+   Path: /public_html/css/ppms-styles/staff/
+   File: staff-dashboard-refined.css
+
+HTML/PHP FILES (7 files):
+   Path: /public_html/html/
+   Files: receiver-dashboard.php
+          staff-dashboard.php
+          landingpage.html
+          receiver-login.html
+          receiver-register.html
+          staff-login.html
+          staff-register.html
+
+PHP BACKEND (5 files):
+   Path: /public_html/php/
+   Files: db_connect.php
+          admin-save-qr.php
+          admin-get-parcels.php
+          staff-get-parcels.php
+          receiver-get-history.php
+
+CONFIG FILES (3 files):
+   Path: /public_html/
+   Files: .env.example
+          .gitignore
+          SECURITY_FIX_NOTICE.md
+
+================================================================================
+STEP 4: CREATE .env FILE
+================================================================================
+1. In cPanel File Manager, navigate to: /public_html/
+2. Right-click → Create New File
+3. Name: .env
+4. Click Create
+5. Right-click .env → Edit
+6. Paste this content:
+
+DB_HOST=localhost
+DB_USER=myppmsco_ppms
+DB_PASS=your_actual_password_here
+DB_NAME=myppmsco_ppms
+ADMIN_ID=ADMIN
+ADMIN_PASSWORD=admin123
+QR_SECRET_KEY=your_secure_key_here
+GMAIL_EMAIL=your_email@gmail.com
+GMAIL_APP_PASSWORD=your_app_password_here
+EMAIL_FROM_NAME=PPMS
+
+7. Replace "your_actual_password_here" with your real database password
+8. Click Save
+
+================================================================================
+STEP 5: TEST ON MOBILE
+================================================================================
+1. Clear browser cache: Ctrl+Shift+Delete
+2. Hard refresh: Ctrl+F5
+3. Open website on mobile device
+4. Check:
+   ✓ Navbar is compact
+   ✓ Logout button is icon-only
+   ✓ Notification dropdown works
+   ✓ Tables scroll properly
+   ✓ Carousel works with swipe
+   ✓ Registration pages responsive
+   ✓ Database connection works
+
+================================================================================
+FILE CHECKLIST
+================================================================================
+
+CSS FILES (7):
+☐ mobile-responsive.css (NEW - CRITICAL!)
+☐ login.css
+☐ landing.css
+☐ receiver-dashboard.css
+☐ receiver-navbar-buttons.css
+☐ receiver-notifications.css
+☐ staff-dashboard-refined.css
+
+HTML/PHP FILES (7):
+☐ receiver-dashboard.php
+☐ staff-dashboard.php
+☐ landingpage.html
+☐ receiver-login.html
+☐ receiver-register.html
+☐ staff-login.html
+☐ staff-register.html
+
+PHP BACKEND (5):
+☐ db_connect.php
+☐ admin-save-qr.php
+☐ admin-get-parcels.php
+☐ staff-get-parcels.php
+☐ receiver-get-history.php
+
+CONFIG (4):
+☐ .env.example
+☐ .gitignore
+☐ SECURITY_FIX_NOTICE.md
+☐ .env (created manually)
+
+TOTAL: 23 files
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+⚠️  mobile-responsive.css is the MOST IMPORTANT file
+    Without it, mobile changes won't appear!
+
+🔒  Keep .env file private - never share it
+
+📱  Always test on actual mobile device, not just browser resize
+
+🔄  Clear cache after uploading: Ctrl+Shift+Delete
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Mobile styles not showing?
+→ Check mobile-responsive.css is uploaded
+→ Clear browser cache (Ctrl+Shift+Delete)
+→ Hard refresh (Ctrl+F5)
+
+Database connection error?
+→ Check .env file exists in /public_html/
+→ Verify password in .env is correct
+→ Check php/db_connect.php is uploaded
+
+Carousel not working?
+→ Check receiver-dashboard.php is uploaded
+→ Check staff-dashboard.php is uploaded
+→ Check browser console (F12) for errors
+
+================================================================================
+DONE! Your mobile responsiveness fix is complete!
+================================================================================
+
