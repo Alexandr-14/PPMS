@@ -73,7 +73,7 @@ function showError($title, $message) {
 }
 
 // Validate required fields
-if (empty($_POST['name']) || empty($_POST['matricnumber']) || empty($_POST['phoneNumber']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+if (empty($_POST['name']) || empty($_POST['matricnumber']) || empty($_POST['phoneNumber']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['security_question']) || empty($_POST['security_answer'])) {
     showError('Missing Information!', 'Please fill in all required fields.');
 }
 
@@ -83,6 +83,8 @@ $matricnumber = sanitizeMatric($_POST['matricnumber']);
 $phone = sanitizePhone($_POST['phoneNumber']);
 $password = $_POST['password']; // Don't sanitize password as it may contain special chars
 $confirmPassword = $_POST['confirm_password'];
+$securityQuestion = sanitizeInput($_POST['security_question']);
+$securityAnswer = strtolower(trim($_POST['security_answer'])); // Store lowercase for case-insensitive comparison
 
 // Additional validation after sanitization
 if (empty($name) || strlen($name) < 2 || strlen($name) > 100) {
@@ -130,12 +132,13 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
-// Hash the password
+// Hash the password and security answer
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+$hashed_security_answer = password_hash($securityAnswer, PASSWORD_DEFAULT);
 
-// Insert new receiver
-$stmt = $conn->prepare("INSERT INTO receiver (MatricNumber, name, phoneNumber, password) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $matricnumber, $name, $phone, $hashed_password);
+// Insert new receiver with security question
+$stmt = $conn->prepare("INSERT INTO receiver (MatricNumber, name, phoneNumber, password, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("ssssss", $matricnumber, $name, $phone, $hashed_password, $securityQuestion, $hashed_security_answer);
 
 if ($stmt->execute()) {
     // Registration successful, redirect with flag

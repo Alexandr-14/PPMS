@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <meta name="darkreader-lock">
     <title>PPMS Staff Registration</title>
     <!-- Bootstrap CSS -->
     <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -11,24 +13,24 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- PPMS Custom Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
-    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css?v=3">
     <!-- Mobile Responsive Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=2">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
 </head>
 <body class="staff-auth-body">
     <div class="staff-auth-container">
-        <!-- Left Panel -->
+        <!-- Left Panel (Welcome) -->
         <div class="staff-left-panel">
             <h2>Join Our Team!</h2>
-            <img src="../assets/stafforganization.gif" alt="Staff Register Illustration">
-            <p>"Together we achieve more"</p>
+            <p>Create your account to start managing parcels.</p>
+            <img src="../assets/stafforganization.gif" alt="Staff organization illustration" onerror="this.style.display='none'">
         </div>
 
         <!-- Right Panel (Form) -->
@@ -42,6 +44,29 @@
             <!-- Scrollable Form Content -->
             <div class="staff-form-content">
                 <form method="post" action="../php/staff-register.php" class="w-100">
+                <!-- Staff Registration Code Field -->
+                <div class="staff-form-group">
+                    <label for="registration-code" class="staff-form-label">
+                        <i class="fas fa-shield-alt me-1" style="color: #FF9800;"></i>
+                        Staff Registration Code
+                    </label>
+                    <div class="position-relative">
+                        <i class="fas fa-key staff-input-icon"></i>
+                        <input
+                            type="password"
+                            class="staff-form-control"
+                            id="registration-code"
+                            name="registration_code"
+                            placeholder="Enter the secret staff code"
+                            required
+                            autocomplete="off">
+                    </div>
+                    <small class="text-muted mt-1 d-block" style="color: #a0aec0 !important;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Contact administrator to get the registration code
+                    </small>
+                </div>
+
                 <!-- Full Name Field -->
                 <div class="staff-form-group">
                     <label for="staff-name" class="staff-form-label">Full Name</label>
@@ -59,18 +84,25 @@
 
                 <!-- Staff ID Field -->
                 <div class="staff-form-group">
-                    <label for="staffId" class="staff-form-label">Staff ID</label>
+                    <label for="staff-id" class="staff-form-label">Staff ID</label>
                     <div class="position-relative">
                         <i class="fas fa-id-badge staff-input-icon"></i>
                         <input
                             type="text"
                             class="staff-form-control"
-                            id="staffId"
+                            id="staff-id"
                             name="staffId"
-                            placeholder="Enter your staff ID"
+                            placeholder="Enter 4-digit ID (8000-8999)"
                             required
-                            maxlength="4">
+                            pattern="8[0-9]{3}"
+                            title="Staff ID must be 4 digits between 8000-8999"
+                            maxlength="4"
+                            inputmode="numeric">
                     </div>
+                    <small class="text-muted mt-1 d-block" style="color: #a0aec0 !important;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Must be 4 digits starting with 8 (e.g., 8001, 8542)
+                    </small>
                 </div>
 
                 <!-- Password Field -->
@@ -213,38 +245,81 @@
 
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
-            const staffId = document.getElementById('staff-id').value;
+            const registrationCode = document.getElementById('registration-code').value.trim();
+            const staffId = document.getElementById('staff-id').value.trim();
             const password = document.getElementById('staff-password').value;
 
-            // Validate Staff ID (4 characters, letters and numbers only)
-            if (!/^[A-Za-z0-9]{4}$/.test(staffId)) {
+            // Validate Registration Code is not empty
+            if (!registrationCode) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Code Required!',
+                    text: 'Please enter the staff registration code provided by the administrator.',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            // Validate Staff ID (4 digits, 8000-8999)
+            if (!/^8[0-9]{3}$/.test(staffId)) {
                 e.preventDefault();
                 Swal.fire({
                     icon: 'error',
                     title: 'Invalid Staff ID!',
-                    text: 'Staff ID must be exactly 4 characters (letters and numbers only).',
+                    text: 'Staff ID must be 4 digits between 8000-8999.',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            // Validate Staff ID range
+            const staffIdNum = parseInt(staffId, 10);
+            if (staffIdNum < 8000 || staffIdNum > 8999) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Staff ID Range!',
+                    text: 'Staff ID must be between 8000 and 8999.',
                     confirmButtonText: 'OK'
                 });
                 return false;
             }
 
             // Validate password length
-            if (password.length < 8) {
+            if (password.length < 12) {
                 e.preventDefault();
                 Swal.fire({
                     icon: 'error',
                     title: 'Password Too Short!',
-                    text: 'Password must be at least 8 characters long.',
+                    text: 'Password must be at least 12 characters long.',
                     confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            // Validate password validator
+            if (staffPasswordValidator && !staffPasswordValidator.isValid()) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Password',
+                    text: 'Please ensure your password meets all requirements and passwords match.',
+                    confirmButtonColor: '#f093fb'
                 });
                 return false;
             }
         });
 
-        // Real-time validation
+        // Real-time validation for Staff ID
         document.getElementById('staff-id').addEventListener('input', function() {
+            // Only allow digits
+            this.value = this.value.replace(/[^0-9]/g, '');
+
             const staffId = this.value;
-            if (/^[A-Za-z0-9]{4}$/.test(staffId)) {
+            const staffIdNum = parseInt(staffId, 10);
+
+            if (staffId.length === 4 && /^8[0-9]{3}$/.test(staffId) && staffIdNum >= 8000 && staffIdNum <= 8999) {
                 this.classList.remove('is-invalid');
                 this.classList.add('is-valid');
             } else if (staffId.length > 0) {
@@ -252,23 +327,6 @@
                 this.classList.add('is-invalid');
             } else {
                 this.classList.remove('is-valid', 'is-invalid');
-            }
-        });
-
-        // Form submission validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (staffPasswordValidator && !staffPasswordValidator.isValid()) {
-                e.preventDefault();
-
-                // Show error message
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Password',
-                    text: 'Please ensure your password meets all requirements and passwords match.',
-                    confirmButtonColor: '#f093fb'
-                });
-
-                return false;
             }
         });
     </script>

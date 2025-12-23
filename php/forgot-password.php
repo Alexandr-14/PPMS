@@ -2,6 +2,8 @@
 session_start();
 require_once 'db_connect.php';
 
+header('Content-Type: application/json');
+
 // Rate limiting - prevent abuse
 $rate_limit_key = 'forgot_password_' . $_SERVER['REMOTE_ADDR'];
 if (!isset($_SESSION[$rate_limit_key])) {
@@ -14,117 +16,165 @@ $_SESSION[$rate_limit_key] = array_filter($_SESSION[$rate_limit_key], function($
 });
 
 // Check if too many attempts
-if (count($_SESSION[$rate_limit_key]) >= 5) {
+if (count($_SESSION[$rate_limit_key]) >= 10) {
     http_response_code(429);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Too many password reset attempts. Please try again later.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Too many attempts. Please try again later.']);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_type = trim($_POST['user_type'] ?? '');
-    $matric_number = trim($_POST['matric_number'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed.']);
+    exit;
+}
 
-    // Security: Only allow receiver type for forgot password
-    if ($user_type !== 'receiver') {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid request.'
-        ]);
-        exit;
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+$action = $input['action'] ?? '';
+
+// Normalize phone number for comparison
+function normalizePhone($phone) {
+    $phone = preg_replace('/[^0-9+]/', '', $phone);
+    if (substr($phone, 0, 1) === '0') {
+        $phone = '+60' . substr($phone, 1);
     }
+    return $phone;
+}
 
-    // Validate input
-    if (empty($matric_number)) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Please enter your Matric Number.'
-        ]);
-        exit;
-    }
+switch ($action) {
+    case 'verify_identity':
+        // Step 1: Verify Matric Number + Phone Number
+        $matric = strtoupper(trim($input['matric_number'] ?? ''));
+        $phone = normalizePhone(trim($input['phone_number'] ?? ''));
 
-    // Validate Matric format (2 letters + 6 digits)
-    if (!preg_match('/^[A-Z]{2}[0-9]{6}$/', $matric_number)) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Please enter a valid Matric Number: 2 letters + 6 digits (e.g., CI230010)'
-        ]);
-        exit;
-    }
-
-    // Add to rate limiting
-    $_SESSION[$rate_limit_key][] = time();
-
-    // Check if receiver exists (receiver-only forgot password)
-    $user_exists = false;
-    $user_name = '';
-
-    $stmt = $conn->prepare("SELECT name FROM receiver WHERE MatricNumber = ?");
-    $stmt->bind_param("s", $matric_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $user_exists = true;
-        $user_name = $row['name'];
-    }
-    $stmt->close();
-    
-    // Always return success message for security (don't reveal if user exists)
-    if ($user_exists) {
-        // Generate secure token
-        $token = bin2hex(random_bytes(32));
-        $expires_at = date('Y-m-d H:i:s', time() + 3600); // 1 hour expiry
-
-        // Clean up old tokens for this user (receiver only)
-        $cleanup_stmt = $conn->prepare("DELETE FROM password_reset_tokens WHERE user_type = ? AND user_id = ?");
-        $cleanup_stmt->bind_param("ss", $user_type, $ic_number);
-        $cleanup_stmt->execute();
-        $cleanup_stmt->close();
-
-        // Insert new token
-        $stmt = $conn->prepare("INSERT INTO password_reset_tokens (user_type, user_id, token, expires_at) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $user_type, $ic_number, $token, $expires_at);
-
-        if ($stmt->execute()) {
-            // In a real system, you would send an email here
-            // For now, we'll store the token in session for demo purposes
-            $_SESSION['reset_token_demo'] = [
-                'token' => $token,
-                'user_type' => $user_type,
-                'user_id' => $ic_number,
-                'user_name' => $user_name,
-                'expires_at' => $expires_at
-            ];
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Password reset instructions have been sent to your email address.',
-                'demo_token' => $token // Remove this in production
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'An error occurred. Please try again later.'
-            ]);
+        if (empty($matric) || empty($phone)) {
+            echo json_encode(['success' => false, 'message' => 'Please enter both Matric Number and Phone Number.']);
+            exit;
         }
-        $stmt->close();
-    } else {
-        // Return success even if user doesn't exist (security)
+
+        if (!preg_match('/^[A-Z]{2}[0-9]{6}$/', $matric)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid Matric Number format.']);
+            exit;
+        }
+
+        $_SESSION[$rate_limit_key][] = time();
+
+        $stmt = $conn->prepare("SELECT security_question, phoneNumber FROM receiver WHERE MatricNumber = ?");
+        $stmt->bind_param("s", $matric);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => false, 'message' => 'No account found with this Matric Number.']);
+            exit;
+        }
+
+        $row = $result->fetch_assoc();
+        $storedPhone = normalizePhone($row['phoneNumber']);
+
+        if ($storedPhone !== $phone) {
+            echo json_encode(['success' => false, 'message' => 'Phone number does not match our records.']);
+            exit;
+        }
+
+        if (empty($row['security_question'])) {
+            echo json_encode(['success' => false, 'message' => 'No security question set. Please contact administrator.']);
+            exit;
+        }
+
+        // Store matric in session for next step
+        $_SESSION['reset_matric'] = $matric;
+
         echo json_encode([
             'success' => true,
-            'message' => 'If an account with that ID exists, password reset instructions have been sent.'
+            'security_question' => $row['security_question']
         ]);
-    }
-    
-    $conn->close();
-} else {
-    http_response_code(405);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Method not allowed.'
-    ]);
+        break;
+
+    case 'verify_answer':
+        // Step 2: Verify Security Answer
+        $matric = strtoupper(trim($input['matric_number'] ?? ''));
+        $answer = strtolower(trim($input['security_answer'] ?? ''));
+
+        if (empty($matric) || empty($answer)) {
+            echo json_encode(['success' => false, 'message' => 'Please provide your answer.']);
+            exit;
+        }
+
+        // Verify session
+        if (!isset($_SESSION['reset_matric']) || $_SESSION['reset_matric'] !== $matric) {
+            echo json_encode(['success' => false, 'message' => 'Session expired. Please start over.']);
+            exit;
+        }
+
+        $_SESSION[$rate_limit_key][] = time();
+
+        $stmt = $conn->prepare("SELECT security_answer FROM receiver WHERE MatricNumber = ?");
+        $stmt->bind_param("s", $matric);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => false, 'message' => 'Account not found.']);
+            exit;
+        }
+
+        $row = $result->fetch_assoc();
+
+        // Verify hashed answer
+        if (!password_verify($answer, $row['security_answer'])) {
+            echo json_encode(['success' => false, 'message' => 'Incorrect answer. Please try again.']);
+            exit;
+        }
+
+        // Generate reset token
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['reset_token'] = $token;
+        $_SESSION['reset_token_matric'] = $matric;
+        $_SESSION['reset_token_expires'] = time() + 600; // 10 minutes
+
+        echo json_encode(['success' => true, 'token' => $token]);
+        break;
+
+    case 'reset_password':
+        // Step 3: Reset Password
+        $matric = strtoupper(trim($input['matric_number'] ?? ''));
+        $token = $input['token'] ?? '';
+        $newPassword = $input['new_password'] ?? '';
+
+        if (empty($matric) || empty($token) || empty($newPassword)) {
+            echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
+            exit;
+        }
+
+        // Verify token
+        if (!isset($_SESSION['reset_token']) || $_SESSION['reset_token'] !== $token ||
+            !isset($_SESSION['reset_token_matric']) || $_SESSION['reset_token_matric'] !== $matric ||
+            !isset($_SESSION['reset_token_expires']) || $_SESSION['reset_token_expires'] < time()) {
+            echo json_encode(['success' => false, 'message' => 'Invalid or expired token. Please start over.']);
+            exit;
+        }
+
+        if (strlen($newPassword) < 8) {
+            echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters.']);
+            exit;
+        }
+
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE receiver SET password = ? WHERE MatricNumber = ?");
+        $stmt->bind_param("ss", $hashedPassword, $matric);
+
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            // Clear session data
+            unset($_SESSION['reset_matric'], $_SESSION['reset_token'], $_SESSION['reset_token_matric'], $_SESSION['reset_token_expires']);
+            echo json_encode(['success' => true, 'message' => 'Password reset successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reset password. Please try again.']);
+        }
+        break;
+
+    default:
+        echo json_encode(['success' => false, 'message' => 'Invalid action.']);
 }
-?>
+
+$conn->close();

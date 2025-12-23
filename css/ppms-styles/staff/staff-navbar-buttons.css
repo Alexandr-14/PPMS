@@ -82,6 +82,18 @@ body > nav:first-of-type {
     position: relative !important;
 }
 
+/* Ensure dropdown menu appears above all content */
+.dropdown-menu.show {
+    z-index: 10000 !important;
+    position: absolute !important;
+}
+
+/* Notification dropdown specific positioning */
+.notification-dropdown.show {
+    position: absolute !important;
+    z-index: 10000 !important;
+}
+
 /* Prevent overflow issues and remove default spacing */
 body {
     overflow-x: visible !important;
@@ -170,6 +182,17 @@ body {
     border-radius: 0.75rem !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
     backdrop-filter: blur(10px) !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    min-width: 200px !important;
+    margin-top: 0 !important;
+}
+
+.dropdown-menu.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
 }
 
 .dropdown-item {
@@ -180,11 +203,27 @@ body {
 }
 
 .dropdown-item:hover {
-    background: rgba(106, 27, 154, 0.1) !important;
-    color: #6A1B9A !important;
+    background: rgba(106, 27, 154, 0.15) !important;
+    color: #4A148C !important;
     transform: translateX(5px) !important;
 }
 
 .dropdown-item i {
     color: #6A1B9A !important;
+}
+
+/* Sort By Dropdown Positioning */
+#sortDropdown,
+#historySort {
+    position: relative;
+}
+
+.dropdown #sortDropdown ~ .dropdown-menu,
+.dropdown #historySort ~ .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    min-width: 200px !important;
+    margin-top: 0 !important;
 }

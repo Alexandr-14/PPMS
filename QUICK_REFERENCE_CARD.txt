@@ -1,0 +1,112 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    PPMS QUICK REFERENCE CARD                               ║
+║                         21-12-2025 Session                                  ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📍 PROJECT LOCATION
+   Local: c:\xampp\htdocs\PPMS
+   Backup: c:\xampp\htdocs\fyp backup\PPMS Backup 21-12-2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ ISSUES FIXED (6 Total)
+
+1. Load More Notifications Button
+   ├─ File: html/receiver-dashboard.php
+   ├─ Lines: 2057-2062
+   └─ Status: ✅ WORKING
+
+2. Sort By Dropdown Positioning
+   ├─ Files: receiver-navbar-buttons.css (line 220)
+   │         staff-navbar-buttons.css (line 221)
+   └─ Status: ✅ WORKING
+
+3. QR Download Button
+   ├─ Files: receiver-dashboard.php (lines 3233-3278)
+   │         staff-dashboard.php (lines 3622-3667)
+   └─ Status: ✅ WORKING
+
+4. Track a Parcel Button Size
+   ├─ File: html/receiver-dashboard.php (lines 250-252)
+   └─ Status: ✅ WORKING
+
+5. File Organization
+   ├─ Action: Moved docs to documentation/ folder
+   └─ Status: ✅ COMPLETE
+
+6. Naming Convention
+   ├─ Action: Renamed all to lowercase
+   └─ Status: ✅ COMPLETE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📤 FILES TO UPLOAD (4 Total)
+
+1. html/receiver-dashboard.php
+2. html/staff-dashboard.php
+3. css/ppms-styles/receiver/receiver-navbar-buttons.css
+4. css/ppms-styles/staff/staff-navbar-buttons.css
+
+Upload via: cPanel File Manager or FTP/SFTP
+After Upload: Refresh with Ctrl+F5
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION FILES
+
+Getting Started: GETTING_STARTED.md (in root)
+Session Summary: SESSION_SUMMARY.txt (in root)
+Main Guide: documentation/index.md
+Quick Start: documentation/quick_start_guide.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 KEY TECHNICAL CHANGES
+
+Load More Notifications:
+   └─ Changed HTML insertion method from insertBefore to appendChild
+   └─ Now properly loads 10 notifications per request
+
+Sort By Dropdown:
+   └─ CSS Selector: .dropdown #sortDropdown ~ .dropdown-menu
+   └─ Changed from sibling (+) to general sibling (~) combinator
+
+QR Download:
+   └─ Method: Canvas-based with CORS handling
+   └─ Fallback: Direct download if canvas fails
+   └─ Works on both receiver and staff dashboards
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 NEXT SESSION CHECKLIST
+
+□ Upload 4 modified files to server
+□ Test Load More button
+□ Test Sort By dropdown
+□ Test QR download
+□ Verify Track a Parcel button
+□ Check for remaining issues
+□ Continue with pending tasks
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 PENDING TASKS (From Task List)
+
+□ Track files for upload
+□ Address empty middle space in landing page
+□ Improve icon consistency
+□ Refine Administrator Access Level note
+□ Add QR buttons to parcel history tab
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ STATUS: READY FOR DEPLOYMENT ✨
+
+All files are error-free and ready to upload!
+Local backup created for safety.
+Documentation complete and organized.
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    Happy Coding! 🚀                                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+

@@ -243,16 +243,18 @@
         font-size: 0.9rem !important;
         white-space: nowrap !important;
         flex-shrink: 0 !important;
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%) !important;
+        border: 1px solid rgba(255, 82, 82, 0.3) !important;
         border-radius: 8px !important;
         color: white !important;
         transition: all 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3) !important;
     }
 
     .logout-btn:hover {
-        background: rgba(255, 255, 255, 0.25) !important;
+        background: linear-gradient(135deg, #FF5252 0%, #FF3838 100%) !important;
         transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(255, 82, 82, 0.4) !important;
     }
 
     /* Hide logout text, keep icon */
@@ -260,8 +262,7 @@
         margin-right: 0 !important;
     }
 
-    .logout-btn span,
-    .logout-btn::after {
+    .logout-btn .logout-text {
         display: none !important;
     }
 
@@ -473,9 +474,11 @@
     .parcel-table-container .table-responsive {
         display: block !important;
         width: 100% !important;
-        overflow-x: visible !important;
+        overflow-x: auto !important;
         overflow-y: visible !important;
-        overflow: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(67, 233, 123, 0.5) rgba(67, 233, 123, 0.1) !important;
         margin: 0 !important;
         padding: 0 !important;
     }
@@ -530,6 +533,25 @@
 
     .btn-group-sm .btn span {
         display: none;
+    }
+
+    /* Webkit scrollbar styling for table-responsive */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px !important;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: rgba(67, 233, 123, 0.1) !important;
+        border-radius: 10px !important;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: rgba(67, 233, 123, 0.5) !important;
+        border-radius: 10px !important;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: rgba(67, 233, 123, 0.7) !important;
     }
 
     /* Remove scroll hint from inner .table-responsive (to avoid duplicates) */
@@ -1264,19 +1286,18 @@
 
 /* === Registration Pages Mobile Fixes === */
 @media (max-width: 767.98px) {
-    /* Main container - full width on mobile */
+    /* Main container - keep card style on mobile */
     .staff-auth-container,
     .receiver-auth-container {
         flex-direction: column !important;
         width: 100% !important;
-        max-width: 100% !important;
-        min-height: 100vh !important;
-        max-height: none !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        overflow: hidden !important;
+        max-width: 450px !important;
+        min-height: auto !important;
+        max-height: 90vh !important;
+        margin: auto !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        overflow-y: auto !important;
     }
 
     /* Hide the left panel with illustration on mobile */
@@ -1285,7 +1306,7 @@
         display: none !important;
     }
 
-    /* Right panel (form) takes full width */
+    /* Right panel (form) - normal styling */
     .staff-right-panel,
     .receiver-right-panel {
         flex: 1 !important;
@@ -1294,18 +1315,18 @@
         padding: 0 !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
     }
 
-    /* Header section - sticky with gradient */
+    /* Header section - normal styling */
     .staff-header-section,
     .receiver-header-section {
-        position: sticky !important;
-        top: 0 !important;
-        padding: 1.5rem 1.25rem 1rem !important;
-        background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%) !important;
-        color: #ffffff !important;
-        z-index: 100 !important;
+        position: relative !important;
+        top: auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        color: inherit !important;
+        z-index: auto !important;
         border-bottom: none !important;
     }
 
@@ -1313,22 +1334,22 @@
     .receiver-header-section h2 {
         font-size: 1.5rem !important;
         margin-bottom: 0.5rem !important;
-        color: #ffffff !important;
+        color: #1a202c !important;
         font-weight: 700 !important;
     }
 
     .staff-welcome-text,
     .receiver-welcome-text {
         font-size: 0.875rem !important;
-        color: rgba(255, 255, 255, 0.9) !important;
+        color: #6b7280 !important;
     }
 
     /* Form content area */
     .staff-form-content,
     .receiver-form-content {
-        padding: 1.5rem 1.25rem !important;
+        padding: 0 !important;
         flex: 1 !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
     }
 
     /* Form groups */
@@ -1391,7 +1412,7 @@
     .receiver-auth-links {
         margin-top: 1.5rem !important;
         text-align: center !important;
-        padding: 0 1.25rem !important;
+        padding: 0 !important;
     }
 
     .staff-auth-links p,

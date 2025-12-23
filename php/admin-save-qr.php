@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         MatricNumber, TrackingNumber, notificationType, messageContent,
                         sentTimestamp, notificationStatus, isRead, deliveryMethod
                     ) VALUES (
-                        ?, ?, 'qr_generated', 'Verification QR code generated for parcel',
+                        ?, ?, 'qr_generated', CONCAT('(', ?, ') QR code generated'),
                         NOW(), 'sent', 0, 'system'
                     )
                 ");

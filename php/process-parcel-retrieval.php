@@ -150,7 +150,7 @@ try {
             throw new Exception('Database error: ' . $conn->error);
         }
 
-        $messageContent = "Your parcel {$trackingNumber} has been retrieved by {$staffID} on {$retrieveDate} at {$retrieveTime}";
+        $messageContent = "({$trackingNumber}) Parcel has been retrieved. Thank you!";
         
         $notificationStmt->bind_param(
             "sss",

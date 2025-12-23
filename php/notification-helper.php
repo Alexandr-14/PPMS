@@ -20,7 +20,7 @@ function sendParcelArrivalNotification($icNumber, $trackingNumber, $parcelName, 
     try {
         // Create smart notification message
         $packageText = ($parcelName && $parcelName !== 'Package') ? $parcelName : 'your package';
-        $message = "New parcel arrived! Your package (Tracking No: {$trackingNumber}) is ready for pickup at {$deliveryLocation}.";
+        $message = "({$trackingNumber}) Parcel has arrived and is ready for pickup.";
 
         // Insert notification into database
         $stmt = $conn->prepare("
@@ -65,7 +65,7 @@ function sendParcelRetrievedNotification($icNumber, $trackingNumber, $parcelName
 
     try {
         // Create smart notification message
-        $message = "Parcel collected! Your package (Tracking No: {$trackingNumber}) has been successfully retrieved. Thank you for using our service!";
+        $message = "({$trackingNumber}) Parcel has been retrieved. Thank you!";
 
         // Insert notification into database
         $stmt = $conn->prepare("
@@ -111,7 +111,7 @@ function sendParcelReadyNotification($icNumber, $trackingNumber, $parcelName, $d
 
     try {
         // Create smart notification message
-        $message = "Parcel ready for pickup! Your package (Tracking No: {$trackingNumber}) is now available for collection at {$deliveryLocation}.";
+        $message = "({$trackingNumber}) Parcel is ready for pickup.";
 
         // Insert notification into database
         $stmt = $conn->prepare("

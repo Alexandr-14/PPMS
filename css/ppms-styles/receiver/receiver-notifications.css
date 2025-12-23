@@ -415,14 +415,19 @@
     gap: 0.2rem;
 }
 
+.notification-message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .notification-unread-dot {
+    display: inline-block;
     width: 8px;
     height: 8px;
     background: #43e97b;
     border-radius: 50%;
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
+    flex-shrink: 0;
 }
 
 .notification-dropdown-empty {
@@ -466,4 +471,88 @@
 
 .notification-dropdown-body::-webkit-scrollbar-thumb:hover {
     background: #38d9a9;
+}
+
+/* Load More Button Styling */
+.notification-load-more-container {
+    padding: 1rem;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.notification-load-more-container .btn {
+    transition: all 0.3s ease;
+    font-weight: 600;
+    border-color: #43e97b;
+    color: #43e97b;
+}
+
+.notification-load-more-container .btn:hover:not(:disabled) {
+    background-color: #43e97b;
+    color: white;
+    border-color: #43e97b;
+}
+
+.notification-load-more-container .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Icon-only Action Buttons */
+.btn-icon-action {
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #dee2e6 !important;
+    background-color: transparent !important;
+    color: #6c757d !important;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-icon-action:hover:not(:disabled) {
+    background-color: #f8f9fa !important;
+    border-color: #43e97b !important;
+    color: #43e97b !important;
+}
+
+.btn-icon-action.mark-read-btn {
+    color: #43e97b !important;
+    border-color: #43e97b !important;
+}
+
+.btn-icon-action.mark-read-btn:hover {
+    background-color: #43e97b !important;
+    color: white !important;
+}
+
+.btn-icon-action.delete-notification-btn {
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-icon-action.delete-notification-btn:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-icon-action:disabled {
+    opacity: 0.5;
+    cursor: default;
+    color: #43e97b !important;
+    border-color: #43e97b !important;
+}
+
+/* Sticky Tab Navigation */
+.sticky-tabs {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    border-bottom: 2px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }

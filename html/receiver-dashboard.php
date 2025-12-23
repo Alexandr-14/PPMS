@@ -194,7 +194,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 </div>
             </div>
             <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                <i class="fas fa-sign-out-alt me-2"></i><span class="logout-text">Logout</span>
             </button>
         </div>
     </nav>
@@ -202,7 +202,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     <!-- Dashboard Container -->
     <div class="dashboard-container">
         <!-- Simple Tabs -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs sticky-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tracking-tab" data-bs-toggle="tab" data-bs-target="#tracking" type="button" role="tab">
                     <svg class="me-1" style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Track Parcel
@@ -248,7 +248,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                style="background: #ffffff !important; color: #2d3748 !important; border: 2px solid #e2e8f0 !important; padding: 0.75rem 1rem !important; font-size: 1rem !important;">
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <svg class="me-1" style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Track Parcel
+                        <i class="fas fa-search me-2"></i>Track a Parcel
                     </button>
                 </form>
 
@@ -400,9 +400,6 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                 <div class="qr-buttons-container">
                                     <button type="button" class="btn-qr btn-qr-download" onclick="downloadReceiverQR()">
                                         <i class="fas fa-download me-2"></i>Download QR Image
-                                    </button>
-                                    <button type="button" class="btn-qr btn-qr-enlarge" onclick="enlargeReceiverQR()">
-                                        <i class="fas fa-expand me-2"></i>Enlarge QR Code
                                     </button>
                                 </div>
                             </div>
@@ -593,18 +590,27 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                                 <?php echo htmlspecialchars($row['deliveryLocation'] ?? 'Not specified', ENT_QUOTES); ?>
                                             </td>
                                             <td class="px-4 py-3">
-                                                <button class="btn btn-sm btn-outline-primary eye-button"
-                                                        data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
-                                                        data-status="<?php echo htmlspecialchars($row['status']); ?>"
-                                                        data-ic="<?php echo htmlspecialchars($row['MatricNumber']); ?>"
-                                                        data-receiver-name="<?php echo htmlspecialchars($row['receiverName'] ?? 'N/A'); ?>"
-                                                        data-weight="<?php echo htmlspecialchars($row['weight'] ?? 'N/A'); ?>"
-                                                        data-location="<?php echo htmlspecialchars($row['deliveryLocation'] ?? 'N/A'); ?>"
-                                                        data-date="<?php echo htmlspecialchars($row['date']); ?>"
-                                                        data-time="<?php echo htmlspecialchars($row['time']); ?>"
-                                                        data-name="<?php echo htmlspecialchars($row['name'] ?? 'Package'); ?>">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+                                                <div class="d-flex gap-2 flex-wrap">
+                                                    <button class="btn btn-sm btn-outline-primary eye-button"
+                                                            data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
+                                                            data-status="<?php echo htmlspecialchars($row['status']); ?>"
+                                                            data-ic="<?php echo htmlspecialchars($row['MatricNumber']); ?>"
+                                                            data-receiver-name="<?php echo htmlspecialchars($row['receiverName'] ?? 'N/A'); ?>"
+                                                            data-weight="<?php echo htmlspecialchars($row['weight'] ?? 'N/A'); ?>"
+                                                            data-location="<?php echo htmlspecialchars($row['deliveryLocation'] ?? 'N/A'); ?>"
+                                                            data-date="<?php echo htmlspecialchars($row['date']); ?>"
+                                                            data-time="<?php echo htmlspecialchars($row['time']); ?>"
+                                                            data-name="<?php echo htmlspecialchars($row['name'] ?? 'Package'); ?>"
+                                                            title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-success qr-download-history-btn"
+                                                            data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
+                                                            onclick="downloadHistoryQR('<?php echo htmlspecialchars($row['TrackingNumber']); ?>')"
+                                                            title="Download QR">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -638,13 +644,20 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     <?php endif; ?>
                 </div>
 
-                <div class="notification-list">
+                <div class="notification-list" id="notificationList">
                     <?php
-                    // Fetch all notifications for the current receiver
-                    $allNotificationStmt = $conn->prepare("SELECT * FROM notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC");
+                    // Fetch first 10 notifications for the current receiver (pagination)
+                    $allNotificationStmt = $conn->prepare("SELECT * FROM notification WHERE MatricNumber = ? ORDER BY sentTimestamp DESC LIMIT 10");
                     $allNotificationStmt->bind_param("s", $receiverIC);
                     $allNotificationStmt->execute();
                     $allNotificationResult = $allNotificationStmt->get_result();
+
+                    // Also get total count for pagination
+                    $countStmt = $conn->prepare("SELECT COUNT(*) as total FROM notification WHERE MatricNumber = ?");
+                    $countStmt->bind_param("s", $receiverIC);
+                    $countStmt->execute();
+                    $countResult = $countStmt->get_result();
+                    $totalNotifications = $countResult->fetch_assoc()['total'];
 
                     if ($allNotificationResult->num_rows > 0):
                         while ($notification = $allNotificationResult->fetch_assoc()):
@@ -677,8 +690,13 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                 <i class="<?php echo $iconClass; ?>"></i>
                             </div>
                             <div class="notification-content">
-                                <div class="notification-message">
-                                    <?php echo htmlspecialchars($notification['messageContent'], ENT_QUOTES); ?>
+                                <div class="notification-message-header">
+                                    <?php if ($isUnread): ?>
+                                        <span class="notification-unread-dot"></span>
+                                    <?php endif; ?>
+                                    <div class="notification-message">
+                                        <?php echo htmlspecialchars($notification['messageContent'], ENT_QUOTES); ?>
+                                    </div>
                                 </div>
                                 <div class="notification-meta">
                                     <span class="notification-time">
@@ -696,25 +714,24 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             <div class="notification-actions">
                                 <div class="notification-buttons">
                                     <?php if ($isUnread): ?>
-                                        <button class="btn btn-sm btn-outline-success mark-read-btn"
+                                        <button class="btn btn-sm btn-icon-action mark-read-btn"
                                                 onclick="markSingleNotificationAsRead(<?php echo $notification['notificationID']; ?>)"
                                                 title="Mark as read">
-                                            <i class="fas fa-check"></i>
+                                            <i class="fas fa-circle"></i>
                                         </button>
                                     <?php else: ?>
-                                        <span class="text-muted small read-status">
-                                            <i class="fas fa-check-circle me-1"></i>Read
-                                        </span>
+                                        <button class="btn btn-sm btn-icon-action read-status"
+                                                disabled
+                                                title="Already read">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
                                     <?php endif; ?>
-                                    <button class="btn btn-sm btn-outline-danger delete-notification-btn"
+                                    <button class="btn btn-sm btn-icon-action delete-notification-btn"
                                             onclick="deleteNotification(<?php echo $notification['notificationID']; ?>)"
                                             title="Delete notification">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
-                                <?php if ($isUnread): ?>
-                                    <div class="notification-unread-indicator"></div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     <?php
@@ -727,6 +744,15 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             </div>
                             <h5>No notifications yet</h5>
                             <p>You'll see updates about your parcels here when they arrive.</p>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Load More Button -->
+                    <?php if ($totalNotifications > 10): ?>
+                        <div class="notification-load-more-container">
+                            <button class="btn btn-outline-success btn-sm w-100" onclick="loadMoreNotifications()" id="loadMoreBtn">
+                                <i class="fas fa-chevron-down me-2"></i>Load More Notifications
+                            </button>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -879,19 +905,97 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Duplicate cards for infinite loop -->
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/posMalaysia.png" alt="Pos Malaysia" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Pos Malaysia</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">Pos Malaysia</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/gdex.png" alt="GDEX" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>GDEX</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">GDEX</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/flashexpress.png" alt="Flash Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Flash Express</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">Flash Express</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/shopeeExpress.jpeg" alt="Shopee Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Shopee Express</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">Shopee Express</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/JNT.webp" alt="J&T Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>J&T Express</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">J&T Express</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/dhl.png" alt="DHL" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>DHL</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">DHL</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="partner-card">
+                                    <div class="partner-card-inner">
+                                        <div class="partner-logo-container">
+                                            <img src="../assets/fedex.png" alt="FedEx" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>FedEx</div>'">
+                                        </div>
+                                        <div class="partner-info">
+                                            <h6 class="partner-name">FedEx</h6>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Navigation Arrows -->
-                        <button class="carousel-nav carousel-nav-prev" onclick="moveCarousel('prev')" aria-label="Previous partners">
+                        <button class="carousel-nav carousel-nav-prev" onclick="moveCarousel('prev')" aria-label="Previous partners" style="display: none;">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <button class="carousel-nav carousel-nav-next" onclick="moveCarousel('next')" aria-label="Next partners">
+                        <button class="carousel-nav carousel-nav-next" onclick="moveCarousel('next')" aria-label="Next partners" style="display: none;">
                             <i class="fas fa-chevron-right"></i>
                         </button>
 
                         <!-- Elegant Indicators -->
-                        <div class="carousel-indicators">
+                        <div class="carousel-indicators" style="display: none;">
                             <button class="carousel-indicator active" onclick="goToSlide(0)" aria-label="Go to slide 1"></button>
                             <button class="carousel-indicator" onclick="goToSlide(1)" aria-label="Go to slide 2"></button>
                             <button class="carousel-indicator" onclick="goToSlide(2)" aria-label="Go to slide 3"></button>
@@ -1570,12 +1674,30 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         // Clear and re-append sorted rows
         tbody.innerHTML = '';
         rows.forEach(row => tbody.appendChild(row));
+
+        // Close the dropdown after sorting
+        const sortDropdown = document.getElementById('sortDropdown');
+        if (sortDropdown) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(sortDropdown);
+            if (dropdownInstance) {
+                dropdownInstance.hide();
+            }
+        }
     }
 
     function filterHistory(status) {
         console.log('Filtering history by', status);
         currentStatusFilter = status; // Update the global status filter
         applyReceiverHistorySearch(); // Re-apply search with new filter
+
+        // Close the dropdown after filtering
+        const sortDropdown = document.getElementById('sortDropdown');
+        if (sortDropdown) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(sortDropdown);
+            if (dropdownInstance) {
+                dropdownInstance.hide();
+            }
+        }
     }
 
     function refreshHistory() {
@@ -1836,14 +1958,135 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     }
 
     function loadMoreNotifications() {
-        // Implementation for loading more notifications
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'info',
-            title: 'Loading more notifications...',
-            showConfirmButton: false,
-            timer: 1500
+        const notificationList = document.getElementById('notificationList');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+        if (!loadMoreBtn) return;
+
+        // Get current offset (number of notifications already loaded)
+        const currentCount = document.querySelectorAll('.notification-item').length;
+
+        // Show loading state
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+
+        // Fetch more notifications
+        fetch('../php/load-more-notifications.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            credentials: 'include',
+            body: 'offset=' + currentCount
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.notifications.length > 0) {
+                // Build HTML for new notifications
+                let html = '';
+                data.notifications.forEach(notification => {
+                    const isUnread = notification.isRead === 0;
+                    const bgClass = isUnread ? 'bg-light' : '';
+
+                    // Determine icon based on notification type
+                    let iconClass = 'fas fa-bell';
+                    if (notification.notificationType === 'arrival') {
+                        iconClass = 'fas fa-box';
+                    } else if (notification.notificationType === 'delivery') {
+                        iconClass = 'fas fa-check-circle';
+                    } else if (notification.notificationType === 'pickup' || notification.notificationType === 'parcel_retrieved') {
+                        iconClass = 'fas fa-hand-holding-box';
+                    } else if (notification.notificationType === 'qr_generated') {
+                        iconClass = 'fas fa-qrcode';
+                    }
+
+                    html += `
+                        <div class="notification-item ${bgClass} ${isUnread ? 'unread' : ''}" data-notification-id="${notification.notificationID}">
+                            <div class="notification-icon-wrapper">
+                                <i class="${iconClass}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-message-header">
+                                    ${isUnread ? '<span class="notification-unread-dot"></span>' : ''}
+                                    <div class="notification-message">
+                                        ${notification.messageContent}
+                                    </div>
+                                </div>
+                                <div class="notification-meta">
+                                    <span class="notification-time">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${new Date(notification.sentTimestamp).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'})}</span>
+                                    ${notification.TrackingNumber ? `<span class="notification-tracking"><i class="fas fa-barcode me-1"></i>${notification.TrackingNumber}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                <div class="notification-buttons">
+                                    ${isUnread ? `
+                                        <button class="btn btn-sm btn-icon-action mark-read-btn"
+                                                onclick="markSingleNotificationAsRead(${notification.notificationID})"
+                                                title="Mark as read">
+                                            <i class="fas fa-circle"></i>
+                                        </button>
+                                    ` : `
+                                        <button class="btn btn-sm btn-icon-action read-status"
+                                                disabled
+                                                title="Already read">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
+                                    `}
+                                    <button class="btn btn-sm btn-icon-action delete-notification-btn"
+                                            onclick="deleteNotification(${notification.notificationID})"
+                                            title="Delete notification">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Insert before load more button
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                while (tempDiv.firstChild) {
+                    notificationList.insertBefore(tempDiv.firstChild, loadMoreBtn.parentElement);
+                }
+
+                // Update or remove load more button
+                if (data.hasMore) {
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = '<i class="fas fa-chevron-down me-2"></i>Load More Notifications';
+                } else {
+                    loadMoreBtn.parentElement.remove();
+                }
+
+                // Re-attach click handlers to new notifications
+                attachNotificationHandlers();
+
+            } else {
+                loadMoreBtn.parentElement.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more notifications:', error);
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.innerHTML = '<i class="fas fa-chevron-down me-2"></i>Load More Notifications';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to load more notifications'
+            });
+        });
+    }
+
+    function attachNotificationHandlers() {
+        // Attach click handlers to newly loaded notifications
+        document.querySelectorAll('.notification-item.unread').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-link')) return; // Don't trigger on button clicks
+                const notificationId = this.dataset.notificationId;
+                markNotificationAsRead(notificationId);
+            });
         });
     }
 
@@ -2196,9 +2439,11 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             timer: 2000
                         });
 
-                        // Check if no notifications left
+                        // Check if no notifications left and try to load more if available
                         setTimeout(() => {
                             const remainingNotifications = document.querySelectorAll('.notification-item');
+                            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
                             if (remainingNotifications.length === 0) {
                                 // Show empty state
                                 const notificationList = document.querySelector('.notification-list');
@@ -2213,6 +2458,9 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                         </div>
                                     `;
                                 }
+                            } else if (loadMoreBtn && remainingNotifications.length < 5) {
+                                // Auto-load more if we have few notifications left and more are available
+                                loadMoreNotifications();
                             }
                         }, 400);
 
@@ -2380,25 +2628,40 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const qrContainer = document.getElementById('parcelQRCode');
         if (!qrContainer) {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'QR Container Not Found',
                 text: 'QR code container is not available.',
                 confirmButtonColor: '#43e97b'
             });
+            console.error('QR Container not found');
             return;
         }
 
-        const img = qrContainer.querySelector('img');
+        let img = qrContainer.querySelector('img');
 
+        // If no image found, try to wait a moment for it to load
         if (!img) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'No QR Code',
-                text: 'QR code is not available for this parcel.',
-                confirmButtonColor: '#43e97b'
-            });
+            console.warn('QR image not found, waiting for it to load...');
+            setTimeout(() => {
+                img = qrContainer.querySelector('img');
+                if (!img) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No QR Code',
+                        text: 'QR code is not available for this parcel. Please wait for it to load.',
+                        confirmButtonColor: '#43e97b'
+                    });
+                    return;
+                }
+                enlargeQRWithImage(img);
+            }, 500);
             return;
         }
+
+        enlargeQRWithImage(img);
+    }
+
+    function enlargeQRWithImage(img) {
 
         // Get higher resolution QR code for enlargement
         let qrImageData = img.src;
@@ -2485,25 +2748,40 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const qrContainer = document.getElementById('parcelQRCode');
         if (!qrContainer) {
             Swal.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: 'QR Container Not Found',
                 text: 'QR code container is not available.',
                 confirmButtonColor: '#43e97b'
             });
+            console.error('QR Container not found');
             return;
         }
 
-        const img = qrContainer.querySelector('img');
+        let img = qrContainer.querySelector('img');
 
+        // If no image found, try to wait a moment for it to load
         if (!img) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'No QR Code',
-                text: 'QR code is not available for this parcel.',
-                confirmButtonColor: '#43e97b'
-            });
+            console.warn('QR image not found, waiting for it to load...');
+            setTimeout(() => {
+                img = qrContainer.querySelector('img');
+                if (!img) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No QR Code',
+                        text: 'QR code is not available for this parcel. Please wait for it to load.',
+                        confirmButtonColor: '#43e97b'
+                    });
+                    return;
+                }
+                downloadQRWithImage(img);
+            }, 500);
             return;
         }
+
+        downloadQRWithImage(img);
+    }
+
+    function downloadQRWithImage(img) {
 
         // Get tracking number
         const trackingNumber = document.querySelector('.tracking-number')?.textContent.trim() || 'QR_Code';
@@ -2793,6 +3071,433 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         `);
         printWindow.document.close();
     }
+
+    // Download QR code from parcel history
+    function downloadHistoryQR(trackingNumber) {
+        console.log('Downloading QR for tracking:', trackingNumber);
+
+        // Fetch parcel data with QR
+        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+            credentials: 'include'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success && data.parcel) {
+                const parcel = data.parcel;
+
+                // Build QR payload
+                const qrPayload = "PPMS|" +
+                                 trackingNumber + "|" +
+                                 parcel.MatricNumber + "|" +
+                                 (parcel.receiverName || 'N/A') + "|" +
+                                 (parcel.deliveryLocation || 'N/A') + "|" +
+                                 (parcel.status || 'Pending');
+
+                // Generate QR code URL
+                const encodedPayload = encodeURIComponent(qrPayload);
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
+
+                // Create print page
+                const printWindow = window.open('', '', 'width=900,height=700');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>QR Code - ${trackingNumber}</title>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 20px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                background: #f5f5f5;
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            }
+                            .container {
+                                background: white;
+                                padding: 40px;
+                                border-radius: 12px;
+                                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                                text-align: center;
+                                max-width: 600px;
+                            }
+                            .header {
+                                background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 8px;
+                                margin-bottom: 30px;
+                            }
+                            .header h1 {
+                                margin: 0 0 10px 0;
+                                font-size: 24px;
+                            }
+                            .header p {
+                                margin: 0;
+                                font-size: 14px;
+                                opacity: 0.9;
+                            }
+                            .qr-display {
+                                margin: 30px 0;
+                                padding: 20px;
+                                background: #f8fafc;
+                                border-radius: 8px;
+                            }
+                            .qr-display img {
+                                max-width: 100%;
+                                height: auto;
+                                border: 2px solid #e5e7eb;
+                                border-radius: 8px;
+                            }
+                            .footer {
+                                margin-top: 30px;
+                                padding-top: 20px;
+                                border-top: 1px solid #e5e7eb;
+                                color: #9ca3af;
+                                font-size: 12px;
+                            }
+                            .actions {
+                                margin-top: 30px;
+                                display: flex;
+                                gap: 10px;
+                                justify-content: center;
+                            }
+                            button {
+                                padding: 10px 20px;
+                                border: none;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                transition: all 0.3s ease;
+                            }
+                            .btn-print {
+                                background: linear-gradient(135deg, #38d9a9 0%, #2dd4bf 100%);
+                                color: white;
+                            }
+                            .btn-print:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 6px 20px rgba(56, 217, 169, 0.3);
+                            }
+                            .btn-download {
+                                background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
+                                color: white;
+                            }
+                            .btn-download:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+                            }
+                            @media print {
+                                body {
+                                    background: white;
+                                    padding: 0;
+                                }
+                                .container {
+                                    box-shadow: none;
+                                    padding: 20px;
+                                }
+                                .actions {
+                                    display: none;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header">
+                                <h1>Perwira Parcel Verification</h1>
+                                <p>Tracking Number: <strong>${trackingNumber}</strong></p>
+                            </div>
+                            <div class="qr-display">
+                                <img src="${qrCodeUrl}" alt="QR Code">
+                            </div>
+                            <div class="footer">
+                                <p>QR Code contains encrypted verification data</p>
+                                <p>Generated: ${new Date().toLocaleString()}</p>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-print" onclick="window.print()">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                <button class="btn-download" onclick="downloadQRImage()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <script>
+                            function downloadQRImage() {
+                                const qrImageUrl = '${qrCodeUrl}';
+                                const fileName = 'PPMS_Verification_${trackingNumber}.png';
+
+                                // Method 1: Try canvas-based download (works with CORS)
+                                const img = new Image();
+                                img.crossOrigin = 'anonymous';
+                                img.onload = function() {
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = img.width;
+                                    canvas.height = img.height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0);
+
+                                    canvas.toBlob(function(blob) {
+                                        const url = window.URL.createObjectURL(blob);
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.download = fileName;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        setTimeout(() => {
+                                            document.body.removeChild(link);
+                                            window.URL.revokeObjectURL(url);
+                                        }, 100);
+                                    }, 'image/png');
+                                };
+
+                                img.onerror = function() {
+                                    console.error('Canvas method failed, trying direct download');
+                                    // Fallback: direct download
+                                    const link = document.createElement('a');
+                                    link.href = qrImageUrl;
+                                    link.download = fileName;
+                                    link.setAttribute('target', '_blank');
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
+                                    }, 100);
+                                };
+
+                                img.src = qrImageUrl;
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Could not fetch parcel data. Please try again.',
+                    confirmButtonColor: '#43e97b'
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to download QR code.',
+                confirmButtonColor: '#43e97b'
+            });
+        });
+    }
+
+    // Enlarge QR code from parcel history
+    function enlargeHistoryQR(trackingNumber) {
+        console.log('Enlarging QR for tracking:', trackingNumber);
+
+        // Fetch parcel data with QR
+        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+            credentials: 'include'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success && data.parcel) {
+                const parcel = data.parcel;
+
+                // Build QR payload
+                const qrPayload = "PPMS|" +
+                                 trackingNumber + "|" +
+                                 parcel.MatricNumber + "|" +
+                                 (parcel.receiverName || 'N/A') + "|" +
+                                 (parcel.deliveryLocation || 'N/A') + "|" +
+                                 (parcel.status || 'Pending');
+
+                // Generate QR code URL with higher resolution
+                const encodedPayload = encodeURIComponent(qrPayload);
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
+
+                // Show enlarged QR in modal
+                Swal.fire({
+                    html: `
+                        <div style="text-align: center;">
+                            <img src="${qrCodeUrl}"
+                                 style="max-width: 90%; max-height: 80vh; height: auto; border: 3px solid white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);"
+                                 alt="Enlarged QR Code">
+                            <p style="color: white; margin-top: 20px; font-size: 14px;">Click outside or press ESC to close</p>
+                        </div>
+                    `,
+                    background: 'transparent',
+                    showConfirmButton: false,
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    customClass: {
+                        popup: 'enlarged-qr-popup'
+                    },
+                    didOpen: (modal) => {
+                        const backdrop = document.querySelector('.swal2-container');
+                        if (backdrop) {
+                            backdrop.style.background = 'rgba(0, 0, 0, 0.9)';
+                            backdrop.style.backdropFilter = 'blur(5px)';
+                        }
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Could not fetch parcel data. Please try again.',
+                    confirmButtonColor: '#43e97b'
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to enlarge QR code.',
+                confirmButtonColor: '#43e97b'
+            });
+        });
+    }
+
+    // CSS Scroll-Snap Carousel with Navigation (variables already declared above)
+
+    function initializeCarousel() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const track = document.getElementById('modernCarouselTrack');
+        if (!viewport || !track) return;
+
+        // Calculate cards per view based on screen size
+        updateCardsPerView();
+
+        // Start auto-slide
+        startAutoSlide();
+
+        // Pause on hover
+        const container = document.querySelector('.modern-carousel-container');
+        container.addEventListener('mouseenter', () => {
+            isAutoSliding = false;
+            clearInterval(autoSlideInterval);
+        });
+
+        // Resume on mouse leave
+        container.addEventListener('mouseleave', () => {
+            isAutoSliding = true;
+            startAutoSlide();
+        });
+
+        // Track scroll position for indicators
+        viewport.addEventListener('scroll', updateCarouselIndicators);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            updateCardsPerView();
+        });
+    }
+
+    function updateCardsPerView() {
+        const width = window.innerWidth;
+        if (width < 480) {
+            cardsPerView = 1;
+        } else if (width < 768) {
+            cardsPerView = 2;
+        } else if (width < 1024) {
+            cardsPerView = 2;
+        } else {
+            cardsPerView = 3;
+        }
+    }
+
+    function startAutoSlide() {
+        if (!isAutoSliding) return;
+
+        autoSlideInterval = setInterval(() => {
+            moveCarousel('next');
+        }, 4000); // Slower for better viewing
+    }
+
+    function moveCarousel(direction) {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+
+        if (!viewport || cards.length === 0) return;
+
+        const cardWidth = cards[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const currentScroll = viewport.scrollLeft;
+
+        if (direction === 'next') {
+            currentCarouselIndex = Math.min(currentCarouselIndex + 1, originalCardsCount - 1);
+        } else {
+            currentCarouselIndex = Math.max(currentCarouselIndex - 1, 0);
+        }
+
+        const targetScroll = currentCarouselIndex * cardWithGap;
+        viewport.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
+
+        updateCarouselIndicators();
+    }
+
+    function goToSlide(index) {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+
+        if (!viewport || cards.length === 0) return;
+
+        currentCarouselIndex = index;
+        const cardWidth = cards[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const targetScroll = currentCarouselIndex * cardWithGap;
+
+        viewport.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
+
+        updateCarouselIndicators();
+
+        // Reset auto-slide
+        if (isAutoSliding) {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+    }
+
+    function updateCarouselIndicators() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+
+        if (!viewport || cards.length === 0 || indicators.length === 0) return;
+
+        const cardWidth = cards[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const scrollPosition = viewport.scrollLeft;
+
+        // Calculate which slide is currently visible
+        const visibleIndex = Math.round(scrollPosition / cardWithGap);
+        currentCarouselIndex = Math.min(visibleIndex, originalCardsCount - 1);
+
+        // Update active indicator
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === currentCarouselIndex);
+        });
+    }
+
+    // Initialize carousel when page loads
+    document.addEventListener('DOMContentLoaded', initializeCarousel);
 
     </script>
 </body>

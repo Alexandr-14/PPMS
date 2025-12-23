@@ -1247,6 +1247,35 @@ body {
 }
 
 /* Touch-friendly Adjustments */
+/* === Action Buttons Alignment === */
+.d-flex.gap-2 .btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0.25rem 0.5rem !important;
+    white-space: nowrap;
+}
+
+.btn-outline-primary.btn-sm,
+.btn-outline-success.btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary.btn-sm:hover,
+.btn-outline-success.btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 @media (max-width: 991.98px) {
     .btn, button, a.btn {
         min-height: 44px;

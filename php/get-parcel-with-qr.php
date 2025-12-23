@@ -3,8 +3,11 @@ session_start();
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-// Check if user is logged in as receiver
-if (!isset($_SESSION['receiver_matric'])) {
+// Check if user is logged in as receiver or staff
+$isReceiver = isset($_SESSION['receiver_matric']);
+$isStaff = isset($_SESSION['staff_id']);
+
+if (!$isReceiver && !$isStaff) {
     echo json_encode([
         'success' => false,
         'message' => 'Access denied. Please log in.'
@@ -22,32 +25,58 @@ if (!isset($_GET['trackingNumber'])) {
 
 try {
     $trackingNumber = $_GET['trackingNumber'];
-    $receiverMatric = $_SESSION['receiver_matric'];
 
-    // Get parcel details with QR code - only for the logged-in receiver
-    $query = "
-        SELECT
-            p.TrackingNumber,
-            p.MatricNumber,
-            p.date,
-            p.time,
-            p.name,
-            p.deliveryLocation,
-            p.weight,
-            p.status,
-            p.QR,
-            p.qr_verification_data,
-            r.name as receiverName
-        FROM parcel p
-        LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
-        WHERE p.TrackingNumber = ? AND p.MatricNumber = ?
-    ";
+    // Build query based on user type
+    if ($isReceiver) {
+        // Receiver can only view their own parcels
+        $receiverMatric = $_SESSION['receiver_matric'];
+        $query = "
+            SELECT
+                p.TrackingNumber,
+                p.MatricNumber,
+                p.date,
+                p.time,
+                p.name,
+                p.deliveryLocation,
+                p.weight,
+                p.status,
+                p.QR,
+                p.qr_verification_data,
+                r.name as receiverName
+            FROM parcel p
+            LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
+            WHERE p.TrackingNumber = ? AND p.MatricNumber = ?
+        ";
 
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $trackingNumber, $receiverMatric);
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ss", $trackingNumber, $receiverMatric);
+    } else {
+        // Staff can view all parcels
+        $query = "
+            SELECT
+                p.TrackingNumber,
+                p.MatricNumber,
+                p.date,
+                p.time,
+                p.name,
+                p.deliveryLocation,
+                p.weight,
+                p.status,
+                p.QR,
+                p.qr_verification_data,
+                r.name as receiverName
+            FROM parcel p
+            LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
+            WHERE p.TrackingNumber = ?
+        ";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $trackingNumber);
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 0) {
         echo json_encode([
             'success' => false,

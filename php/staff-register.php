@@ -2,6 +2,12 @@
 require 'db_connect.php';
 require 'password-validator.php';
 
+// =====================================================
+// STAFF REGISTRATION CODE - Change this as needed
+// =====================================================
+define('STAFF_REGISTRATION_CODE', 'PPMS2024');
+// =====================================================
+
 // Check database connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -34,18 +40,32 @@ function showError($title, $message) {
 }
 
 // Validate required fields
-if (empty($_POST['name']) || empty($_POST['staffId']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+if (empty($_POST['registration_code']) || empty($_POST['name']) || empty($_POST['staffId']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
     showError('Missing Information!', 'Please fill in all required fields.');
 }
 
+$registrationCode = trim($_POST['registration_code']);
 $name = trim($_POST['name']);
 $staffId = trim($_POST['staffId']);
 $password = $_POST['password'];
 $confirmPassword = $_POST['confirm_password'];
 
-// Validate Staff ID format (4 characters)
-if (!preg_match('/^[A-Za-z0-9]{4}$/', $staffId)) {
-    showError('Invalid Staff ID!', 'Staff ID must be exactly 4 characters (letters and numbers only).');
+// Validate Registration Code FIRST (security check)
+if ($registrationCode !== STAFF_REGISTRATION_CODE) {
+    // Log failed attempt (optional security measure)
+    error_log("Failed staff registration attempt with invalid code from IP: " . $_SERVER['REMOTE_ADDR']);
+    showError('Invalid Registration Code!', 'The registration code you entered is incorrect. Please contact the administrator.');
+}
+
+// Validate Staff ID format (4 digits, 8000-8999)
+if (!preg_match('/^8[0-9]{3}$/', $staffId)) {
+    showError('Invalid Staff ID!', 'Staff ID must be 4 digits between 8000-8999.');
+}
+
+// Validate Staff ID range
+$staffIdNum = intval($staffId);
+if ($staffIdNum < 8000 || $staffIdNum > 8999) {
+    showError('Invalid Staff ID Range!', 'Staff ID must be between 8000 and 8999.');
 }
 
 // Validate password strength

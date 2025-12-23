@@ -2,6 +2,11 @@
    PPMS Login Page Styles
    ================================== */
 
+/* === Force Light Mode Color Scheme === */
+:root {
+    color-scheme: light only;
+}
+
 /* === Shared Authentication Animations === */
 @keyframes fadeIn {
     from {
@@ -101,21 +106,25 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: var(--bg-white);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%) !important;
     overflow-y: auto;
 }
 
 .staff-right-panel h2 {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
     margin-bottom: var(--spacing-md);
     text-align: center;
 }
 
 .staff-welcome-text {
     text-align: center;
-    color: var(--text-muted);
+    color: #a0aec0 !important;
+    -webkit-text-fill-color: #a0aec0 !important;
+    background: none !important;
     margin-bottom: var(--spacing-xl);
     font-size: var(--font-size-sm);
 }
@@ -127,7 +136,9 @@
 
 .staff-form-label {
     font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
     margin-bottom: var(--spacing-sm);
     font-size: var(--font-size-sm);
     display: block;
@@ -162,7 +173,7 @@
     left: var(--spacing-md);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-light);
+    color: #a0aec0;
     font-size: var(--font-size-lg);
 }
 
@@ -171,7 +182,7 @@
     right: var(--spacing-md);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-light);
+    color: #a0aec0;
     font-size: var(--font-size-lg);
     cursor: pointer;
     transition: var(--transition);
@@ -179,7 +190,7 @@
 }
 
 .staff-password-toggle:hover {
-    color: #6A1B9A;
+    color: #FF9800;
 }
 
 .staff-btn-primary {
@@ -202,13 +213,13 @@
 }
 
 .staff-btn-secondary {
-    background: transparent;
-    border: 2px solid var(--border-light);
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+    border: none;
     border-radius: var(--radius-lg);
     padding: var(--spacing-sm) var(--spacing-2xl);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
+    color: #ffffff;
     width: 100%;
     margin-top: var(--spacing-md);
     transition: var(--transition);
@@ -216,9 +227,9 @@
 }
 
 .staff-btn-secondary:hover {
-    border-color: #6A1B9A;
-    color: #6A1B9A;
-    background: rgba(106, 27, 154, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(106, 27, 154, 0.3);
+    color: #ffffff;
 }
 
 .staff-auth-links {
@@ -226,24 +237,30 @@
     margin-top: var(--spacing-2xl);
 }
 
+.staff-auth-links p {
+    color: #a0aec0;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
 .staff-auth-links a {
-    color: #6A1B9A;
+    color: #FF9800;
     text-decoration: none;
     font-weight: var(--font-weight-medium);
     transition: var(--transition);
 }
 
 .staff-auth-links a:hover {
-    color: #FF9800;
+    color: #ffffff;
 }
 
 .staff-auth-links .text-muted {
-    color: #6c757d !important;
+    color: #a0aec0 !important;
     font-size: 0.875rem;
 }
 
 .staff-auth-links .text-muted i {
-    color: #6c757d !important;
+    color: #a0aec0 !important;
 }
 
 .staff-copyright {
@@ -336,21 +353,25 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: var(--bg-white);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%) !important;
     overflow-y: auto;
 }
 
 .receiver-right-panel h2 {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
     margin-bottom: var(--spacing-md);
     text-align: center;
 }
 
 .receiver-welcome-text {
     text-align: center;
-    color: var(--text-muted);
+    color: #a0aec0 !important;
+    -webkit-text-fill-color: #a0aec0 !important;
+    background: none !important;
     margin-bottom: var(--spacing-xl);
     font-size: var(--font-size-sm);
 }
@@ -362,7 +383,9 @@
 
 .receiver-form-label {
     font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
     margin-bottom: var(--spacing-sm);
     font-size: var(--font-size-sm);
     display: block;
@@ -397,7 +420,7 @@
     left: var(--spacing-md);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-light);
+    color: #a0aec0;
     font-size: var(--font-size-lg);
 }
 
@@ -406,7 +429,7 @@
     right: var(--spacing-md);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-light);
+    color: #a0aec0;
     font-size: var(--font-size-lg);
     cursor: pointer;
     transition: var(--transition);
@@ -437,13 +460,13 @@
 }
 
 .receiver-btn-secondary {
-    background: transparent;
-    border: 2px solid var(--border-light);
+    background: linear-gradient(135deg, #667eea 0%, #43e97b 100%);
+    border: none;
     border-radius: var(--radius-lg);
     padding: var(--spacing-sm) var(--spacing-2xl);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
+    color: #ffffff;
     width: 100%;
     margin-top: var(--spacing-md);
     transition: var(--transition);
@@ -451,14 +474,20 @@
 }
 
 .receiver-btn-secondary:hover {
-    border-color: #43e97b;
-    color: #43e97b;
-    background: rgba(67, 233, 123, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(67, 233, 123, 0.3);
+    color: #ffffff;
 }
 
 .receiver-auth-links {
     text-align: center;
     margin-top: var(--spacing-2xl);
+}
+
+.receiver-auth-links p {
+    color: #a0aec0;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
 }
 
 .receiver-auth-links a {
@@ -469,7 +498,16 @@
 }
 
 .receiver-auth-links a:hover {
-    color: #667eea;
+    color: #ffffff;
+}
+
+.receiver-auth-links .text-muted {
+    color: #a0aec0 !important;
+    font-size: 0.875rem;
+}
+
+.receiver-auth-links .text-muted i {
+    color: #a0aec0 !important;
 }
 
 .receiver-copyright {
@@ -529,14 +567,16 @@
 
 /* === Mobile Responsive - Auth Pages === */
 @media (max-width: 991.98px) {
-    /* Staff Auth Container */
+    /* Staff Auth - Full screen, no card box */
     .staff-auth-container {
         flex-direction: column;
-        width: 95%;
-        max-width: 480px;
+        width: 100%;
+        max-width: 100%;
         max-height: none;
-        min-height: auto;
-        margin: 1rem auto;
+        min-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
     }
 
     .staff-left-panel {
@@ -544,29 +584,37 @@
     }
 
     .staff-right-panel {
-        padding: 2rem 1.5rem;
-        border-radius: 16px;
+        padding: 3rem 1.5rem 2rem 1.5rem;
+        border-radius: 0;
         width: 100%;
+        background: transparent !important;
+        box-shadow: none !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
     }
 
     .staff-right-panel h2 {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         margin-bottom: 0.5rem;
     }
 
     .staff-right-panel p {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         margin-bottom: 1.5rem;
     }
 
-    /* Receiver Auth Container */
+    /* Receiver Auth - Full screen, no card box */
     .receiver-auth-container {
         flex-direction: column;
-        width: 95%;
-        max-width: 480px;
+        width: 100%;
+        max-width: 100%;
         max-height: none;
-        min-height: auto;
-        margin: 1rem auto;
+        min-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
     }
 
     .receiver-left-panel {
@@ -574,18 +622,24 @@
     }
 
     .receiver-right-panel {
-        padding: 2rem 1.5rem;
-        border-radius: 16px;
+        padding: 3rem 1.5rem 2rem 1.5rem;
+        border-radius: 0;
         width: 100%;
+        background: transparent !important;
+        box-shadow: none !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
     }
 
     .receiver-right-panel h2 {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         margin-bottom: 0.5rem;
     }
 
     .receiver-right-panel p {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         margin-bottom: 1.5rem;
     }
 }

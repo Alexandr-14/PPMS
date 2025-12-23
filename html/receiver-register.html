@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <meta name="darkreader-lock">
     <title>PPMS Receiver Registration</title>
     <!-- Bootstrap CSS -->
     <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -11,24 +13,24 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- PPMS Custom Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
-    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/password-validation.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css?v=2">
+    <link rel="stylesheet" href="../css/ppms-styles/auth/register.css?v=5">
     <!-- Mobile Responsive Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=2">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
 </head>
 <body class="receiver-auth-body">
     <div class="receiver-auth-container">
-        <!-- Left Panel -->
+        <!-- Left Panel (Welcome) -->
         <div class="receiver-left-panel">
-            <h2>Join Us Now!</h2>
-            <img src="../assets/parcelsecure.gif" alt="Receiver Register Illustration">
-            <p>"Your parcel could not be more secure in our care"</p>
+            <h2>Join Us!</h2>
+            <p>Create your account to start tracking your parcels.</p>
+            <img src="../assets/parcelsecure.gif" alt="Parcel security illustration" onerror="this.style.display='none'">
         </div>
 
         <!-- Right Panel (Form) -->
@@ -95,6 +97,49 @@
                             title="Enter Malaysian phone number: +60xxxxxxxxx or 01xxxxxxxx"
                             maxlength="13">
                     </div>
+                </div>
+
+                <!-- Security Question Field -->
+                <div class="receiver-form-group">
+                    <label for="security_question" class="receiver-form-label">Security Question</label>
+                    <div class="position-relative">
+                        <i class="fas fa-shield-alt receiver-input-icon"></i>
+                        <select
+                            class="receiver-form-control"
+                            id="security_question"
+                            name="security_question"
+                            required
+                            style="padding-left: 2.8rem;">
+                            <option value="">Select a security question...</option>
+                            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                            <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                            <option value="What city were you born in?">What city were you born in?</option>
+                            <option value="What is your favorite movie?">What is your favorite movie?</option>
+                            <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                            <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Security Answer Field -->
+                <div class="receiver-form-group">
+                    <label for="security_answer" class="receiver-form-label">Security Answer</label>
+                    <div class="position-relative">
+                        <i class="fas fa-key receiver-input-icon"></i>
+                        <input
+                            type="text"
+                            class="receiver-form-control"
+                            id="security_answer"
+                            name="security_answer"
+                            placeholder="Enter your answer (case-insensitive)"
+                            required
+                            minlength="2"
+                            maxlength="100">
+                    </div>
+                    <small class="text-muted mt-1 d-block" style="color: #a0aec0 !important;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This will be used to recover your password if forgotten.
+                    </small>
                 </div>
 
                 <!-- Password Field -->
@@ -229,6 +274,8 @@
     const matricNumber = document.getElementById('matricnumber').value;
     const phoneNumber = document.getElementById('phone').value;
     const password = document.getElementById('receiver-password').value;
+    const securityQuestion = document.getElementById('security_question').value;
+    const securityAnswer = document.getElementById('security_answer').value.trim();
 
     // Validate Matric number (2 letters + 6 digits)
     if (!/^[A-Z]{2}[0-9]{6}$/.test(matricNumber)) {
@@ -249,6 +296,30 @@
         icon: 'error',
         title: 'Invalid Phone Number!',
         text: 'Please enter a valid Malaysian phone number (e.g., +60123456789 or 0123456789).',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+
+    // Validate security question
+    if (!securityQuestion) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Security Question Required!',
+        text: 'Please select a security question for password recovery.',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+
+    // Validate security answer
+    if (securityAnswer.length < 2) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: 'Security Answer Required!',
+        text: 'Please provide an answer to your security question (at least 2 characters).',
         confirmButtonText: 'OK'
       });
       return false;

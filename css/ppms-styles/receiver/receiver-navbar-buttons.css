@@ -85,7 +85,13 @@ body > nav:first-of-type {
 /* Ensure dropdown menu appears above all content */
 .dropdown-menu.show {
     z-index: 10000 !important;
-    position: fixed !important;
+    position: absolute !important;
+}
+
+/* Notification dropdown specific positioning */
+.notification-dropdown.show {
+    position: absolute !important;
+    z-index: 10000 !important;
 }
 
 /* Prevent overflow issues and remove default spacing */
@@ -176,6 +182,17 @@ body {
     border-radius: 0.75rem !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
     backdrop-filter: blur(10px) !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    min-width: 200px !important;
+    margin-top: 0 !important;
+}
+
+.dropdown-menu.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
 }
 
 .dropdown-item {
@@ -186,11 +203,25 @@ body {
 }
 
 .dropdown-item:hover {
-    background: rgba(67, 233, 123, 0.1) !important;
-    color: #43e97b !important;
+    background: rgba(67, 233, 123, 0.15) !important;
+    color: #2d9a5d !important;
     transform: translateX(5px) !important;
 }
 
 .dropdown-item i {
     color: #43e97b !important;
+}
+
+/* Sort By Dropdown Positioning */
+#sortDropdown {
+    position: relative;
+}
+
+.dropdown #sortDropdown ~ .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    min-width: 200px !important;
+    margin-top: 0 !important;
 }

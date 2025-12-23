@@ -85,17 +85,17 @@ $is_admin = ($user_role === 'Admin');
 
         /* QR Action Buttons - Staff Theme */
         .btn-qr-staff {
-            padding: 0.75rem 1.25rem;
+            padding: 0.5rem 1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             color: white;
         }
 
@@ -365,7 +365,7 @@ $is_admin = ($user_role === 'Admin');
                 </div>
             </div>
             <button type="button" class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                <i class="fas fa-sign-out-alt me-2"></i><span class="logout-text">Logout</span>
             </button>
         </div>
     </nav>
@@ -809,9 +809,6 @@ $is_admin = ($user_role === 'Admin');
                                             <button type="button" class="btn-qr-staff btn-qr-staff-download" onclick="downloadQR()">
                                                 <i class="fas fa-download me-2"></i>Download QR Image
                                             </button>
-                                            <button type="button" class="btn-qr-staff btn-qr-staff-enlarge" onclick="enlargeQR()">
-                                                <i class="fas fa-expand me-2"></i>Enlarge QR Code
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1185,7 +1182,7 @@ $is_admin = ($user_role === 'Admin');
                                     </div>
                                 </div>
 
-                                <!-- Duplicate Set for Infinite Scroll -->
+                                <!-- Duplicate cards for infinite loop -->
                                 <div class="partner-card">
                                     <div class="partner-card-inner">
                                         <div class="partner-logo-container">
@@ -1259,17 +1256,6 @@ $is_admin = ($user_role === 'Admin');
                                         </div>
                                         <div class="partner-info">
                                             <h6 class="partner-name">FedEx</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/ninjavan.png" alt="Ninja Van" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Ninja Van</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Ninja Van</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -2469,9 +2455,12 @@ $is_admin = ($user_role === 'Admin');
                         '</div>' +
                     '</td>' +
                     '<td class="px-4 py-3">' +
-                        '<div class="btn-group btn-group-sm" role="group">' +
-                            '<button type="button" class="btn btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                        '<div class="d-flex gap-2 flex-wrap">' +
+                            '<button type="button" class="btn btn-sm btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
+                            '</button>' +
+                            '<button type="button" class="btn btn-sm btn-outline-success" onclick="downloadHistoryQRStaff(\'' + parcel.TrackingNumber + '\')" title="Download QR">' +
+                                '<i class="fas fa-download"></i>' +
                             '</button>' +
                         '</div>' +
                     '</td>';
@@ -2574,6 +2563,10 @@ $is_admin = ($user_role === 'Admin');
 
         // Sort parcel history
         function sortParcelHistory(field, order) {
+            // Store current scroll position
+            const tableContainer = document.querySelector('.table-responsive');
+            const scrollTop = tableContainer ? tableContainer.scrollTop : 0;
+
             if (field === 'tracking') {
                 filteredParcelHistory.sort((a, b) => {
                     const aVal = a.TrackingNumber.toLowerCase();
@@ -2589,6 +2582,13 @@ $is_admin = ($user_role === 'Admin');
             }
             currentHistoryPage = 1;
             displayParcelHistory(filteredParcelHistory);
+
+            // Restore scroll position after a brief delay
+            setTimeout(() => {
+                if (tableContainer) {
+                    tableContainer.scrollTop = scrollTop;
+                }
+            }, 100);
         }
 
         // Search parcels for QR generation
@@ -3092,18 +3092,33 @@ $is_admin = ($user_role === 'Admin');
         // Enhanced download QR code - Opens print page
         function downloadQR() {
             // Check for both canvas and image elements
-            const canvas = document.querySelector('#qrCodeDisplay canvas');
-            const img = document.querySelector('#qrCodeDisplay img');
+            let canvas = document.querySelector('#qrCodeDisplay canvas');
+            let img = document.querySelector('#qrCodeDisplay img');
 
             if (!canvas && !img) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No QR Code',
-                    text: 'Please generate a QR code first.',
-                    confirmButtonColor: '#6A1B9A'
-                });
+                console.warn('QR code not found, waiting for it to load...');
+                // Wait a moment for QR to load
+                setTimeout(() => {
+                    canvas = document.querySelector('#qrCodeDisplay canvas');
+                    img = document.querySelector('#qrCodeDisplay img');
+                    if (!canvas && !img) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No QR Code',
+                            text: 'Please generate a QR code first.',
+                            confirmButtonColor: '#6A1B9A'
+                        });
+                        return;
+                    }
+                    downloadQRWithData(canvas, img);
+                }, 500);
                 return;
             }
+
+            downloadQRWithData(canvas, img);
+        }
+
+        function downloadQRWithData(canvas, img) {
 
             const trackingNumber = window.selectedTrackingNumber;
             const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
@@ -3343,18 +3358,33 @@ $is_admin = ($user_role === 'Admin');
 
         // Enlarge QR code in modal - Sleek Modal
         function enlargeQR() {
-            const canvas = document.querySelector('#qrCodeDisplay canvas');
-            const img = document.querySelector('#qrCodeDisplay img');
+            let canvas = document.querySelector('#qrCodeDisplay canvas');
+            let img = document.querySelector('#qrCodeDisplay img');
 
             if (!canvas && !img) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No QR Code',
-                    text: 'Please generate a QR code first.',
-                    confirmButtonColor: '#6A1B9A'
-                });
+                console.warn('QR code not found, waiting for it to load...');
+                // Wait a moment for QR to load
+                setTimeout(() => {
+                    canvas = document.querySelector('#qrCodeDisplay canvas');
+                    img = document.querySelector('#qrCodeDisplay img');
+                    if (!canvas && !img) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No QR Code',
+                            text: 'Please generate a QR code first.',
+                            confirmButtonColor: '#6A1B9A'
+                        });
+                        return;
+                    }
+                    enlargeQRWithData(canvas, img);
+                }, 500);
                 return;
             }
+
+            enlargeQRWithData(canvas, img);
+        }
+
+        function enlargeQRWithData(canvas, img) {
 
             let qrImageData;
             if (canvas) {
@@ -3426,6 +3456,300 @@ $is_admin = ($user_role === 'Admin');
                     const closeBtn = document.querySelector('button[style*="position: fixed"]');
                     if (closeBtn) closeBtn.remove();
                 }
+            });
+        }
+
+        // Download QR code from parcel history (Staff)
+        function downloadHistoryQRStaff(trackingNumber) {
+            console.log('Downloading QR for tracking:', trackingNumber);
+
+            // Fetch parcel data with QR
+            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && data.parcel) {
+                    const parcel = data.parcel;
+
+                    // Build QR payload
+                    const qrPayload = "PPMS|" +
+                                     trackingNumber + "|" +
+                                     parcel.MatricNumber + "|" +
+                                     (parcel.receiverName || 'N/A') + "|" +
+                                     (parcel.deliveryLocation || 'N/A') + "|" +
+                                     (parcel.status || 'Pending');
+
+                    // Generate QR code URL
+                    const encodedPayload = encodeURIComponent(qrPayload);
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
+
+                    // Create print page
+                    const printWindow = window.open('', '', 'width=900,height=700');
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>QR Code - ${trackingNumber}</title>
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                            <style>
+                                body {
+                                    margin: 0;
+                                    padding: 20px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                    background: #f5f5f5;
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                }
+                                .container {
+                                    background: white;
+                                    padding: 40px;
+                                    border-radius: 12px;
+                                    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                                    text-align: center;
+                                    max-width: 600px;
+                                }
+                                .header {
+                                    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+                                    color: white;
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    margin-bottom: 30px;
+                                }
+                                .header h1 {
+                                    margin: 0 0 10px 0;
+                                    font-size: 24px;
+                                }
+                                .header p {
+                                    margin: 0;
+                                    font-size: 14px;
+                                    opacity: 0.9;
+                                }
+                                .qr-display {
+                                    margin: 30px 0;
+                                    padding: 20px;
+                                    background: #f8fafc;
+                                    border-radius: 8px;
+                                }
+                                .qr-display img {
+                                    max-width: 100%;
+                                    height: auto;
+                                    border: 2px solid #e5e7eb;
+                                    border-radius: 8px;
+                                }
+                                .footer {
+                                    margin-top: 30px;
+                                    padding-top: 20px;
+                                    border-top: 1px solid #e5e7eb;
+                                    color: #9ca3af;
+                                    font-size: 12px;
+                                }
+                                .actions {
+                                    margin-top: 30px;
+                                    display: flex;
+                                    gap: 10px;
+                                    justify-content: center;
+                                }
+                                button {
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    transition: all 0.3s ease;
+                                }
+                                .btn-print {
+                                    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                                    color: white;
+                                }
+                                .btn-print:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+                                }
+                                .btn-download {
+                                    background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
+                                    color: white;
+                                }
+                                .btn-download:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 6px 20px rgba(106, 27, 154, 0.3);
+                                }
+                                @media print {
+                                    body {
+                                        background: white;
+                                        padding: 0;
+                                    }
+                                    .container {
+                                        box-shadow: none;
+                                        padding: 20px;
+                                    }
+                                    .actions {
+                                        display: none;
+                                    }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">
+                                    <h1>Perwira Parcel Verification</h1>
+                                    <p>Tracking Number: <strong>${trackingNumber}</strong></p>
+                                </div>
+                                <div class="qr-display">
+                                    <img src="${qrCodeUrl}" alt="QR Code">
+                                </div>
+                                <div class="footer">
+                                    <p>QR Code contains encrypted verification data</p>
+                                    <p>Generated: ${new Date().toLocaleString()}</p>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn-print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <button class="btn-download" onclick="downloadQRImage()">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                            <script>
+                                function downloadQRImage() {
+                                    const qrImageUrl = '${qrCodeUrl}';
+                                    const fileName = 'PPMS_Verification_${trackingNumber}.png';
+
+                                    // Method 1: Try canvas-based download (works with CORS)
+                                    const img = new Image();
+                                    img.crossOrigin = 'anonymous';
+                                    img.onload = function() {
+                                        const canvas = document.createElement('canvas');
+                                        canvas.width = img.width;
+                                        canvas.height = img.height;
+                                        const ctx = canvas.getContext('2d');
+                                        ctx.drawImage(img, 0, 0);
+
+                                        canvas.toBlob(function(blob) {
+                                            const url = window.URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+                                            link.href = url;
+                                            link.download = fileName;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            setTimeout(() => {
+                                                document.body.removeChild(link);
+                                                window.URL.revokeObjectURL(url);
+                                            }, 100);
+                                        }, 'image/png');
+                                    };
+
+                                    img.onerror = function() {
+                                        console.error('Canvas method failed, trying direct download');
+                                        // Fallback: direct download
+                                        const link = document.createElement('a');
+                                        link.href = qrImageUrl;
+                                        link.download = fileName;
+                                        link.setAttribute('target', '_blank');
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        setTimeout(() => {
+                                            document.body.removeChild(link);
+                                        }, 100);
+                                    };
+
+                                    img.src = qrImageUrl;
+                                }
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Could not fetch parcel data. Please try again.',
+                        confirmButtonColor: '#6A1B9A'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to download QR code.',
+                    confirmButtonColor: '#6A1B9A'
+                });
+            });
+        }
+
+        // Enlarge QR code from parcel history (Staff)
+        function enlargeHistoryQRStaff(trackingNumber) {
+            console.log('Enlarging QR for tracking:', trackingNumber);
+
+            // Fetch parcel data with QR
+            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && data.parcel) {
+                    const parcel = data.parcel;
+
+                    // Build QR payload
+                    const qrPayload = "PPMS|" +
+                                     trackingNumber + "|" +
+                                     parcel.MatricNumber + "|" +
+                                     (parcel.receiverName || 'N/A') + "|" +
+                                     (parcel.deliveryLocation || 'N/A') + "|" +
+                                     (parcel.status || 'Pending');
+
+                    // Generate QR code URL with higher resolution
+                    const encodedPayload = encodeURIComponent(qrPayload);
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
+
+                    // Show enlarged QR in modal
+                    Swal.fire({
+                        html: `
+                            <div style="text-align: center;">
+                                <img src="${qrCodeUrl}"
+                                     style="max-width: 90%; max-height: 80vh; height: auto; border: 3px solid white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);"
+                                     alt="Enlarged QR Code">
+                                <p style="color: white; margin-top: 20px; font-size: 14px;">Click outside or press ESC to close</p>
+                            </div>
+                        `,
+                        background: 'transparent',
+                        showConfirmButton: false,
+                        allowOutsideClick: true,
+                        allowEscapeKey: true,
+                        customClass: {
+                            popup: 'enlarged-qr-popup'
+                        },
+                        didOpen: (modal) => {
+                            const backdrop = document.querySelector('.swal2-container');
+                            if (backdrop) {
+                                backdrop.style.background = 'rgba(0, 0, 0, 0.9)';
+                                backdrop.style.backdropFilter = 'blur(5px)';
+                            }
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Could not fetch parcel data. Please try again.',
+                        confirmButtonColor: '#6A1B9A'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to enlarge QR code.',
+                    confirmButtonColor: '#6A1B9A'
+                });
             });
         }
 
@@ -4140,29 +4464,45 @@ $is_admin = ($user_role === 'Admin');
         margin-bottom: 1rem;
     }
 
-    /* === CLEAN MODERN CAROUSEL === */
+    /* === CLEAN MODERN CAROUSEL WITH CSS SCROLL SNAP === */
     .modern-carousel-container {
         position: relative;
         max-width: 100%;
         margin: 0 auto;
         padding: 1.25rem 0.75rem;
-        background: linear-gradient(135deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 250, 255, 0.95) 100%);
         border-radius: 16px;
-        border: 1px solid rgba(226, 232, 240, 0.6);
-        overflow: hidden;
+        border: 1px solid rgba(106, 27, 154, 0.15);
+        overflow: visible;
+        box-shadow: 0 4px 20px rgba(106, 27, 154, 0.1);
     }
 
     .carousel-viewport {
         overflow: hidden;
         padding: 0 0.5rem;
         margin: 0 auto;
+        position: relative;
     }
 
     .carousel-track {
         display: flex;
         gap: 0.75rem;
-        transition: transform 0.5s ease-out;
         padding: 0.5rem 0;
+        width: max-content;
+        animation: infiniteScroll 40s linear infinite;
+    }
+
+    .carousel-track:hover {
+        animation-play-state: paused;
+    }
+
+    @keyframes infiniteScroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(calc(-120px * 8 - 0.75rem * 8));
+        }
     }
 
     .partner-card {
@@ -4180,6 +4520,11 @@ $is_admin = ($user_role === 'Admin');
         transform: translateY(-3px);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
         border-color: rgba(106, 27, 154, 0.3);
+        filter: grayscale(0%);
+    }
+
+    .partner-card {
+        filter: grayscale(100%);
     }
 
     .partner-card-inner {
@@ -4252,27 +4597,68 @@ $is_admin = ($user_role === 'Admin');
         line-height: 1.3;
     }
 
-    /* Hide Navigation Arrows - Use auto-scroll instead */
+    /* Navigation Arrows */
     .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(106, 27, 154, 0.8);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
         display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
     }
 
-    .modern-carousel-container:hover .carousel-nav {
-        display: none;
+    .carousel-nav:hover {
+        background: rgba(106, 27, 154, 1);
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 4px 12px rgba(106, 27, 154, 0.4);
     }
 
-    .carousel-nav-prev,
+    .carousel-nav-prev {
+        left: 0.5rem;
+    }
+
     .carousel-nav-next {
-        display: none;
+        right: 0.5rem;
     }
 
-    /* Hide Indicators - Cleaner look */
+    /* Indicators - Dots */
     .carousel-indicators {
         display: none;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0 1rem;
     }
 
     .carousel-indicator {
-        display: none;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(106, 27, 154, 0.3);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+
+    .carousel-indicator.active {
+        background: rgba(106, 27, 154, 1);
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    .carousel-indicator:hover {
+        background: rgba(106, 27, 154, 0.6);
     }
 
     /* Carousel Responsive Design */
@@ -4291,8 +4677,8 @@ $is_admin = ($user_role === 'Admin');
         }
 
         .partner-card {
-            flex: 0 0 75px;
-            min-width: 75px;
+            flex: 0 0 100px;
+            min-width: 100px;
         }
 
         .partner-card-inner {
@@ -4328,12 +4714,18 @@ $is_admin = ($user_role === 'Admin');
         .partner-description {
             display: none;
         }
+
+        .carousel-nav {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
     }
 
     @media (max-width: 480px) {
         .partner-card {
-            flex: 0 0 68px;
-            min-width: 68px;
+            flex: 0 0 90px;
+            min-width: 90px;
         }
 
         .carousel-track {
@@ -4359,21 +4751,41 @@ $is_admin = ($user_role === 'Admin');
         .partner-name {
             font-size: 0.5rem;
         }
+
+        .carousel-nav {
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+        }
+
+        .carousel-indicators {
+            margin-top: 0.75rem;
+            gap: 0.375rem;
+        }
+
+        .carousel-indicator {
+            width: 6px;
+            height: 6px;
+        }
+
+        .carousel-indicator.active {
+            width: 20px;
+        }
     }
     </style>
 
     <script>
-    // Modern Carousel with Infinite Scroll
+    // CSS Scroll-Snap Carousel with Navigation
     let currentCarouselIndex = 0;
     let isAutoSliding = true;
     let autoSlideInterval;
     let cardsPerView = 3;
-    let isTransitioning = false;
     let originalCardsCount = 8; // Number of unique cards
 
     function initializeCarousel() {
+        const viewport = document.querySelector('.carousel-viewport');
         const track = document.getElementById('modernCarouselTrack');
-        if (!track) return;
+        if (!viewport || !track) return;
 
         // Calculate cards per view based on screen size
         updateCardsPerView();
@@ -4394,10 +4806,12 @@ $is_admin = ($user_role === 'Admin');
             startAutoSlide();
         });
 
+        // Track scroll position for indicators
+        viewport.addEventListener('scroll', updateCarouselIndicators);
+
         // Handle window resize
         window.addEventListener('resize', () => {
             updateCardsPerView();
-            updateCarouselPosition();
         });
     }
 
@@ -4423,56 +4837,48 @@ $is_admin = ($user_role === 'Admin');
     }
 
     function moveCarousel(direction) {
-        if (isTransitioning) return;
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
 
-        const track = document.getElementById('modernCarouselTrack');
+        if (!viewport || cards.length === 0) return;
+
+        const cardWidth = cards[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const currentScroll = viewport.scrollLeft;
 
         if (direction === 'next') {
-            currentCarouselIndex++;
-            updateCarouselPosition();
-
-            // Check if we've reached the end of original cards
-            if (currentCarouselIndex >= originalCardsCount) {
-                isTransitioning = true;
-                setTimeout(() => {
-                    // Reset to beginning without animation
-                    currentCarouselIndex = 0;
-                    track.style.transition = 'none';
-                    updateCarouselPosition(false);
-
-                    // Re-enable transition after a brief moment
-                    setTimeout(() => {
-                        track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                        isTransitioning = false;
-                    }, 50);
-                }, 500);
-            }
+            currentCarouselIndex = Math.min(currentCarouselIndex + 1, originalCardsCount - 1);
         } else {
-            if (currentCarouselIndex <= 0) {
-                // Jump to end of original set
-                isTransitioning = true;
-                currentCarouselIndex = originalCardsCount - 1;
-                track.style.transition = 'none';
-                updateCarouselPosition(false);
-
-                setTimeout(() => {
-                    track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    isTransitioning = false;
-                }, 50);
-            } else {
-                currentCarouselIndex--;
-                updateCarouselPosition();
-            }
+            currentCarouselIndex = Math.max(currentCarouselIndex - 1, 0);
         }
+
+        const targetScroll = currentCarouselIndex * cardWithGap;
+        viewport.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
 
         updateCarouselIndicators();
     }
 
     function goToSlide(index) {
-        if (isTransitioning) return;
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+
+        if (!viewport || cards.length === 0) return;
 
         currentCarouselIndex = index;
-        updateCarouselPosition();
+        const cardWidth = cards[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const targetScroll = currentCarouselIndex * cardWithGap;
+
+        viewport.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
+
         updateCarouselIndicators();
 
         // Reset auto-slide
@@ -4482,28 +4888,25 @@ $is_admin = ($user_role === 'Admin');
         }
     }
 
-    function updateCarouselPosition(animate = true) {
-        const track = document.getElementById('modernCarouselTrack');
-        const cards = track.children;
+    function updateCarouselIndicators() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const cards = document.querySelectorAll('.partner-card');
+        const indicators = document.querySelectorAll('.carousel-indicator');
 
-        if (cards.length === 0) return;
+        if (!viewport || cards.length === 0 || indicators.length === 0) return;
 
         const cardWidth = cards[0].offsetWidth;
-        const gap = 24; // 1.5rem gap
-        const offset = currentCarouselIndex * (cardWidth + gap);
+        const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
+        const cardWithGap = cardWidth + gap;
+        const scrollPosition = viewport.scrollLeft;
 
-        if (animate) {
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        }
-        track.style.transform = `translateX(-${offset}px)`;
-    }
+        // Calculate which slide is currently visible
+        const visibleIndex = Math.round(scrollPosition / cardWithGap);
+        currentCarouselIndex = Math.min(visibleIndex, originalCardsCount - 1);
 
-    function updateCarouselIndicators() {
-        const indicators = document.querySelectorAll('.carousel-indicator');
-        const currentPage = Math.floor((currentCarouselIndex % originalCardsCount) / Math.max(1, Math.floor(originalCardsCount / indicators.length)));
-
+        // Update active indicator
         indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentPage);
+            indicator.classList.toggle('active', index === currentCarouselIndex);
         });
     }
 

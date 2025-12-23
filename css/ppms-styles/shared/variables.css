@@ -173,17 +173,8 @@
     --status-info: var(--primary-gradient);
 }
 
-/* === Dark Mode Variables (for future use) === */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --text-primary: #f7fafc;
-        --text-secondary: #e2e8f0;
-        --text-muted: #a0aec0;
-        --bg-white: #1a202c;
-        --bg-light: #2d3748;
-        --border-light: #4a5568;
-    }
-}
+/* === Dark Mode Variables (disabled - using light theme only) === */
+/* Dark mode support disabled to maintain consistent light theme across all devices */
 
 /* === Print Styles === */
 @media print {
