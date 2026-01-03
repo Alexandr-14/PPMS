@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 // Check if user is logged in as receiver or staff
 $isReceiver = isset($_SESSION['receiver_matric']);
@@ -92,7 +92,7 @@ try {
     $qrPath = null;
     
     if (!empty($parcel['QR'])) {
-        $fullQrPath = '../' . $parcel['QR'];
+        $fullQrPath = __DIR__ . '/../' . ltrim($parcel['QR'], '/\\');
         if (file_exists($fullQrPath)) {
             $qrExists = true;
             $qrPath = $parcel['QR'];

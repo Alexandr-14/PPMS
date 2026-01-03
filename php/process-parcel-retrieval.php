@@ -14,7 +14,7 @@ header('Content-Type: application/json');
 session_start();
 
 // Include database connection
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 // Security: Verify staff is logged in
 if (!isset($_SESSION['staff_id'])) {
@@ -37,7 +37,6 @@ try {
 
     $trackingNumber = $input['trackingNumber'];
     $staffID = $_SESSION['staff_id'];
-    $verificationToken = $input['verificationToken'] ?? null;
 
     // Fetch parcel to verify it exists and is pending
     $query = "
@@ -102,9 +101,8 @@ try {
                 staffID,
                 retrieveDate,
                 retrieveTime,
-                status,
-                verification_token
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                status
+            ) VALUES (?, ?, ?, ?, ?, ?)
         ";
 
         $retrievalStmt = $conn->prepare($retrievalQuery);
@@ -114,14 +112,13 @@ try {
         }
 
         $retrievalStmt->bind_param(
-            "sssssss",
+            "ssssss",
             $trackingNumber,
             $parcel['MatricNumber'],
             $staffID,
             $retrieveDate,
             $retrieveTime,
-            $retrievalStatus,
-            $verificationToken
+            $retrievalStatus
         );
 
         if (!$retrievalStmt->execute()) {

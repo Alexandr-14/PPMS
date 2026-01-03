@@ -1,6 +1,6 @@
 <?php
-require 'db_connect.php';
-require 'password-validator.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/password-validator.php';
 
 // Enable error reporting for debugging (remove in production)
 error_reporting(E_ALL);

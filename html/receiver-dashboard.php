@@ -22,16 +22,16 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- PPMS Custom Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-dashboard.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-dashboard-overrides.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-notifications.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-navbar-buttons.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-dashboard.css">
+    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-dashboard-overrides.css">
+    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-notifications.css">
+    <link rel="stylesheet" href="../css/ppms-styles/receiver/receiver-navbar-buttons.css">
     <!-- Mobile Responsive Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
     <style>
@@ -76,14 +76,13 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 <img src="../assets/Icon Web.ico" alt="PPMS Logo" style="height: 40px; width: 40px; border-radius: 8px;">
             </div>
             <div>
-                <div class="navbar-brand mb-0">PERWIRA PARCEL MANAGEMENT SYSTEM</div>
-                <div style="font-size: 0.85rem; opacity: 0.8;">Universiti Tun Hussein Onn Malaysia</div>
+                <div class="navbar-brand mb-0">Perwira Parcel Management System</div>
+                <div class="navbar-subtitle" style="font-size: 0.85rem; opacity: 0.8;">Receiver Access - Parcel Tracking</div>
             </div>
         </div>
-        <div class="d-flex align-items-center">
-            <div class="me-4 d-flex align-items-center">
-                <!-- Notification Bell with Dropdown -->
-                <div class="dropdown me-3">
+        <div class="d-flex align-items-center gap-3">
+            <!-- Notification Bell with Dropdown (Receiver only) -->
+            <div class="dropdown">
                     <button class="notification-bell-btn btn" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
                         <?php
@@ -187,22 +186,20 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     </div>
                 </div>
 
-                <!-- User Info -->
-                <div class="text-end">
-                    <div class="navbar-welcome">Welcome back,</div>
-                    <div style="font-weight: 700; font-size: 1.1rem;"><?php echo htmlspecialchars($receiverName); ?></div>
+                <div class="navbar-user-name">
+                    <?php echo htmlspecialchars($receiverName); ?>
                 </div>
-            </div>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt me-2"></i><span class="logout-text">Logout</span>
-            </button>
-        </div>
-    </nav>
 
-    <!-- Dashboard Container -->
-    <div class="dashboard-container">
-        <!-- Simple Tabs -->
-        <ul class="nav nav-tabs sticky-tabs" id="myTab" role="tablist">
+                <button type="button" class="logout-btn" onclick="logout()" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt me-2"></i><span class="logout-text">Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Container -->
+        <div class="dashboard-container">
+            <!-- Simple Tabs -->
+            <ul class="nav nav-tabs sticky-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tracking-tab" data-bs-toggle="tab" data-bs-target="#tracking" type="button" role="tab">
                     <svg class="me-1" style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Track Parcel
@@ -497,14 +494,14 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     </div>
 
                         <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
-                        <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                        <div class="d-flex flex-wrap align-items-center mb-3 gap-3">
                             <div class="input-group" style="width: 100%; max-width: 450px;">
                                 <input type="text" id="receiverHistorySearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(25, 135, 84, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
                                 <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
                                     <i class="fas fa-search" style="color: #43e97b; font-size: 1.1rem;"></i>
                                 </span>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex gap-2 ms-auto flex-wrap justify-content-end mt-2 mt-md-0">
                                 <div class="dropdown">
                                     <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                                         <i class="fas fa-sort me-1"></i> Sort By
@@ -530,6 +527,9 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                 </div>
                                 <button class="btn btn-outline-success" onclick="refreshHistory()">
                                     <i class="fas fa-sync-alt me-1"></i> Refresh
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="printReceiverHistory()">
+                                    <i class="fas fa-print me-1"></i> Print
                                 </button>
                             </div>
                         </div>
@@ -591,7 +591,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                             </td>
                                             <td class="px-4 py-3">
                                                 <div class="d-flex gap-2 flex-wrap">
-                                                    <button class="btn btn-sm btn-outline-primary eye-button"
+                                                    <button class="btn btn-sm eye-button" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none;"
                                                             data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
                                                             data-status="<?php echo htmlspecialchars($row['status']); ?>"
                                                             data-ic="<?php echo htmlspecialchars($row['MatricNumber']); ?>"
@@ -604,7 +604,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                                             title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-success qr-download-history-btn"
+                                                    <button class="btn btn-sm" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0); color: white; border: none;" 
                                                             data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
                                                             onclick="downloadHistoryQR('<?php echo htmlspecialchars($row['TrackingNumber']); ?>')"
                                                             title="Download QR">
@@ -906,72 +906,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                     </div>
                                 </div>
 
-                                <!-- Duplicate cards for infinite loop -->
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/posMalaysia.png" alt="Pos Malaysia" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Pos Malaysia</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Pos Malaysia</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/gdex.png" alt="GDEX" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>GDEX</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">GDEX</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/flashexpress.png" alt="Flash Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Flash Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Flash Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/shopeeExpress.jpeg" alt="Shopee Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>Shopee Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">Shopee Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/JNT.webp" alt="J&T Express" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>J&T Express</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">J&T Express</h6>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="partner-card">
-                                    <div class="partner-card-inner">
-                                        <div class="partner-logo-container">
-                                            <img src="../assets/dhl.png" alt="DHL" class="partner-logo" onerror="this.outerHTML='<div class=&quot;partner-logo-placeholder&quot;>DHL</div>'">
-                                        </div>
-                                        <div class="partner-info">
-                                            <h6 class="partner-name">DHL</h6>
-                                        </div>
-                                    </div>
-                                </div>
+                                
 
                                 <div class="partner-card">
                                     <div class="partner-card-inner">
@@ -1001,6 +936,13 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             <button class="carousel-indicator" onclick="goToSlide(2)" aria-label="Go to slide 3"></button>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Copyright Notice -->
+            <div class="row mt-4 pt-4" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
+                <div class="col-12 text-center">
+                    <p class="text-muted small mb-0">&copy; 2026 Perwira Parcel Management System. All rights reserved.</p>
                 </div>
             </div>
         </div>
@@ -1755,7 +1697,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                 <td class="px-4 py-3"><i class="fas fa-weight-hanging me-1 text-muted"></i>${parcel.weight} kg</td>
                                 <td class="px-4 py-3"><i class="fas fa-map-marker-alt me-1 text-muted"></i>${parcel.deliveryLocation || 'Not specified'}</td>
                                 <td class="px-4 py-3">
-                                    <button class="btn btn-sm btn-outline-primary eye-button"
+                                    <button class="btn btn-sm eye-button" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none;"
                                             data-tracking="${parcel.TrackingNumber}"
                                             data-status="${parcel.status}"
                                             data-ic="${parcel.MatricNumber}"
@@ -1883,6 +1825,178 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 timer: 1500
             });
         });
+    }
+
+    // Print Receiver History Function
+    function printReceiverHistory() {
+        const printWindow = window.open('', '_blank');
+        const historyData = filteredHistory; // Use the filtered history data
+        
+        let tableRows = '';
+        historyData.forEach((parcel, index) => {
+            // Format status for display
+            let statusText = parcel.status;
+            if (parcel.status === 'Arrived') statusText = 'Arrived';
+            else if (parcel.status === 'Collected') statusText = 'Collected';
+            else if (parcel.status === 'Overdue') statusText = 'Overdue';
+            
+            tableRows += `<tr>
+                <td style="text-align: center;">${index + 1}</td>
+                <td>${parcel.TrackingNumber}</td>
+                <td>${parcel.MatricNumber}</td>
+                <td>${parcel.receiverName || 'N/A'}</td>
+                <td style="text-align: center;">${statusText}</td>
+                <td>${parcel.deliveryLocation || 'N/A'}</td>
+                <td style="text-align: center;">${parcel.date}</td>
+            </tr>`;
+        });
+        
+        const currentDate = new Date().toLocaleString('en-MY', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Parcel History Report</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        padding: 30px;
+                        color: #333;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 3px solid #28a745;
+                        padding-bottom: 20px;
+                    }
+                    .header h1 {
+                        color: #28a745;
+                        font-size: 28px;
+                        margin-bottom: 10px;
+                        font-weight: 700;
+                    }
+                    .header .subtitle {
+                        color: #666;
+                        font-size: 14px;
+                        margin-bottom: 5px;
+                    }
+                    .header .date {
+                        color: #999;
+                        font-size: 12px;
+                        font-style: italic;
+                    }
+                    .info {
+                        margin-bottom: 20px;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-left: 4px solid #28a745;
+                        border-radius: 4px;
+                    }
+                    .info p {
+                        margin: 5px 0;
+                        font-size: 14px;
+                    }
+                    .info strong {
+                        color: #28a745;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    }
+                    thead {
+                        background-color: #28a745;
+                        color: white;
+                    }
+                    th {
+                        padding: 14px 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        font-size: 13px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                    td {
+                        padding: 12px;
+                        border-bottom: 1px solid #e9ecef;
+                        font-size: 13px;
+                    }
+                    tbody tr:hover {
+                        background-color: #f8f9fa;
+                    }
+                    tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+                    .footer {
+                        margin-top: 40px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #999;
+                        border-top: 2px solid #e9ecef;
+                        padding-top: 20px;
+                    }
+                    @media print {
+                        body { padding: 20px; }
+                        .header { page-break-after: avoid; }
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>PERWIRA PARCEL MANAGEMENT SYSTEM</h1>
+                    <div class="subtitle">Parcel History Report - Receiver Dashboard</div>
+                    <div class="date">Generated on: ${currentDate}</div>
+                </div>
+                
+                <div class="info">
+                    <p><strong>Total Records:</strong> ${historyData.length}</p>
+                    <p><strong>Report Type:</strong> Complete Parcel History</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">#</th>
+                            <th style="width: 140px;">Tracking Number</th>
+                            <th style="width: 120px;">Matric Number</th>
+                            <th>Receiver Name</th>
+                            <th style="width: 100px; text-align: center;">Status</th>
+                            <th>Delivery Location</th>
+                            <th style="width: 110px; text-align: center;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    <p>&copy; 2025 Perwira Parcel Management System (PPMS)</p>
+                    <p>Universiti Tun Hussein Onn Malaysia (UTHM)</p>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
     }
 
 
@@ -2515,93 +2629,117 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
 
     <script>
-    // CSS Scroll Snap Carousel with Indicator Updates and Keyboard Navigation
-    let carouselIndicatorUpdateTimer;
+    // CSS Scroll-Snap Carousel with Navigation
+    let currentCarouselIndex = 0;
+    let isAutoSliding = false; // Carousel is static by default
+    let autoSlideInterval;
+    let cardsPerView = 3;
     const originalCardsCount = 8; // Number of unique cards
 
-    function initializeCarousel() {
+    // Infinite carousel state
+    let carouselIsInfiniteReady = false;
+    let carouselBaseOffset = 0;
+    let carouselBaseWidth = 0;
+    let carouselCardWithGap = 0;
+    let carouselScrollNormalizeLock = false;
+
+    function setupInfiniteCarousel() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const track = document.getElementById('modernCarouselTrack');
+        if (!viewport || !track) return;
+
+        const originals = Array.from(track.querySelectorAll('.partner-card'));
+        if (originals.length === 0) return;
+
+        if (track.dataset.infiniteReady === '1') return;
+
+        carouselBaseWidth = track.scrollWidth;
+
+        const cloneCount = Math.min(3, originals.length);
+        const headClones = originals.slice(0, cloneCount).map(node => node.cloneNode(true));
+        const tailClones = originals.slice(-cloneCount).map(node => node.cloneNode(true));
+
+        tailClones.forEach(clone => {
+            clone.setAttribute('aria-hidden', 'true');
+            clone.classList.add('is-clone');
+            track.insertBefore(clone, track.firstChild);
+        });
+        headClones.forEach(clone => {
+            clone.setAttribute('aria-hidden', 'true');
+            clone.classList.add('is-clone');
+            track.appendChild(clone);
+        });
+
+        requestAnimationFrame(() => {
+            const cards = track.querySelectorAll('.partner-card');
+            const gap = parseInt(window.getComputedStyle(track).gap) || 0;
+            const firstCard = cards[0];
+            carouselCardWithGap = (firstCard ? firstCard.offsetWidth : 0) + gap;
+            carouselBaseOffset = cards[cloneCount] ? cards[cloneCount].offsetLeft : 0;
+            viewport.scrollLeft = carouselBaseOffset;
+            carouselIsInfiniteReady = true;
+            track.dataset.infiniteReady = '1';
+            updateCarouselIndicators();
+        });
+    }
+
+    // Carousel Drag Functionality
+    function initializeCarouselDrag() {
         const viewport = document.querySelector('.carousel-viewport');
         if (!viewport) return;
 
-        // Update indicators on scroll
-        viewport.addEventListener('scroll', updateCarouselIndicators, { passive: true });
+        let isDown = false;
+        let startX;
+        let scrollLeft;
 
-        // Keyboard navigation support
-        document.addEventListener('keydown', handleCarouselKeyboard);
-
-        // Set initial indicator
-        updateCarouselIndicators();
-    }
-
-    function updateCarouselIndicators() {
-        const viewport = document.querySelector('.carousel-viewport');
-        const cards = document.querySelectorAll('.partner-card');
-        const indicators = document.querySelectorAll('.carousel-indicator');
-
-        if (!viewport || cards.length === 0 || indicators.length === 0) return;
-
-        // Calculate which card is in the center of the viewport
-        const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
-        let closestCard = 0;
-        let closestDistance = Infinity;
-
-        cards.forEach((card, index) => {
-            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-            const distance = Math.abs(viewportCenter - cardCenter);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestCard = index;
-            }
+        viewport.addEventListener('mousedown', (e) => {
+            isDown = true;
+            viewport.classList.add('active');
+            viewport.style.cursor = 'grabbing';
+            startX = e.pageX - viewport.offsetLeft;
+            scrollLeft = viewport.scrollLeft;
         });
 
-        // Map card index to indicator index (8 cards, 3 indicators)
-        const indicatorIndex = Math.floor((closestCard % originalCardsCount) / Math.max(1, Math.floor(originalCardsCount / indicators.length)));
-
-        // Update active indicator
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === indicatorIndex);
+        viewport.addEventListener('mouseleave', () => {
+            isDown = false;
+            viewport.classList.remove('active');
+            viewport.style.cursor = 'grab';
         });
-    }
 
-    function goToSlide(index) {
-        const viewport = document.querySelector('.carousel-viewport');
-        const cards = document.querySelectorAll('.partner-card');
-
-        if (!viewport || !cards[index]) return;
-
-        // Scroll to the card smoothly
-        cards[index].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
+        viewport.addEventListener('mouseup', () => {
+            isDown = false;
+            viewport.classList.remove('active');
+            viewport.style.cursor = 'grab';
         });
+
+        viewport.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll speed multiplier
+            viewport.scrollLeft = scrollLeft - walk;
+        });
+
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchScrollLeft = 0;
+
+        viewport.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].pageX - viewport.offsetLeft;
+            touchScrollLeft = viewport.scrollLeft;
+        }, { passive: true });
+
+        viewport.addEventListener('touchmove', (e) => {
+            const x = e.touches[0].pageX - viewport.offsetLeft;
+            const walk = (x - touchStartX) * 2;
+            viewport.scrollLeft = touchScrollLeft - walk;
+        }, { passive: true });
+
+        // Set initial cursor style
+        viewport.style.cursor = 'grab';
     }
 
-    function handleCarouselKeyboard(event) {
-        const viewport = document.querySelector('.carousel-viewport');
-        const cards = document.querySelectorAll('.partner-card');
-
-        if (!viewport || cards.length === 0) return;
-
-        // Only handle arrow keys when carousel is in focus or nearby
-        if (event.key === 'ArrowLeft') {
-            event.preventDefault();
-            viewport.scrollBy({
-                left: -150,
-                behavior: 'smooth'
-            });
-        } else if (event.key === 'ArrowRight') {
-            event.preventDefault();
-            viewport.scrollBy({
-                left: 150,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-    // Initialize carousel when page loads
-    document.addEventListener('DOMContentLoaded', initializeCarousel);
+    // Drag functionality is initialized in the consolidated DOMContentLoaded listener
 
     // Function to format Matric number (8 digits, no formatting needed)
     function formatICNumber(matricNumber) {
@@ -2743,216 +2881,75 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         });
     }
 
-    // Download/Print QR code for receiver - Opens print page
+    // Download QR code for receiver (direct download, no popup page)
     function downloadReceiverQR() {
-        const qrContainer = document.getElementById('parcelQRCode');
-        if (!qrContainer) {
+        const trackingNumber = document.querySelector('.tracking-number')?.textContent.trim();
+        if (!trackingNumber) {
             Swal.fire({
-                icon: 'error',
-                title: 'QR Container Not Found',
-                text: 'QR code container is not available.',
+                icon: 'warning',
+                title: 'No Parcel Selected',
+                text: 'Please track a parcel first.',
                 confirmButtonColor: '#43e97b'
             });
-            console.error('QR Container not found');
             return;
         }
 
-        let img = qrContainer.querySelector('img');
+        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+            credentials: 'include'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || !data.success || !data.parcel) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Could not fetch QR data. Please try again.',
+                    confirmButtonColor: '#43e97b'
+                });
+                return;
+            }
 
-        // If no image found, try to wait a moment for it to load
-        if (!img) {
-            console.warn('QR image not found, waiting for it to load...');
-            setTimeout(() => {
-                img = qrContainer.querySelector('img');
-                if (!img) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'No QR Code',
-                        text: 'QR code is not available for this parcel. Please wait for it to load.',
-                        confirmButtonColor: '#43e97b'
-                    });
-                    return;
-                }
-                downloadQRWithImage(img);
-            }, 500);
-            return;
-        }
+            if (!data.parcel.qrGenerated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QR Not Available',
+                    text: 'QR code has not been generated by staff yet.',
+                    confirmButtonColor: '#43e97b'
+                });
+                return;
+            }
 
-        downloadQRWithImage(img);
+            if (!data.parcel.qrExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QR File Missing',
+                    text: 'QR code exists, but the image file is missing. Please contact staff to regenerate it.',
+                    confirmButtonColor: '#43e97b'
+                });
+                return;
+            }
+
+            downloadQrFile(trackingNumber);
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to download QR code.',
+                confirmButtonColor: '#43e97b'
+            });
+        });
     }
 
-    function downloadQRWithImage(img) {
-
-        // Get tracking number
-        const trackingNumber = document.querySelector('.tracking-number')?.textContent.trim() || 'QR_Code';
-
-        // Store the image source
-        const qrImageSrc = img.src;
-
-        // Create print page
-        const printWindow = window.open('', '', 'width=900,height=700');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>QR Code - ${trackingNumber}</title>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                <style>
-                    body {
-                        margin: 0;
-                        padding: 20px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        min-height: 100vh;
-                        background: #f5f5f5;
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    }
-                    .container {
-                        background: white;
-                        padding: 40px;
-                        border-radius: 12px;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                        text-align: center;
-                        max-width: 600px;
-                    }
-                    .header {
-                        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                        color: white;
-                        padding: 20px;
-                        border-radius: 8px;
-                        margin-bottom: 30px;
-                    }
-                    .header h1 {
-                        margin: 0 0 10px 0;
-                        font-size: 24px;
-                    }
-                    .header p {
-                        margin: 0;
-                        font-size: 14px;
-                        opacity: 0.9;
-                    }
-                    .qr-display {
-                        margin: 30px 0;
-                        padding: 20px;
-                        background: #f8fafc;
-                        border-radius: 8px;
-                    }
-                    .qr-display img {
-                        max-width: 100%;
-                        height: auto;
-                        border: 2px solid #e5e7eb;
-                        border-radius: 8px;
-                    }
-                    .footer {
-                        margin-top: 30px;
-                        padding-top: 20px;
-                        border-top: 1px solid #e5e7eb;
-                        color: #9ca3af;
-                        font-size: 12px;
-                    }
-                    .actions {
-                        margin-top: 30px;
-                        display: flex;
-                        gap: 10px;
-                        justify-content: center;
-                    }
-                    button {
-                        padding: 10px 20px;
-                        border: none;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 600;
-                        transition: all 0.3s ease;
-                    }
-                    .btn-print {
-                        background: linear-gradient(135deg, #38d9a9 0%, #2dd4bf 100%);
-                        color: white;
-                    }
-                    .btn-print:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(56, 217, 169, 0.3);
-                    }
-                    .btn-download {
-                        background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                        color: white;
-                    }
-                    .btn-download:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
-                    }
-                    @media print {
-                        body {
-                            background: white;
-                            padding: 0;
-                        }
-                        .container {
-                            box-shadow: none;
-                            padding: 20px;
-                        }
-                        .actions {
-                            display: none;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>Perwira Parcel Verification</h1>
-                        <p>Tracking Number: <strong>${trackingNumber}</strong></p>
-                    </div>
-                    <div class="qr-display">
-                        <img src="${qrImageSrc}" alt="QR Code">
-                    </div>
-                    <div class="footer">
-                        <p>QR Code contains encrypted verification data</p>
-                        <p>Generated: ${new Date().toLocaleString()}</p>
-                    </div>
-                    <div class="actions">
-                        <button class="btn-print" onclick="window.print()">
-                            <i class="fas fa-print"></i> Print
-                        </button>
-                        <button class="btn-download" onclick="downloadQRImage()">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                    </div>
-                </div>
-                <script>
-                    function downloadQRImage() {
-                        const qrImageUrl = '${qrImageSrc}';
-                        const fileName = 'PPMS_Verification_${trackingNumber}.png';
-
-                        // Create a temporary link and trigger download
-                        fetch(qrImageUrl)
-                            .then(response => response.blob())
-                            .then(blob => {
-                                const url = window.URL.createObjectURL(blob);
-                                const link = document.createElement('a');
-                                link.href = url;
-                                link.download = fileName;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(url);
-                            })
-                            .catch(error => {
-                                console.error('Download failed:', error);
-                                // Fallback: try direct download
-                                const link = document.createElement('a');
-                                link.href = qrImageUrl;
-                                link.download = fileName;
-                                link.target = '_blank';
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                            });
-                    }
-                <\/script>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
+    function downloadQrFile(trackingNumber) {
+        const url = `../php/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     // Print QR code for receiver - Opens print window
     function printReceiverQR() {
@@ -3076,214 +3073,42 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     function downloadHistoryQR(trackingNumber) {
         console.log('Downloading QR for tracking:', trackingNumber);
 
-        // Fetch parcel data with QR
         fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
             credentials: 'include'
         })
         .then(r => r.json())
         .then(data => {
-            if (data && data.success && data.parcel) {
-                const parcel = data.parcel;
-
-                // Build QR payload
-                const qrPayload = "PPMS|" +
-                                 trackingNumber + "|" +
-                                 parcel.MatricNumber + "|" +
-                                 (parcel.receiverName || 'N/A') + "|" +
-                                 (parcel.deliveryLocation || 'N/A') + "|" +
-                                 (parcel.status || 'Pending');
-
-                // Generate QR code URL
-                const encodedPayload = encodeURIComponent(qrPayload);
-                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
-
-                // Create print page
-                const printWindow = window.open('', '', 'width=900,height=700');
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>QR Code - ${trackingNumber}</title>
-                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                        <style>
-                            body {
-                                margin: 0;
-                                padding: 20px;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                min-height: 100vh;
-                                background: #f5f5f5;
-                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                            }
-                            .container {
-                                background: white;
-                                padding: 40px;
-                                border-radius: 12px;
-                                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                                text-align: center;
-                                max-width: 600px;
-                            }
-                            .header {
-                                background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                                color: white;
-                                padding: 20px;
-                                border-radius: 8px;
-                                margin-bottom: 30px;
-                            }
-                            .header h1 {
-                                margin: 0 0 10px 0;
-                                font-size: 24px;
-                            }
-                            .header p {
-                                margin: 0;
-                                font-size: 14px;
-                                opacity: 0.9;
-                            }
-                            .qr-display {
-                                margin: 30px 0;
-                                padding: 20px;
-                                background: #f8fafc;
-                                border-radius: 8px;
-                            }
-                            .qr-display img {
-                                max-width: 100%;
-                                height: auto;
-                                border: 2px solid #e5e7eb;
-                                border-radius: 8px;
-                            }
-                            .footer {
-                                margin-top: 30px;
-                                padding-top: 20px;
-                                border-top: 1px solid #e5e7eb;
-                                color: #9ca3af;
-                                font-size: 12px;
-                            }
-                            .actions {
-                                margin-top: 30px;
-                                display: flex;
-                                gap: 10px;
-                                justify-content: center;
-                            }
-                            button {
-                                padding: 10px 20px;
-                                border: none;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                font-weight: 600;
-                                transition: all 0.3s ease;
-                            }
-                            .btn-print {
-                                background: linear-gradient(135deg, #38d9a9 0%, #2dd4bf 100%);
-                                color: white;
-                            }
-                            .btn-print:hover {
-                                transform: translateY(-2px);
-                                box-shadow: 0 6px 20px rgba(56, 217, 169, 0.3);
-                            }
-                            .btn-download {
-                                background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                                color: white;
-                            }
-                            .btn-download:hover {
-                                transform: translateY(-2px);
-                                box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
-                            }
-                            @media print {
-                                body {
-                                    background: white;
-                                    padding: 0;
-                                }
-                                .container {
-                                    box-shadow: none;
-                                    padding: 20px;
-                                }
-                                .actions {
-                                    display: none;
-                                }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <div class="header">
-                                <h1>Perwira Parcel Verification</h1>
-                                <p>Tracking Number: <strong>${trackingNumber}</strong></p>
-                            </div>
-                            <div class="qr-display">
-                                <img src="${qrCodeUrl}" alt="QR Code">
-                            </div>
-                            <div class="footer">
-                                <p>QR Code contains encrypted verification data</p>
-                                <p>Generated: ${new Date().toLocaleString()}</p>
-                            </div>
-                            <div class="actions">
-                                <button class="btn-print" onclick="window.print()">
-                                    <i class="fas fa-print"></i> Print
-                                </button>
-                                <button class="btn-download" onclick="downloadQRImage()">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                            </div>
-                        </div>
-                        <script>
-                            function downloadQRImage() {
-                                const qrImageUrl = '${qrCodeUrl}';
-                                const fileName = 'PPMS_Verification_${trackingNumber}.png';
-
-                                // Method 1: Try canvas-based download (works with CORS)
-                                const img = new Image();
-                                img.crossOrigin = 'anonymous';
-                                img.onload = function() {
-                                    const canvas = document.createElement('canvas');
-                                    canvas.width = img.width;
-                                    canvas.height = img.height;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0);
-
-                                    canvas.toBlob(function(blob) {
-                                        const url = window.URL.createObjectURL(blob);
-                                        const link = document.createElement('a');
-                                        link.href = url;
-                                        link.download = fileName;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        setTimeout(() => {
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(url);
-                                        }, 100);
-                                    }, 'image/png');
-                                };
-
-                                img.onerror = function() {
-                                    console.error('Canvas method failed, trying direct download');
-                                    // Fallback: direct download
-                                    const link = document.createElement('a');
-                                    link.href = qrImageUrl;
-                                    link.download = fileName;
-                                    link.setAttribute('target', '_blank');
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
-                                    }, 100);
-                                };
-
-                                img.src = qrImageUrl;
-                            }
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-            } else {
+            if (!data || !data.success || !data.parcel) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Could not fetch parcel data. Please try again.',
                     confirmButtonColor: '#43e97b'
                 });
+                return;
             }
+
+            if (!data.parcel.qrGenerated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QR Not Available',
+                    text: 'QR code has not been generated by staff yet.',
+                    confirmButtonColor: '#43e97b'
+                });
+                return;
+            }
+
+            if (!data.parcel.qrExists) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QR File Missing',
+                    text: 'QR code exists, but the image file is missing. Please contact staff to regenerate it.',
+                    confirmButtonColor: '#43e97b'
+                });
+                return;
+            }
+
+            downloadQrFile(trackingNumber);
         })
         .catch(err => {
             console.error('Error:', err);
@@ -3366,8 +3191,6 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         });
     }
 
-    // CSS Scroll-Snap Carousel with Navigation (variables already declared above)
-
     function initializeCarousel() {
         const viewport = document.querySelector('.carousel-viewport');
         const track = document.getElementById('modernCarouselTrack');
@@ -3376,20 +3199,15 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         // Calculate cards per view based on screen size
         updateCardsPerView();
 
-        // Start auto-slide
-        startAutoSlide();
+        // Auto-slide is disabled - carousel is static by default
+        // Users can navigate using arrow buttons and touch/mouse
 
-        // Pause on hover
+        // Pause on hover (not needed since auto-slide is disabled)
         const container = document.querySelector('.modern-carousel-container');
-        container.addEventListener('mouseenter', () => {
-            isAutoSliding = false;
-            clearInterval(autoSlideInterval);
-        });
-
-        // Resume on mouse leave
+        
+        // Remove auto-slide resume logic since carousel is static
         container.addEventListener('mouseleave', () => {
-            isAutoSliding = true;
-            startAutoSlide();
+            // No auto-slide to resume
         });
 
         // Track scroll position for indicators
@@ -3434,12 +3252,12 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const currentScroll = viewport.scrollLeft;
 
         if (direction === 'next') {
-            currentCarouselIndex = Math.min(currentCarouselIndex + 1, originalCardsCount - 1);
+            currentCarouselIndex = (currentCarouselIndex + 1 + originalCardsCount) % originalCardsCount;
         } else {
-            currentCarouselIndex = Math.max(currentCarouselIndex - 1, 0);
+            currentCarouselIndex = (currentCarouselIndex - 1 + originalCardsCount) % originalCardsCount;
         }
 
-        const targetScroll = currentCarouselIndex * cardWithGap;
+        const targetScroll = (carouselIsInfiniteReady ? carouselBaseOffset : 0) + (currentCarouselIndex * cardWithGap);
         viewport.scrollTo({
             left: targetScroll,
             behavior: 'smooth'
@@ -3458,7 +3276,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
-        const targetScroll = currentCarouselIndex * cardWithGap;
+        const targetScroll = (carouselIsInfiniteReady ? carouselBaseOffset : 0) + (currentCarouselIndex * cardWithGap);
 
         viewport.scrollTo({
             left: targetScroll,
@@ -3484,11 +3302,24 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
-        const scrollPosition = viewport.scrollLeft;
+        if (carouselIsInfiniteReady && carouselBaseWidth > 0 && !carouselScrollNormalizeLock) {
+            const min = carouselBaseOffset - 2;
+            const max = carouselBaseOffset + carouselBaseWidth + 2;
+            if (viewport.scrollLeft < min) {
+                carouselScrollNormalizeLock = true;
+                viewport.scrollLeft = viewport.scrollLeft + carouselBaseWidth;
+                requestAnimationFrame(() => { carouselScrollNormalizeLock = false; });
+            } else if (viewport.scrollLeft > max) {
+                carouselScrollNormalizeLock = true;
+                viewport.scrollLeft = viewport.scrollLeft - carouselBaseWidth;
+                requestAnimationFrame(() => { carouselScrollNormalizeLock = false; });
+            }
+        }
 
-        // Calculate which slide is currently visible
+        const scrollPosition = carouselIsInfiniteReady ? (viewport.scrollLeft - carouselBaseOffset) : viewport.scrollLeft;
+
         const visibleIndex = Math.round(scrollPosition / cardWithGap);
-        currentCarouselIndex = Math.min(visibleIndex, originalCardsCount - 1);
+        currentCarouselIndex = ((visibleIndex % originalCardsCount) + originalCardsCount) % originalCardsCount;
 
         // Update active indicator
         indicators.forEach((indicator, index) => {
@@ -3497,7 +3328,11 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     }
 
     // Initialize carousel when page loads
-    document.addEventListener('DOMContentLoaded', initializeCarousel);
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeCarousel();
+        initializeCarouselDrag();
+        setupInfiniteCarousel();
+    });
 
     </script>
 </body>

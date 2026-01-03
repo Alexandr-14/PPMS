@@ -1086,21 +1086,14 @@ select:focus {
     padding: 0.5rem 0;
     margin: 0;
     width: max-content;
-    animation: infiniteScroll 40s linear infinite;
+    /* Animation removed - carousel is now static */
 }
 
 .carousel-track:hover {
-    animation-play-state: paused;
+    /* No animation to pause */
 }
 
-@keyframes infiniteScroll {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(calc(-120px * 8 - 0.75rem * 8));
-    }
-}
+/* Keyframes removed - carousel doesn't auto-scroll */
 
 .partner-card {
     flex: 0 0 120px;

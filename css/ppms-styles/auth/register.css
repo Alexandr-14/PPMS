@@ -155,6 +155,14 @@
     display: block;
 }
 
+/* Mobile: Dark labels on white background */
+@media (max-width: 991.98px) {
+    .staff-form-label {
+        color: #4b5563 !important;
+        -webkit-text-fill-color: #4b5563 !important;
+    }
+}
+
 .staff-form-control {
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -413,6 +421,14 @@
     display: block;
 }
 
+/* Mobile: Dark labels on white background */
+@media (max-width: 991.98px) {
+    .receiver-form-label {
+        color: #4b5563 !important;
+        -webkit-text-fill-color: #4b5563 !important;
+    }
+}
+
 .receiver-form-control {
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -567,239 +583,230 @@
     color: #ff6b6b;
 }
 
-/* === Mobile Responsive - Registration Pages === */
+/* === Mobile Responsive - Registration Pages (Design 1: Semi-Transparent White Card) === */
 @media (max-width: 991.98px) {
-    /* Staff Auth Container */
     .staff-auth-container {
         flex-direction: column;
-        width: 95%;
-        max-width: 480px;
-        max-height: none;
-        min-height: auto;
-        margin: 1rem auto;
+        width: 95% !important;
+        max-width: 450px !important;
+        min-height: auto !important;
+        margin: 2rem auto !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
+        border: none !important;
+        border-radius: 24px !important;
+        padding: 0 !important;
+        position: relative !important;
+        display: block !important;
     }
 
     .staff-left-panel {
         display: none;
     }
 
-    /* WHITE CARD for mobile */
     .staff-right-panel {
-        padding: 2rem 1.5rem;
-        border-radius: 16px;
-        width: 100%;
-        background: #ffffff !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        min-height: auto !important;
+        width: 100% !important;
+        display: block !important;
     }
 
     .staff-header-section {
-        padding: 0 0 1rem 0;
         border-bottom: none;
         background: transparent !important;
-    }
-
-    .staff-form-content {
-        padding: 0;
-        max-height: none;
-        overflow: visible;
+        padding: 2.5rem 2rem 1.5rem 2rem !important;
+        margin-bottom: 0;
     }
 
     .staff-right-panel h2 {
-        font-size: 1.5rem;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #9ca3af !important;
+        -webkit-text-fill-color: #9ca3af !important;
         margin-bottom: 0.5rem;
-        color: #1a1a2e !important;
-        -webkit-text-fill-color: #1a1a2e !important;
+        text-align: center;
     }
 
     .staff-welcome-text {
         color: #6b7280 !important;
-        -webkit-text-fill-color: #6b7280 !important;
+        margin-bottom: 0;
+        font-size: 0.9375rem;
+        text-align: center;
+    }
+
+    /* Form content */
+    .staff-form-content {
+        background: transparent !important;
+        padding: 0 2rem 2rem 2rem !important;
+        max-height: none;
+        overflow: visible;
     }
 
     .staff-form-label {
-        color: #374151 !important;
-        -webkit-text-fill-color: #374151 !important;
+        color: #4b5563 !important;
+        -webkit-text-fill-color: #4b5563 !important;
+        font-weight: 600;
+        font-size: 0.9375rem;
     }
 
-    .staff-form-control {
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #1a1a2e !important;
-    }
-
-    .staff-form-control:focus {
-        border-color: #6A1B9A !important;
-        box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.1) !important;
-    }
-
-    .staff-input-icon,
-    .staff-password-toggle {
-        color: #6b7280 !important;
-    }
-
-    .staff-auth-links,
-    .staff-auth-links a,
-    .staff-auth-links span {
-        color: #6b7280 !important;
-        -webkit-text-fill-color: #6b7280 !important;
-    }
-
-    .staff-btn-secondary {
-        background: transparent !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #374151 !important;
-        -webkit-text-fill-color: #374151 !important;
-    }
-
-    /* Receiver Auth Container */
     .receiver-auth-container {
         flex-direction: column;
-        width: 95%;
-        max-width: 480px;
-        max-height: none;
-        min-height: auto;
-        margin: 1rem auto;
+        width: 95% !important;
+        max-width: 450px !important;
+        min-height: auto !important;
+        margin: 2rem auto !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
+        border: none !important;
+        border-radius: 24px !important;
+        padding: 0 !important;
+        position: relative !important;
+        display: block !important;
     }
 
     .receiver-left-panel {
         display: none;
     }
 
-    /* WHITE CARD for mobile */
     .receiver-right-panel {
-        padding: 2rem 1.5rem;
-        border-radius: 16px;
-        width: 100%;
-        background: #ffffff !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        min-height: auto !important;
+        width: 100% !important;
+        display: block !important;
     }
 
     .receiver-header-section {
-        padding: 0 0 1rem 0;
         border-bottom: none;
         background: transparent !important;
-    }
-
-    .receiver-form-content {
-        padding: 0;
-        max-height: none;
-        overflow: visible;
+        padding: 2.5rem 2rem 1.5rem 2rem !important;
+        margin-bottom: 0;
     }
 
     .receiver-right-panel h2 {
-        font-size: 1.5rem;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #9ca3af !important;
+        -webkit-text-fill-color: #9ca3af !important;
         margin-bottom: 0.5rem;
-        color: #1a1a2e !important;
-        -webkit-text-fill-color: #1a1a2e !important;
+        text-align: center;
     }
 
     .receiver-welcome-text {
         color: #6b7280 !important;
-        -webkit-text-fill-color: #6b7280 !important;
+        margin-bottom: 0;
+        font-size: 0.9375rem;
+        text-align: center;
+    }
+
+    /* Form content */
+    .receiver-form-content {
+        background: transparent !important;
+        padding: 0 2rem 2rem 2rem !important;
+        max-height: none;
+        overflow: visible;
     }
 
     .receiver-form-label {
-        color: #374151 !important;
-        -webkit-text-fill-color: #374151 !important;
-    }
-
-    .receiver-form-control {
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #1a1a2e !important;
-    }
-
-    .receiver-form-control:focus {
-        border-color: #667eea !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
-    }
-
-    .receiver-input-icon,
-    .receiver-password-toggle {
-        color: #6b7280 !important;
-    }
-
-    .receiver-auth-links,
-    .receiver-auth-links a,
-    .receiver-auth-links span {
-        color: #6b7280 !important;
-        -webkit-text-fill-color: #6b7280 !important;
-    }
-
-    .receiver-btn-secondary {
-        background: transparent !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #374151 !important;
-        -webkit-text-fill-color: #374151 !important;
+        color: #4b5563 !important;
+        -webkit-text-fill-color: #4b5563 !important;
+        font-weight: 600;
+        font-size: 0.9375rem;
     }
 }
 
 @media (max-width: 575.98px) {
     .staff-auth-container,
     .receiver-auth-container {
-        width: calc(100% - 1.5rem);
-        margin: 0.75rem auto;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 1rem auto !important;
+        border-radius: 20px !important;
     }
 
     .staff-header-section,
     .receiver-header-section {
-        padding: 1.25rem 1.25rem 0.75rem 1.25rem;
-    }
-
-    .staff-form-content,
-    .receiver-form-content {
-        padding: 0.75rem 1.25rem 1.25rem 1.25rem;
+        padding: 2rem 1.5rem 1.25rem 1.5rem !important;
     }
 
     .staff-right-panel h2,
     .receiver-right-panel h2 {
-        font-size: 1.35rem;
+        font-size: 1.625rem !important;
     }
 
-    /* Form controls */
+    .staff-welcome-text,
+    .receiver-welcome-text {
+        font-size: 0.875rem !important;
+    }
+
+    .staff-form-content,
+    .receiver-form-content {
+        padding: 0 1.5rem 1.75rem 1.5rem !important;
+    }
+
+    /* Form controls - Better touch targets */
     .staff-form-group,
     .receiver-form-group {
-        margin-bottom: 0.875rem;
+        margin-bottom: 1.25rem !important;
     }
 
     .staff-form-control,
     .receiver-form-control {
-        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.9375rem 0.9375rem 0.9375rem 2.875rem !important;
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        min-height: 50px !important;
     }
 
     .staff-input-icon,
     .receiver-input-icon {
-        left: 0.75rem;
-        font-size: 1rem;
+        left: 0.9375rem !important;
+        font-size: 1.1rem !important;
     }
 
     /* Buttons */
     .staff-btn-primary,
-    .receiver-btn-primary,
+    .receiver-btn-primary {
+        padding: 0.9375rem 1.5rem !important;
+        min-height: 50px !important;
+    }
+
     .staff-btn-secondary,
     .receiver-btn-secondary {
-        padding: 0.875rem 1.5rem;
-        font-size: 1rem;
-        width: 100%;
+        padding: 0.8125rem 1.5rem !important;
+        min-height: 46px !important;
     }
 
     /* Auth links */
     .staff-auth-links,
     .receiver-auth-links {
-        margin-top: 1.25rem;
-        text-align: center;
+        margin-top: 1.25rem !important;
+    }
+
+    .staff-auth-links p,
+    .receiver-auth-links p {
+        font-size: 0.8125rem !important;
     }
 
     .staff-auth-links a,
     .receiver-auth-links a {
-        font-size: 0.9rem;
+        font-size: 0.875rem !important;
     }
 
     /* Password toggle */
     .staff-password-toggle,
     .receiver-password-toggle {
-        right: 0.75rem;
-        font-size: 1rem;
+        right: 0.9375rem !important;
+        font-size: 1.1rem !important;
     }
 }

@@ -30,13 +30,16 @@ class PasswordValidator {
             this.confirmPasswordField.addEventListener('input', () => this.validatePasswordMatch());
         }
 
-        // Hide requirements when clicking outside
-        document.addEventListener('click', (e) => {
+        // Hide requirements when interacting outside (mobile-friendly: force close even if keyboard keeps focus)
+        const handleOutsideInteraction = (e) => {
             const passwordContainer = this.passwordField.closest('.password-field-container');
             if (passwordContainer && !passwordContainer.contains(e.target)) {
-                this.hideRequirements();
+                this.hideRequirements(true);
             }
-        });
+        };
+
+        document.addEventListener('click', handleOutsideInteraction);
+        document.addEventListener('touchstart', handleOutsideInteraction, { passive: true });
         
         // Add password toggle functionality
         this.addPasswordToggle();
@@ -238,12 +241,16 @@ class PasswordValidator {
         }
     }
 
-    hideRequirements() {
+    hideRequirements(force = false) {
         const passwordContainer = this.passwordField.closest('.password-field-container');
         if (!passwordContainer) return;
 
         const requirements = passwordContainer.querySelector('.password-requirements');
         if (requirements) {
+            if (force) {
+                requirements.classList.remove('show');
+                return;
+            }
             setTimeout(() => {
                 if (document.activeElement !== this.passwordField) {
                     requirements.classList.remove('show');

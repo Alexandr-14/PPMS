@@ -9,7 +9,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 });
 
 session_start();
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 // Check if user is logged in as staff or admin
 if (!isset($_SESSION['staff_role']) || ($_SESSION['staff_role'] !== 'Staff' && $_SESSION['staff_role'] !== 'Admin')) {
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Create QR codes directory if it doesn't exist
-        $qrDir = '../assets/qr-codes/';
+        $qrDir = __DIR__ . '/../assets/qr-codes/';
         if (!file_exists($qrDir)) {
             mkdir($qrDir, 0755, true);
         }
@@ -117,20 +117,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updateStmt->bind_param("sss", $qrRelativePath, $secureVerificationData, $trackingNumber);
 
         if ($updateStmt->execute()) {
-            // Log QR generation activity (optional - don't fail if this fails)
+            // Send notification to receiver about QR code generation (de-duplicate)
             try {
-                $logStmt = $conn->prepare("
-                    INSERT INTO notification (
-                        MatricNumber, TrackingNumber, notificationType, messageContent,
-                        sentTimestamp, notificationStatus, isRead, deliveryMethod
-                    ) VALUES (
-                        ?, ?, 'qr_generated', CONCAT('(', ?, ') QR code generated'),
-                        NOW(), 'sent', 0, 'system'
-                    )
+                // Skip if we've already notified for this parcel
+                $alreadyNotified = false;
+                $checkNotifStmt = $conn->prepare("
+                    SELECT 1
+                    FROM notification
+                    WHERE MatricNumber = ?
+                      AND TrackingNumber = ?
+                      AND notificationType = 'qr_generated'
+                    LIMIT 1
                 ");
-                if ($logStmt) {
-                    $logStmt->bind_param("ss", $matricNumber, $trackingNumber);
-                    $logStmt->execute();
+                if ($checkNotifStmt) {
+                    $checkNotifStmt->bind_param("ss", $matricNumber, $trackingNumber);
+                    $checkNotifStmt->execute();
+                    $checkNotifStmt->store_result();
+                    $alreadyNotified = ($checkNotifStmt->num_rows > 0);
+                    $checkNotifStmt->close();
+                }
+
+                if (!$alreadyNotified) {
+                    $message = "({$trackingNumber}) QR code has been generated. Your parcel is ready for pickup verification.";
+
+                    $logStmt = $conn->prepare("
+                        INSERT INTO notification (
+                            MatricNumber, TrackingNumber, notificationType, messageContent,
+                            sentTimestamp, notificationStatus, isRead, deliveryMethod
+                        ) VALUES (
+                            ?, ?, 'qr_generated', ?,
+                            NOW(), 'sent', 0, 'system'
+                        )
+                    ");
+                    if ($logStmt) {
+                        $logStmt->bind_param("sss", $matricNumber, $trackingNumber, $message);
+                        $logStmt->execute();
+                        $logStmt->close();
+                    }
                 }
             } catch (Exception $logError) {
                 // Log notification is optional, don't fail the QR generation

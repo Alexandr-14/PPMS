@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'db_connect.php';
-require_once 'notification-helper.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/notification-helper.php';
 
 // Check if user is admin
 if (!isset($_SESSION['staff_role']) || $_SESSION['staff_role'] !== 'Admin') {

@@ -35,54 +35,19 @@ $is_admin = ($user_role === 'Admin');
     <!-- PPMS QR Code Configuration -->
     <script src="../js/qr-config.js"></script>
     <!-- PPMS Custom Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-refined.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-overrides.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-navbar-buttons.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/variables.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/typography.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/safe-typography-enhancements.css">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/components.css">
+    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-refined.css">
+    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-dashboard-overrides.css">
+    <link rel="stylesheet" href="../css/ppms-styles/staff/staff-navbar-buttons.css">
     <!-- Mobile Responsive Styles -->
-    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/ppms-styles/shared/mobile-responsive.css">
     <!-- Favicon -->
     <link rel="icon" href="../assets/Icon Web.ico" type="image/x-icon">
+
     <style>
-        /* Row hover effect for parcel tables (Staff) */
-        #parcelsTableBody tr,
-        #historyTableBody tr {
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        #parcelsTableBody tr:hover,
-        #historyTableBody tr:hover {
-            background-color: rgba(106, 27, 154, 0.06); /* purple tint */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Hide native browser clear (X) to prevent overlap with our custom clear buttons */
-        #parcelListSearchInput::-ms-clear, #parcelListSearchInput::-ms-reveal,
-        #historySearchInput::-ms-clear, #historySearchInput::-ms-reveal { display: none; width:0; height:0; }
-        #parcelListSearchInput::-webkit-search-cancel-button,
-        #historySearchInput::-webkit-search-cancel-button { -webkit-appearance: none; }
-
-        /* Override CSS for search inputs - remove borders */
-        #parcelListSearchInput,
-        #historySearchInput {
-            border: none !important;
-            border-radius: 50px !important;
-            background: white !important;
-            padding: 12px 20px 12px 20px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        #parcelListSearchInput:focus,
-        #historySearchInput:focus {
-            border: none !important;
-            box-shadow: 0 4px 16px rgba(106, 27, 154, 0.2) !important;
-            outline: none !important;
-        }
-
         /* QR Action Buttons - Staff Theme */
         .btn-qr-staff {
             padding: 0.5rem 1rem;
@@ -133,8 +98,13 @@ $is_admin = ($user_role === 'Admin');
         }
 
         .bg-purple-light {
-            background: linear-gradient(135deg, rgba(106, 27, 154, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(106, 27, 154, 0.85) 0%, rgba(156, 39, 176, 0.85) 100%);
             border-bottom: 2px solid #6A1B9A;
+            color: white !important;
+        }
+
+        .bg-purple-light h6 {
+            color: white !important;
         }
 
         /* Report Header */
@@ -335,36 +305,26 @@ $is_admin = ($user_role === 'Admin');
             <div>
                 <div class="navbar-brand mb-0">
                     <?php if ($is_admin): ?>
-                        PPMS ADMIN DASHBOARD
+                        Perwira Parcel Management System - Admin
                     <?php else: ?>
-                        PERWIRA PARCEL MANAGEMENT SYSTEM
+                        Perwira Parcel Management System - Staff
                     <?php endif; ?>
                 </div>
-                <div style="font-size: 0.85rem; opacity: 0.8;">
+                <div class="navbar-subtitle" style="font-size: 0.85rem; opacity: 0.8;">
                     <?php if ($is_admin): ?>
-                        Administrator Access - Full System Control
+                        Admin Access - Parcel Management
                     <?php else: ?>
                         Staff Access - Parcel Management
                     <?php endif; ?>
                 </div>
             </div>
         </div>
-        <div class="d-flex align-items-center">
-            <div class="me-4 d-flex align-items-center">
-                <!-- User Info -->
-                <div class="text-end">
-                    <div class="navbar-welcome">Welcome back,</div>
-                    <div style="font-weight: 700; font-size: 1.1rem;">
-                        <?php if ($is_admin): ?>
-                            <i class="fas fa-shield-alt me-1"></i>
-                        <?php else: ?>
-                            <i class="fas fa-user-tie me-1"></i>
-                        <?php endif; ?>
-                        <?php echo htmlspecialchars($user_name); ?>
-                    </div>
-                </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="navbar-user-name">
+                <?php echo $is_admin ? 'Admin' : htmlspecialchars($user_name); ?>
             </div>
-            <button type="button" class="logout-btn" onclick="logout()">
+            <button type="button" class="logout-btn" onclick="logout()" aria-label="Logout">
                 <i class="fas fa-sign-out-alt me-2"></i><span class="logout-text">Logout</span>
             </button>
         </div>
@@ -580,16 +540,16 @@ $is_admin = ($user_role === 'Admin');
                     <!-- Table Container -->
                     <div class="table-wrapper">
                     <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
-                    <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                    <div class="d-flex flex-wrap align-items-center mb-3 gap-3">
                         <div class="input-group" style="width: 100%; max-width: 450px;">
                             <input type="text" id="parcelListSearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(106, 27, 154, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
                             <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
                                 <i class="fas fa-search" style="color: #6a1b9a; font-size: 1.1rem;"></i>
                             </span>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 ms-auto flex-wrap justify-content-end mt-2 mt-md-0">
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                                <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                                     <i class="fas fa-sort me-1"></i> Sort By
                                 </button>
                                 <ul class="dropdown-menu">
@@ -598,10 +558,6 @@ $is_admin = ($user_role === 'Admin');
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('all')"><i class="fas fa-list me-2"></i>Show All</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('Pending')"><i class="fas fa-clock me-2"></i>Pending Only</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="filterParcels('Retrieved')"><i class="fas fa-check me-2"></i>Retrieved Only</a></li>
                                 </ul>
                             </div>
                             <button type="button" class="btn btn-outline-primary" onclick="refreshParcels()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
@@ -847,16 +803,16 @@ $is_admin = ($user_role === 'Admin');
                     </div>
 
                     <!-- Controls Row: Search (left) + Sort/Refresh (right) -->
-                    <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+                    <div class="d-flex flex-wrap align-items-center mb-3 gap-3">
                         <div class="input-group" style="width: 100%; max-width: 450px;">
                             <input type="text" id="historySearchInput" class="form-control" placeholder="Find a parcel..." style="border: none; border-radius: 50px; background: white; font-size: 0.95rem; padding: 12px 20px 12px 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'" onfocus="this.style.boxShadow='0 4px 16px rgba(106, 27, 154, 0.2)'; this.style.outline='none'" onblur="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)'">
                             <span class="input-group-text" style="border: none; background: transparent; padding-left: 0; margin-left: -40px; z-index: 10;">
                                 <i class="fas fa-search" style="color: #6a1b9a; font-size: 1.1rem;"></i>
                             </span>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 ms-auto flex-wrap justify-content-end mt-2 mt-md-0">
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="historySort" data-bs-toggle="dropdown">
+                                <button class="btn btn-outline-success dropdown-toggle" type="button" id="historySort" data-bs-toggle="dropdown">
                                     <i class="fas fa-sort me-1"></i> Sort By
                                 </button>
                                 <ul class="dropdown-menu">
@@ -868,6 +824,7 @@ $is_admin = ($user_role === 'Admin');
                                 </ul>
                             </div>
                             <button type="button" class="btn btn-outline-primary" onclick="refreshParcelHistory()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
+                            <button type="button" class="btn btn-outline-success" onclick="printParcelHistory()"><i class="fas fa-print me-1"></i> Print</button>
                         </div>
                     </div>
                     <div id="historyNoResults" class="text-muted small mb-2 d-none">No parcels match your search</div>
@@ -1279,6 +1236,13 @@ $is_admin = ($user_role === 'Admin');
                     </div>
                 </div>
             </div>
+            
+            <!-- Copyright Notice -->
+            <div class="row mt-4 pt-4" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
+                <div class="col-12 text-center">
+                    <p class="text-muted small mb-0">&copy; 2026 Perwira Parcel Management System. All rights reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -1679,13 +1643,13 @@ $is_admin = ($user_role === 'Admin');
                     '<td class="px-4 py-3">' + statusBadge + '</td>' +
                     '<td class="px-4 py-3">' +
                         '<div class="btn-group btn-group-sm" role="group">' +
-                            '<button type="button" class="btn btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: white; border: none;" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-outline-warning" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
+                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #ff6b35, #ff8c42); color: white; border: none;" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
                                 '<i class="fas fa-edit"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-outline-info" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
+                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #17a2b8, #20c997); color: white; border: none;" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
                                 '<i class="fas fa-qrcode"></i>' +
                             '</button>' +
                             deleteButton +
@@ -2122,10 +2086,37 @@ $is_admin = ($user_role === 'Admin');
         });
 
         // View parcel details
-        function viewParcel(trackingNumber) {
+        async function viewParcel(trackingNumber) {
             console.log('viewParcel called with:', trackingNumber);
 
-            const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
+            const findLocalParcel = () => {
+                return (allParcels || []).find(p => p.TrackingNumber === trackingNumber)
+                    || (filteredParcelHistory || []).find(p => p.TrackingNumber === trackingNumber)
+                    || (allParcelHistory || []).find(p => p.TrackingNumber === trackingNumber);
+            };
+
+            let parcel = findLocalParcel();
+
+            // If parcel isn't in the active list (common for history), or details are incomplete,
+            // fetch a full record from the server.
+            const needsFetch = !parcel
+                || parcel.deliveryLocation === undefined
+                || parcel.weight === undefined
+                || parcel.status === undefined
+                || parcel.qrGenerated === undefined;
+
+            if (needsFetch) {
+                try {
+                    const response = await fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+                    const data = await response.json();
+                    if (data && data.success && data.parcel) {
+                        parcel = data.parcel;
+                    }
+                } catch (e) {
+                    console.warn('Failed to fetch parcel details:', e);
+                }
+            }
+
             if (!parcel) {
                 console.error('Parcel not found:', trackingNumber);
                 Swal.fire({
@@ -2456,10 +2447,10 @@ $is_admin = ($user_role === 'Admin');
                     '</td>' +
                     '<td class="px-4 py-3">' +
                         '<div class="d-flex gap-2 flex-wrap">' +
-                            '<button type="button" class="btn btn-sm btn-outline-primary" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: white; border: none;" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-sm btn-outline-success" onclick="downloadHistoryQRStaff(\'' + parcel.TrackingNumber + '\')" title="Download QR">' +
+                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #00695c, #009688); color: white; border: none;" onclick="downloadHistoryQRStaff(\'' + parcel.TrackingNumber + '\')" title="Download QR">' +
                                 '<i class="fas fa-download"></i>' +
                             '</button>' +
                         '</div>' +
@@ -2589,6 +2580,82 @@ $is_admin = ($user_role === 'Admin');
                     tableContainer.scrollTop = scrollTop;
                 }
             }, 100);
+        }
+
+        // Print Parcel History function
+        function printParcelHistory() {
+            const printWindow = window.open('', '_blank');
+            const historyData = filteredParcelHistory;
+            
+            let tableRows = '';
+            historyData.forEach((parcel, index) => {
+                tableRows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${parcel.TrackingNumber}</td>
+                        <td>${parcel.MatricNumber}</td>
+                        <td>${parcel.receiverName || 'N/A'}</td>
+                        <td>${parcel.location}</td>
+                        <td>${parcel.date} ${parcel.time}</td>
+                    </tr>
+                `;
+            });
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Parcel History Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .header h1 { color: #6a1b9a; margin: 0; }
+                        .header p { margin: 5px 0; color: #666; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background-color: #6a1b9a; color: white; font-weight: 600; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .footer { margin-top: 30px; text-align: center; color: #666; font-size: 12px; }
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Perwira Parcel Management System</h1>
+                        <p>Parcel History Report</p>
+                        <p>Generated: ${new Date().toLocaleString()}</p>
+                        <p>Total Records: ${historyData.length}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tracking Number</th>
+                                <th>Receiver Matric</th>
+                                <th>Receiver Name</th>
+                                <th>Location</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>&copy; 2026 Perwira Parcel Management System. All rights reserved.</p>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         // Search parcels for QR generation
@@ -3052,6 +3119,10 @@ $is_admin = ($user_role === 'Admin');
 
                 const qrBase64 = canvas.toDataURL('image/png');
 
+                // Keep a local copy for immediate download (even before server save finishes)
+                window.lastGeneratedQrBase64 = qrBase64;
+                window.lastGeneratedQrTracking = trackingNumber;
+
                 // Send to backend to save
                 const formData = new FormData();
                 formData.append('trackingNumber', trackingNumber);
@@ -3089,189 +3160,93 @@ $is_admin = ($user_role === 'Admin');
             img.src = qrCodeUrl;
         }
 
-        // Enhanced download QR code - Opens print page
+        // Download QR code (direct download, no popup page)
         function downloadQR() {
-            // Check for both canvas and image elements
-            let canvas = document.querySelector('#qrCodeDisplay canvas');
-            let img = document.querySelector('#qrCodeDisplay img');
+            const trackingNumber = window.selectedTrackingNumber;
 
-            if (!canvas && !img) {
-                console.warn('QR code not found, waiting for it to load...');
-                // Wait a moment for QR to load
-                setTimeout(() => {
-                    canvas = document.querySelector('#qrCodeDisplay canvas');
-                    img = document.querySelector('#qrCodeDisplay img');
-                    if (!canvas && !img) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'No QR Code',
-                            text: 'Please generate a QR code first.',
-                            confirmButtonColor: '#6A1B9A'
-                        });
-                        return;
-                    }
-                    downloadQRWithData(canvas, img);
-                }, 500);
+            // Check for both canvas and image elements
+            const canvas = document.querySelector('#qrCodeDisplay canvas');
+            const img = document.querySelector('#qrCodeDisplay img');
+
+            if (!trackingNumber) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Parcel Selected',
+                    text: 'Please search and select a parcel first.',
+                    confirmButtonColor: '#6A1B9A'
+                });
                 return;
             }
 
-            downloadQRWithData(canvas, img);
-        }
-
-        function downloadQRWithData(canvas, img) {
-
-            const trackingNumber = window.selectedTrackingNumber;
-            const parcel = allParcels.find(p => p.TrackingNumber === trackingNumber);
-
-            let qrImageData;
-            if (canvas) {
-                qrImageData = canvas.toDataURL();
-            } else if (img) {
-                qrImageData = img.src;
+            if (!canvas && !img) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No QR Code',
+                    text: 'Please generate a QR code first.',
+                    confirmButtonColor: '#6A1B9A'
+                });
+                return;
             }
 
-            // Create print page
-            const printWindow = window.open('', '', 'width=900,height=700');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>QR Code - ${trackingNumber}</title>
-                    <style>
-                        body {
-                            margin: 0;
-                            padding: 20px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            min-height: 100vh;
-                            background: #f5f5f5;
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        }
-                        .container {
-                            background: white;
-                            padding: 40px;
-                            border-radius: 12px;
-                            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                            text-align: center;
-                            max-width: 600px;
-                        }
-                        .header {
-                            background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
-                            color: white;
-                            padding: 20px;
-                            border-radius: 8px;
-                            margin-bottom: 30px;
-                        }
-                        .header h1 {
-                            margin: 0 0 10px 0;
-                            font-size: 24px;
-                        }
-                        .header p {
-                            margin: 0;
-                            font-size: 14px;
-                            opacity: 0.9;
-                        }
-                        .qr-display {
-                            margin: 30px 0;
-                            padding: 20px;
-                            background: #f8fafc;
-                            border-radius: 8px;
-                        }
-                        .qr-display img {
-                            max-width: 100%;
-                            height: auto;
-                            border: 2px solid #e5e7eb;
-                            border-radius: 8px;
-                        }
-                        .footer {
-                            margin-top: 30px;
-                            padding-top: 20px;
-                            border-top: 1px solid #e5e7eb;
-                            color: #9ca3af;
-                            font-size: 12px;
-                        }
-                        .actions {
-                            margin-top: 30px;
-                            display: flex;
-                            gap: 10px;
-                            justify-content: center;
-                        }
-                        button {
-                            padding: 10px 20px;
-                            border: none;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-weight: 600;
-                            transition: all 0.3s ease;
-                        }
-                        .btn-print {
-                            background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
-                            color: white;
-                        }
-                        .btn-print:hover {
-                            transform: translateY(-2px);
-                            box-shadow: 0 6px 20px rgba(106, 27, 154, 0.3);
-                        }
-                        .btn-download {
-                            background: linear-gradient(135deg, #43e97b 0%, #38d9a9 100%);
-                            color: white;
-                        }
-                        .btn-download:hover {
-                            transform: translateY(-2px);
-                            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
-                        }
-                        @media print {
-                            body {
-                                background: white;
-                                padding: 0;
-                            }
-                            .container {
-                                box-shadow: none;
-                                padding: 20px;
-                            }
-                            .actions {
-                                display: none;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>Perwira Parcel Verification</h1>
-                            <p>Tracking Number: <strong>${trackingNumber}</strong></p>
-                        </div>
-                        <div class="qr-display">
-                            <img src="${qrImageData}" alt="QR Code">
-                        </div>
-                        <div class="footer">
-                            <p>QR Code contains encrypted verification data</p>
-                            <p>Generated: ${new Date().toLocaleString()}</p>
-                        </div>
-                        <div class="actions">
-                            <button class="btn-print" onclick="window.print()">
-                                <i class="fas fa-print"></i> Print
-                            </button>
-                            <button class="btn-download" onclick="downloadQR()">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                    <script>
-                        function downloadQR() {
-                            const link = document.createElement('a');
-                            link.href = '${qrImageData}';
-                            link.download = 'PPMS_Verification_${trackingNumber}.png';
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+            // Prefer downloading the locally-rendered QR (most reliable across browsers)
+            if (window.lastGeneratedQrBase64 && window.lastGeneratedQrTracking === trackingNumber) {
+                const link = document.createElement('a');
+                link.href = window.lastGeneratedQrBase64;
+                link.download = `PPMS_Verification_${trackingNumber}.png`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return;
+            }
+
+            // Try to convert the displayed image to base64 for a reliable download
+            if (img && img.src) {
+                const tempImg = new Image();
+                tempImg.crossOrigin = 'anonymous';
+                tempImg.onload = function() {
+                    try {
+                        const tmpCanvas = document.createElement('canvas');
+                        tmpCanvas.width = tempImg.width;
+                        tmpCanvas.height = tempImg.height;
+                        const ctx = tmpCanvas.getContext('2d');
+                        ctx.drawImage(tempImg, 0, 0);
+                        const base64 = tmpCanvas.toDataURL('image/png');
+
+                        window.lastGeneratedQrBase64 = base64;
+                        window.lastGeneratedQrTracking = trackingNumber;
+
+                        const link = document.createElement('a');
+                        link.href = base64;
+                        link.download = `PPMS_Verification_${trackingNumber}.png`;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } catch (e) {
+                        console.warn('QR base64 conversion failed, falling back to server download:', e);
+                        downloadQrFile(trackingNumber);
+                    }
+                };
+                tempImg.onerror = function() {
+                    downloadQrFile(trackingNumber);
+                };
+                tempImg.src = img.src;
+                return;
+            }
+
+            // Fallback: download the server-saved QR file
+            downloadQrFile(trackingNumber);
+        }
+
+        function downloadQrFile(trackingNumber) {
+            const url = `../php/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+            const link = document.createElement('a');
+            link.href = url;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
 
@@ -3311,7 +3286,7 @@ $is_admin = ($user_role === 'Admin');
                 '<html>' +
                 '<head>' +
                     '<title>PPMS QR Verification - ' + trackingNumber + '</title>' +
-                    '<style>' +
+                    '<style>'+
                         'body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: white; }' +
                         '.header { background: #6A1B9A; color: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; }' +
                         '.qr-container { margin: 20px 0; padding: 20px; border: 2px dashed #6A1B9A; border-radius: 12px; }' +
@@ -3463,214 +3438,42 @@ $is_admin = ($user_role === 'Admin');
         function downloadHistoryQRStaff(trackingNumber) {
             console.log('Downloading QR for tracking:', trackingNumber);
 
-            // Fetch parcel data with QR
             fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
                 credentials: 'include'
             })
             .then(r => r.json())
             .then(data => {
-                if (data && data.success && data.parcel) {
-                    const parcel = data.parcel;
-
-                    // Build QR payload
-                    const qrPayload = "PPMS|" +
-                                     trackingNumber + "|" +
-                                     parcel.MatricNumber + "|" +
-                                     (parcel.receiverName || 'N/A') + "|" +
-                                     (parcel.deliveryLocation || 'N/A') + "|" +
-                                     (parcel.status || 'Pending');
-
-                    // Generate QR code URL
-                    const encodedPayload = encodeURIComponent(qrPayload);
-                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodedPayload}`;
-
-                    // Create print page
-                    const printWindow = window.open('', '', 'width=900,height=700');
-                    printWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <title>QR Code - ${trackingNumber}</title>
-                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                            <style>
-                                body {
-                                    margin: 0;
-                                    padding: 20px;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    min-height: 100vh;
-                                    background: #f5f5f5;
-                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                                }
-                                .container {
-                                    background: white;
-                                    padding: 40px;
-                                    border-radius: 12px;
-                                    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                                    text-align: center;
-                                    max-width: 600px;
-                                }
-                                .header {
-                                    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
-                                    color: white;
-                                    padding: 20px;
-                                    border-radius: 8px;
-                                    margin-bottom: 30px;
-                                }
-                                .header h1 {
-                                    margin: 0 0 10px 0;
-                                    font-size: 24px;
-                                }
-                                .header p {
-                                    margin: 0;
-                                    font-size: 14px;
-                                    opacity: 0.9;
-                                }
-                                .qr-display {
-                                    margin: 30px 0;
-                                    padding: 20px;
-                                    background: #f8fafc;
-                                    border-radius: 8px;
-                                }
-                                .qr-display img {
-                                    max-width: 100%;
-                                    height: auto;
-                                    border: 2px solid #e5e7eb;
-                                    border-radius: 8px;
-                                }
-                                .footer {
-                                    margin-top: 30px;
-                                    padding-top: 20px;
-                                    border-top: 1px solid #e5e7eb;
-                                    color: #9ca3af;
-                                    font-size: 12px;
-                                }
-                                .actions {
-                                    margin-top: 30px;
-                                    display: flex;
-                                    gap: 10px;
-                                    justify-content: center;
-                                }
-                                button {
-                                    padding: 10px 20px;
-                                    border: none;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-weight: 600;
-                                    transition: all 0.3s ease;
-                                }
-                                .btn-print {
-                                    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-                                    color: white;
-                                }
-                                .btn-print:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
-                                }
-                                .btn-download {
-                                    background: linear-gradient(135deg, #6A1B9A 0%, #9C27B0 100%);
-                                    color: white;
-                                }
-                                .btn-download:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 6px 20px rgba(106, 27, 154, 0.3);
-                                }
-                                @media print {
-                                    body {
-                                        background: white;
-                                        padding: 0;
-                                    }
-                                    .container {
-                                        box-shadow: none;
-                                        padding: 20px;
-                                    }
-                                    .actions {
-                                        display: none;
-                                    }
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="container">
-                                <div class="header">
-                                    <h1>Perwira Parcel Verification</h1>
-                                    <p>Tracking Number: <strong>${trackingNumber}</strong></p>
-                                </div>
-                                <div class="qr-display">
-                                    <img src="${qrCodeUrl}" alt="QR Code">
-                                </div>
-                                <div class="footer">
-                                    <p>QR Code contains encrypted verification data</p>
-                                    <p>Generated: ${new Date().toLocaleString()}</p>
-                                </div>
-                                <div class="actions">
-                                    <button class="btn-print" onclick="window.print()">
-                                        <i class="fas fa-print"></i> Print
-                                    </button>
-                                    <button class="btn-download" onclick="downloadQRImage()">
-                                        <i class="fas fa-download"></i> Download
-                                    </button>
-                                </div>
-                            </div>
-                            <script>
-                                function downloadQRImage() {
-                                    const qrImageUrl = '${qrCodeUrl}';
-                                    const fileName = 'PPMS_Verification_${trackingNumber}.png';
-
-                                    // Method 1: Try canvas-based download (works with CORS)
-                                    const img = new Image();
-                                    img.crossOrigin = 'anonymous';
-                                    img.onload = function() {
-                                        const canvas = document.createElement('canvas');
-                                        canvas.width = img.width;
-                                        canvas.height = img.height;
-                                        const ctx = canvas.getContext('2d');
-                                        ctx.drawImage(img, 0, 0);
-
-                                        canvas.toBlob(function(blob) {
-                                            const url = window.URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = url;
-                                            link.download = fileName;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            setTimeout(() => {
-                                                document.body.removeChild(link);
-                                                window.URL.revokeObjectURL(url);
-                                            }, 100);
-                                        }, 'image/png');
-                                    };
-
-                                    img.onerror = function() {
-                                        console.error('Canvas method failed, trying direct download');
-                                        // Fallback: direct download
-                                        const link = document.createElement('a');
-                                        link.href = qrImageUrl;
-                                        link.download = fileName;
-                                        link.setAttribute('target', '_blank');
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        setTimeout(() => {
-                                            document.body.removeChild(link);
-                                        }, 100);
-                                    };
-
-                                    img.src = qrImageUrl;
-                                }
-                            <\/script>
-                        </body>
-                        </html>
-                    `);
-                    printWindow.document.close();
-                } else {
+                if (!data || !data.success || !data.parcel) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
                         text: 'Could not fetch parcel data. Please try again.',
                         confirmButtonColor: '#6A1B9A'
                     });
+                    return;
                 }
+
+                if (!data.parcel.qrGenerated) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'QR Not Generated',
+                        text: 'This parcel does not have a QR code yet. Generate it first.',
+                        confirmButtonColor: '#6A1B9A'
+                    });
+                    return;
+                }
+
+                if (!data.parcel.qrExists) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'QR File Missing',
+                        text: 'QR code record exists, but the image file is missing. Please regenerate the QR code.',
+                        confirmButtonColor: '#6A1B9A'
+                    });
+                    return;
+                }
+
+                downloadQrFile(trackingNumber);
             })
             .catch(err => {
                 console.error('Error:', err);
@@ -4489,21 +4292,12 @@ $is_admin = ($user_role === 'Admin');
         gap: 0.75rem;
         padding: 0.5rem 0;
         width: max-content;
-        animation: infiniteScroll 40s linear infinite;
+        /* Animation removed - carousel is now static */
     }
 
-    .carousel-track:hover {
-        animation-play-state: paused;
-    }
+    
 
-    @keyframes infiniteScroll {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(calc(-120px * 8 - 0.75rem * 8));
-        }
-    }
+    /* Keyframes removed - carousel doesn't auto-scroll */
 
     .partner-card {
         flex: 0 0 120px;
@@ -4777,10 +4571,63 @@ $is_admin = ($user_role === 'Admin');
     <script>
     // CSS Scroll-Snap Carousel with Navigation
     let currentCarouselIndex = 0;
-    let isAutoSliding = true;
+    let isAutoSliding = false; // Carousel is now static by default
     let autoSlideInterval;
     let cardsPerView = 3;
     let originalCardsCount = 8; // Number of unique cards
+
+    // Infinite carousel state
+    let carouselIsInfiniteReady = false;
+    let carouselBaseOffset = 0;
+    let carouselBaseWidth = 0;
+    let carouselCardWithGap = 0;
+    let carouselScrollNormalizeLock = false;
+
+    function setupInfiniteCarousel() {
+        const viewport = document.querySelector('.carousel-viewport');
+        const track = document.getElementById('modernCarouselTrack');
+        if (!viewport || !track) return;
+
+        const originals = Array.from(track.querySelectorAll('.partner-card'));
+        if (originals.length === 0) return;
+
+        // Avoid double-initializing
+        if (track.dataset.infiniteReady === '1') return;
+
+        // Measure base width before cloning
+        carouselBaseWidth = track.scrollWidth;
+
+        // Clone a small buffer on both ends (enough for smooth looping)
+        const cloneCount = Math.min(3, originals.length);
+        const headClones = originals.slice(0, cloneCount).map(node => node.cloneNode(true));
+        const tailClones = originals.slice(-cloneCount).map(node => node.cloneNode(true));
+
+        tailClones.forEach(clone => {
+            clone.setAttribute('aria-hidden', 'true');
+            clone.classList.add('is-clone');
+            track.insertBefore(clone, track.firstChild);
+        });
+        headClones.forEach(clone => {
+            clone.setAttribute('aria-hidden', 'true');
+            clone.classList.add('is-clone');
+            track.appendChild(clone);
+        });
+
+        // After clones inserted, compute base offset and card step
+        requestAnimationFrame(() => {
+            const cards = track.querySelectorAll('.partner-card');
+            const gap = parseInt(window.getComputedStyle(track).gap) || 0;
+            const firstCard = cards[0];
+            carouselCardWithGap = (firstCard ? firstCard.offsetWidth : 0) + gap;
+
+            // First original card is after the prepended clones
+            carouselBaseOffset = cards[cloneCount] ? cards[cloneCount].offsetLeft : 0;
+            viewport.scrollLeft = carouselBaseOffset;
+            carouselIsInfiniteReady = true;
+            track.dataset.infiniteReady = '1';
+            updateCarouselIndicators();
+        });
+    }
 
     function initializeCarousel() {
         const viewport = document.querySelector('.carousel-viewport');
@@ -4790,20 +4637,15 @@ $is_admin = ($user_role === 'Admin');
         // Calculate cards per view based on screen size
         updateCardsPerView();
 
-        // Start auto-slide
-        startAutoSlide();
+        // Auto-slide is disabled - carousel is static by default
+        // Users can navigate using arrow buttons and touch/mouse
 
-        // Pause on hover
+        // Pause on hover (not needed since auto-slide is disabled)
         const container = document.querySelector('.modern-carousel-container');
-        container.addEventListener('mouseenter', () => {
-            isAutoSliding = false;
-            clearInterval(autoSlideInterval);
-        });
-
-        // Resume on mouse leave
+        
+        // Remove auto-slide resume logic since carousel is static
         container.addEventListener('mouseleave', () => {
-            isAutoSliding = true;
-            startAutoSlide();
+            // No auto-slide to resume
         });
 
         // Track scroll position for indicators
@@ -4848,12 +4690,12 @@ $is_admin = ($user_role === 'Admin');
         const currentScroll = viewport.scrollLeft;
 
         if (direction === 'next') {
-            currentCarouselIndex = Math.min(currentCarouselIndex + 1, originalCardsCount - 1);
+            currentCarouselIndex = (currentCarouselIndex + 1 + originalCardsCount) % originalCardsCount;
         } else {
-            currentCarouselIndex = Math.max(currentCarouselIndex - 1, 0);
+            currentCarouselIndex = (currentCarouselIndex - 1 + originalCardsCount) % originalCardsCount;
         }
 
-        const targetScroll = currentCarouselIndex * cardWithGap;
+        const targetScroll = (carouselIsInfiniteReady ? carouselBaseOffset : 0) + (currentCarouselIndex * cardWithGap);
         viewport.scrollTo({
             left: targetScroll,
             behavior: 'smooth'
@@ -4872,7 +4714,7 @@ $is_admin = ($user_role === 'Admin');
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
-        const targetScroll = currentCarouselIndex * cardWithGap;
+        const targetScroll = (carouselIsInfiniteReady ? carouselBaseOffset : 0) + (currentCarouselIndex * cardWithGap);
 
         viewport.scrollTo({
             left: targetScroll,
@@ -4898,11 +4740,26 @@ $is_admin = ($user_role === 'Admin');
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
-        const scrollPosition = viewport.scrollLeft;
+        // Normalize scroll position for infinite looping
+        if (carouselIsInfiniteReady && carouselBaseWidth > 0 && !carouselScrollNormalizeLock) {
+            const min = carouselBaseOffset - 2;
+            const max = carouselBaseOffset + carouselBaseWidth + 2;
+            if (viewport.scrollLeft < min) {
+                carouselScrollNormalizeLock = true;
+                viewport.scrollLeft = viewport.scrollLeft + carouselBaseWidth;
+                requestAnimationFrame(() => { carouselScrollNormalizeLock = false; });
+            } else if (viewport.scrollLeft > max) {
+                carouselScrollNormalizeLock = true;
+                viewport.scrollLeft = viewport.scrollLeft - carouselBaseWidth;
+                requestAnimationFrame(() => { carouselScrollNormalizeLock = false; });
+            }
+        }
 
-        // Calculate which slide is currently visible
+        const scrollPosition = carouselIsInfiniteReady ? (viewport.scrollLeft - carouselBaseOffset) : viewport.scrollLeft;
+
+        // Calculate which slide is currently visible (within the base region)
         const visibleIndex = Math.round(scrollPosition / cardWithGap);
-        currentCarouselIndex = Math.min(visibleIndex, originalCardsCount - 1);
+        currentCarouselIndex = ((visibleIndex % originalCardsCount) + originalCardsCount) % originalCardsCount;
 
         // Update active indicator
         indicators.forEach((indicator, index) => {
@@ -4910,8 +4767,67 @@ $is_admin = ($user_role === 'Admin');
         });
     }
 
+    // Carousel Drag Functionality
+    function initializeCarouselDrag() {
+        const viewport = document.querySelector('.carousel-viewport');
+        if (!viewport) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        viewport.addEventListener('mousedown', (e) => {
+            isDown = true;
+            viewport.classList.add('active');
+            viewport.style.cursor = 'grabbing';
+            startX = e.pageX - viewport.offsetLeft;
+            scrollLeft = viewport.scrollLeft;
+        });
+
+        viewport.addEventListener('mouseleave', () => {
+            isDown = false;
+            viewport.classList.remove('active');
+            viewport.style.cursor = 'grab';
+        });
+
+        viewport.addEventListener('mouseup', () => {
+            isDown = false;
+            viewport.classList.remove('active');
+            viewport.style.cursor = 'grab';
+        });
+
+        viewport.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - viewport.offsetLeft;
+            const walk = (x - startX) * 2;
+            viewport.scrollLeft = scrollLeft - walk;
+        });
+
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchScrollLeft = 0;
+
+        viewport.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].pageX - viewport.offsetLeft;
+            touchScrollLeft = viewport.scrollLeft;
+        }, { passive: true });
+
+        viewport.addEventListener('touchmove', (e) => {
+            const x = e.touches[0].pageX - viewport.offsetLeft;
+            const walk = (x - touchStartX) * 2;
+            viewport.scrollLeft = touchScrollLeft - walk;
+        }, { passive: true });
+
+        viewport.style.cursor = 'grab';
+    }
+
     // Initialize carousel when page loads
-    document.addEventListener('DOMContentLoaded', initializeCarousel);
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeCarousel();
+        initializeCarouselDrag();
+        setupInfiniteCarousel();
+    });
 
     // Function to format Matric number (8 digits, no formatting needed)
     function formatICNumber(matricNumber) {

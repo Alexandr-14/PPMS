@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 // Check if user is logged in as staff or admin
 if (!isset($_SESSION['staff_role']) || !in_array($_SESSION['staff_role'], ['Staff', 'Admin'])) {
@@ -28,6 +28,7 @@ try {
         FROM parcel p
         LEFT JOIN receiver r ON p.MatricNumber = r.MatricNumber
         LEFT JOIN retrievalrecord ret ON p.TrackingNumber = ret.trackingNumber
+        WHERE (p.status IS NULL OR p.status <> 'Retrieved')
         ORDER BY p.date DESC, p.time DESC
     ";
 

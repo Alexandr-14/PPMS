@@ -14,7 +14,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 });
 
 session_start();
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 // Check if user is logged in as staff or admin
 if (!isset($_SESSION['staff_role']) || ($_SESSION['staff_role'] !== 'Staff' && $_SESSION['staff_role'] !== 'Admin')) {

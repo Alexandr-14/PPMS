@@ -4,7 +4,7 @@
  * Handles creating and sending notifications to receivers
  */
 
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 /**
  * Send notification to receiver when parcel arrives/is added

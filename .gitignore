@@ -35,6 +35,16 @@ node_modules/
 config/qr-config.php
 config/smtp-config.php
 
+# Local runtime config (do not commit)
+php/db_connect.local.php
+
+# Internal/private docs
+documentation/_ADMIN_CONFIDENTIAL/
+
+# Local scratch
+suggestions/
+*.phpHold
+
 # Cache
 cache/
 tmp/

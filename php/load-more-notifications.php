@@ -8,7 +8,8 @@ if (!isset($_SESSION['receiver_matric']) && !isset($_SESSION['matric_number'])) 
     exit();
 }
 
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
+
 
 $receiverIC = $_SESSION['receiver_matric'] ?? $_SESSION['matric_number'];
 $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;

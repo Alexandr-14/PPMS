@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db_connect.php';
+require_once __DIR__ . '/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $staffId = trim($_POST['staffId'] ?? '');
@@ -10,17 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = "Please enter both Staff ID and password!";
         header("Location: ../html/staff-login.html?login=fail");
         exit;
-    }
-
-    // Check if it's the default admin login
-    if ($staffId === 'ADMIN' && $password === 'admin123') {
-        // Default admin login
-        $_SESSION['staff_id'] = 'ADMIN';
-        $_SESSION['staff_name'] = 'System Administrator';
-        $_SESSION['staff_role'] = 'Admin';
-        $_SESSION['login_success'] = "Welcome back, Administrator!";
-        header("Location: ../html/staff-dashboard.php?login=success&role=admin");
-        exit();
     }
 
     // Check staff table for regular staff

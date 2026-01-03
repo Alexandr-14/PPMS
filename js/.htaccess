@@ -1,0 +1,12 @@
+# Cache policy for static assets (JS)
+# Goal: avoid "stale JS" after uploads without needing manual ?v=123 bumps.
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|map)$">
+    Header set Cache-Control "no-cache, max-age=0, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+

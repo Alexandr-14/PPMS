@@ -311,7 +311,7 @@ input[type="number"]:focus {
 
 .table tbody td {
     border: none !important;
-    padding: 1.25rem 1.5rem !important;
+    padding: 0.75rem 1rem !important;
     vertical-align: middle !important;
 }
 

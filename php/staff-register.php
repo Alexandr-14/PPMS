@@ -1,11 +1,11 @@
 <?php
-require 'db_connect.php';
-require 'password-validator.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/password-validator.php';
 
 // =====================================================
 // STAFF REGISTRATION CODE - Change this as needed
 // =====================================================
-define('STAFF_REGISTRATION_CODE', 'PPMS2024');
+define('STAFF_REGISTRATION_CODE', getenv('STAFF_REGISTRATION_CODE') ?: 'CHANGE_ME');
 // =====================================================
 
 // Check database connection
@@ -51,6 +51,9 @@ $password = $_POST['password'];
 $confirmPassword = $_POST['confirm_password'];
 
 // Validate Registration Code FIRST (security check)
+if (STAFF_REGISTRATION_CODE === 'CHANGE_ME') {
+    showError('Registration Disabled', 'Staff registration code is not configured. Please contact the administrator.');
+}
 if ($registrationCode !== STAFF_REGISTRATION_CODE) {
     // Log failed attempt (optional security measure)
     error_log("Failed staff registration attempt with invalid code from IP: " . $_SERVER['REMOTE_ADDR']);
