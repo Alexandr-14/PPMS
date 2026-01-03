@@ -161,20 +161,23 @@ try {
  * In production, use environment variables
  */
 function getQRSecretKey() {
-    // For development, use a default key
-    // In production, load from environment or secure config
+    // Try to get from environment variable first
     $secretKey = getenv('QR_SECRET_KEY');
-    
-    if (!$secretKey) {
-        // Fallback to config file if exists
-        if (file_exists(__DIR__ . '/../config/qr-config.php')) {
-            require_once __DIR__ . '/../config/qr-config.php';
-            return defined('QR_SECRET_KEY') ? QR_SECRET_KEY : 'default-secret-key-change-in-production';
-        }
-        return 'default-secret-key-change-in-production';
+
+    if ($secretKey) {
+        return $secretKey;
     }
-    
-    return $secretKey;
+
+    // Try to load from config file
+    if (file_exists(__DIR__ . '/../config/qr-config.php')) {
+        require_once __DIR__ . '/../config/qr-config.php';
+        if (defined('QR_SECRET_KEY')) {
+            return QR_SECRET_KEY;
+        }
+    }
+
+    // Fallback to default (MUST be changed in production!)
+    return 'ppms-qr-secret-key-change-in-production-' . date('Y');
 }
 ?>
 
