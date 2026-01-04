@@ -56,13 +56,15 @@ try {
     // Get secret key from config
     $secretKey = getQRSecretKey();
     
-    // Reconstruct data for signature verification
-    $dataToVerify = json_encode([
+    // Reconstruct data for signature verification (sort keys for consistent hashing)
+    $dataArray = [
         'tracking' => $trackingNumber,
         'matric' => $matricNumber,
         'timestamp' => $timestamp,
         'location' => $location
-    ], JSON_UNESCAPED_SLASHES | JSON_SORT_KEYS);
+    ];
+    ksort($dataArray);
+    $dataToVerify = json_encode($dataArray, JSON_UNESCAPED_SLASHES);
 
     // Verify signature
     $expectedSignature = hash_hmac('sha256', $dataToVerify, $secretKey);
@@ -172,7 +174,7 @@ function getQRSecretKey() {
     if (file_exists(__DIR__ . '/../config/qr-config.php')) {
         require_once __DIR__ . '/../config/qr-config.php';
         if (defined('QR_SECRET_KEY')) {
-            return QR_SECRET_KEY;
+            return constant('QR_SECRET_KEY');
         }
     }
 

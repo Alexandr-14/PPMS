@@ -1,5 +1,6 @@
 <?php
 // Set error handling to return JSON
+header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
@@ -199,7 +200,7 @@ function getQRSecretKey() {
     if (file_exists(__DIR__ . '/../config/qr-config.php')) {
         require_once __DIR__ . '/../config/qr-config.php';
         if (defined('QR_SECRET_KEY')) {
-            return QR_SECRET_KEY;
+            return constant('QR_SECRET_KEY');
         }
     }
 
