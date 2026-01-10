@@ -1,0 +1,79 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    ⚠️  CONFIDENTIAL - ADMIN ONLY  ⚠️                          ║
+║                     STAFF REGISTRATION CODE GUIDE                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+📌 CURRENT STAFF REGISTRATION CODE
+================================================================================
+
+    Code:       PPMS2024
+    Status:     ACTIVE
+    Last Updated: 21 December 2024
+
+================================================================================
+🔐 PURPOSE
+================================================================================
+
+This registration code prevents unauthorized users from registering as staff.
+Only individuals who have been given this code by an administrator can 
+successfully create a staff account.
+
+================================================================================
+📍 WHERE TO CHANGE THE CODE
+================================================================================
+
+File Location:  php/staff-register.php
+Line Number:    8
+
+Look for this line:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  define('STAFF_REGISTRATION_CODE', 'PPMS2024');                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Replace 'PPMS2024' with your new code. Example:
+    define('STAFF_REGISTRATION_CODE', 'NEWCODE2025');
+
+================================================================================
+🛡️ SECURITY MEASURES IN PLACE
+================================================================================
+
+1. REGISTRATION CODE
+   - Required field on staff registration form
+   - Validated both client-side (JavaScript) and server-side (PHP)
+   - Failed attempts are logged with IP address
+
+2. STAFF ID RANGE (8000-8999)
+   - Staff IDs must be exactly 4 digits
+   - Must start with 8 (range: 8000 to 8999)
+   - Prevents conflict with other user types
+
+================================================================================
+⚠️ IMPORTANT NOTES
+================================================================================
+
+• NEVER share this code publicly or commit it to public repositories
+• Change the code periodically (recommended: every semester/term)
+• If the code is leaked, change it immediately in staff-register.php
+• Keep a record of who you've shared the code with
+• Failed registration attempts are logged in PHP error log
+
+================================================================================
+📝 CODE CHANGE LOG
+================================================================================
+
+| Date          | Old Code   | New Code   | Changed By      | Reason          |
+|---------------|------------|------------|-----------------|-----------------|
+| 21-Dec-2024   | N/A        | PPMS2024   | Initial Setup   | First creation  |
+|               |            |            |                 |                 |
+|               |            |            |                 |                 |
+
+================================================================================
+📞 CONTACT
+================================================================================
+
+If you need assistance or have security concerns, contact the system 
+administrator or the FYP supervisor.
+
+================================================================================
+

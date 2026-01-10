@@ -225,3 +225,28 @@ body {
     min-width: 200px !important;
     margin-top: 0 !important;
 }
+
+/* === Sort dropdown UX fixes (history tables) ===
+   - Reduce gap between button and menu
+   - Make hover fill full width (no inset)
+   - Prevent hover highlight from shifting outside menu
+*/
+.dropdown-menu.ppms-sort-menu {
+    margin-top: 0.2rem !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.dropdown-menu.ppms-sort-menu .dropdown-item {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1.25rem !important;
+}
+
+.dropdown-menu.ppms-sort-menu .dropdown-item:hover {
+    transform: none !important;
+}
+
+.dropdown-menu.ppms-sort-menu .dropdown-divider {
+    margin: 0.25rem 0 !important;
+}

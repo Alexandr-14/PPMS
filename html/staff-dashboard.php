@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../php/db_connect.php';
+require_once '../api/db_connect.php';
 
 // Check if user is logged in as staff or admin
 if (!isset($_SESSION['staff_role']) || ($_SESSION['staff_role'] !== 'Staff' && $_SESSION['staff_role'] !== 'Admin')) {
@@ -305,7 +305,7 @@ $is_admin = ($user_role === 'Admin');
             <div>
                 <div class="navbar-brand mb-0">
                     <?php if ($is_admin): ?>
-                        Perwira Parcel Management System - Admin
+                        Perwira Parcel Management System 
                     <?php else: ?>
                         Perwira Parcel Management System - Staff
                     <?php endif; ?>
@@ -413,7 +413,7 @@ $is_admin = ($user_role === 'Admin');
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="qr-generation-tab" data-bs-toggle="tab" data-bs-target="#qr-generation" type="button" role="tab">
-                    <i class="fas fa-qrcode me-1"></i> QR Generation
+                    <i class="fas fa-qrcode me-1"></i> QR Management
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -477,10 +477,27 @@ $is_admin = ($user_role === 'Admin');
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="deliveryLocation" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-2"></i>Delivery Location *
+                                    <i class="fas fa-th me-2"></i>Storage Rack *
                                 </label>
-                                <input type="text" class="form-control" id="deliveryLocation" required
-                                       placeholder="Enter delivery address">
+                                <select class="form-select" id="deliveryLocation" required>
+                                    <option value="" disabled selected>Select storage rack...</option>
+                                    <optgroup label="Rack A">
+                                        <option value="A-1">A-1 (Bottom - Large Items)</option>
+                                        <option value="A-2">A-2 (Middle - Medium Items)</option>
+                                        <option value="A-3">A-3 (Top - Small Items)</option>
+                                    </optgroup>
+                                    <optgroup label="Rack B">
+                                        <option value="B-1">B-1 (Bottom - Large Items)</option>
+                                        <option value="B-2">B-2 (Middle - Medium Items)</option>
+                                        <option value="B-3">B-3 (Top - Small Items)</option>
+                                    </optgroup>
+                                    <optgroup label="Rack C">
+                                        <option value="C-1">C-1 (Bottom - Large Items)</option>
+                                        <option value="C-2">C-2 (Middle - Medium Items)</option>
+                                        <option value="C-3">C-3 (Top - Small Items)</option>
+                                    </optgroup>
+                                </select>
+                                <div class="form-text">Select the storage rack location</div>
                             </div>
                         </div>
                     </div>
@@ -549,15 +566,23 @@ $is_admin = ($user_role === 'Admin');
                         </div>
                         <div class="d-flex gap-2 ms-auto flex-wrap justify-content-end mt-2 mt-md-0">
                             <div class="dropdown">
-                                <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                                     <i class="fas fa-sort me-1"></i> Sort By
                                 </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</a></li>
+                                <ul class="dropdown-menu ppms-sort-menu">
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcels('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcels('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</button>
+                                    </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcels('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</a></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcels('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcels('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</button>
+                                    </li>
                                 </ul>
                             </div>
                             <button type="button" class="btn btn-outline-primary" onclick="refreshParcels()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
@@ -571,10 +596,12 @@ $is_admin = ($user_role === 'Admin');
                                     <tr>
                                         <th class="px-4 py-3">Tracking Number</th>
                                         <th class="px-4 py-3">Receiver Matric</th>
-                                        <th class="px-4 py-3">Location</th>
+                                        <th class="px-4 py-3">Storage Rack</th>
                                         <th class="px-4 py-3">Date & Time</th>
                                         <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3">Actions</th>
+                                        <th class="px-4 py-3">
+                                            <span>ACTIONS</span>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="parcelsTableBody">
@@ -597,10 +624,10 @@ $is_admin = ($user_role === 'Admin');
                     </div>
                 </div>
             </div>
-            <!-- QR Generation Tab -->
+            <!-- QR Management Tab -->
             <div class="tab-pane fade" id="qr-generation" role="tabpanel">
-                <h4>QR Code Generation</h4>
-                <p class="text-muted">Generate QR codes for parcel tracking and receiver identification.</p>
+                <h4>QR Code Management</h4>
+                <p class="text-muted">View, regenerate, and manage QR codes for parcels. QR codes are now auto-generated when parcels are registered.</p>
 
                 <div class="mt-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); padding: 2.5rem; border-radius: 1.5rem; border: 1px solid rgba(106, 27, 154, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);">
                     <div class="row">
@@ -655,7 +682,7 @@ $is_admin = ($user_role === 'Admin');
                                             </div>
                                             <div>
                                                 <h5 class="mb-1 fw-bold" style="color: white !important;">Selected Parcel</h5>
-                                                <small class="opacity-90" style="color: white !important;">Ready for QR Code Generation</small>
+                                                <small class="opacity-90" style="color: white !important;">View or Regenerate QR Code</small>
                                             </div>
                                         </div>
                                         <!-- Decorative element -->
@@ -695,8 +722,8 @@ $is_admin = ($user_role === 'Admin');
                                             <div class="col-md-6">
                                                 <div class="info-box h-100 p-3 rounded-3" style="background: #f8f9fa; border-left: 4px solid #43e97b;">
                                                     <div class="d-flex align-items-center mb-2">
-                                                        <i class="fas fa-map-marker-alt text-success me-2"></i>
-                                                        <small class="text-muted fw-semibold text-uppercase">Pickup Location</small>
+                                                        <i class="fas fa-th text-success me-2"></i>
+                                                        <small class="text-muted fw-semibold text-uppercase">Storage Rack</small>
                                                     </div>
                                                     <div id="parcelLocation" class="fw-bold text-dark" style="font-size: 1.1rem;"></div>
                                                 </div>
@@ -716,10 +743,10 @@ $is_admin = ($user_role === 'Admin');
                                         <div class="mt-4 p-3 rounded-3 text-center" style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%); border: 1px solid rgba(67, 233, 123, 0.3);">
                                             <div class="d-flex align-items-center justify-content-center mb-2">
                                                 <i class="fas fa-arrow-down text-success me-2 fa-lg"></i>
-                                                <span class="fw-semibold text-success">Ready for QR Generation</span>
+                                                <span class="fw-semibold text-success">QR Management</span>
                                             </div>
                                             <small class="text-muted">
-                                                Click the "Generate Verification QR Code" button below to create a secure QR code for this parcel.
+                                                Generate a new QR code or regenerate if needed. QR codes are now auto-generated when parcels are registered.
                                             </small>
                                         </div>
                                     </div>
@@ -738,7 +765,7 @@ $is_admin = ($user_role === 'Admin');
                                                box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3);"
                                         onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(106, 27, 154, 0.4)';"
                                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(106, 27, 154, 0.3)';">
-                                    <i class="fas fa-qrcode me-2 fa-lg"></i>Generate Verification QR Code
+                                    <i class="fas fa-sync-alt me-2 fa-lg"></i>Generate/Regenerate QR Code
                                 </button>
                                 <div class="mt-2">
                                     <small class="text-muted">
@@ -812,19 +839,26 @@ $is_admin = ($user_role === 'Admin');
                         </div>
                         <div class="d-flex gap-2 ms-auto flex-wrap justify-content-end mt-2 mt-md-0">
                             <div class="dropdown">
-                                <button class="btn btn-outline-success dropdown-toggle" type="button" id="historySort" data-bs-toggle="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="historySort" data-bs-toggle="dropdown">
                                     <i class="fas fa-sort me-1"></i> Sort By
                                 </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</a></li>
+                                <ul class="dropdown-menu ppms-sort-menu">
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcelHistory('tracking', 'asc')"><i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)</button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcelHistory('tracking', 'desc')"><i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)</button>
+                                    </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="sortParcelHistory('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</a></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcelHistory('date', 'desc')"><i class="fas fa-calendar me-2"></i>Date (Newest First)</button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" onclick="sortParcelHistory('date', 'asc')"><i class="fas fa-calendar me-2"></i>Date (Oldest First)</button>
+                                    </li>
                                 </ul>
                             </div>
                             <button type="button" class="btn btn-outline-primary" onclick="refreshParcelHistory()"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
-                            <button type="button" class="btn btn-outline-success" onclick="printParcelHistory()"><i class="fas fa-print me-1"></i> Print</button>
                         </div>
                     </div>
                     <div id="historyNoResults" class="text-muted small mb-2 d-none">No parcels match your search</div>
@@ -839,9 +873,9 @@ $is_admin = ($user_role === 'Admin');
                                         <th class="px-4 py-3">Receiver Matric</th>
                                         <th class="px-4 py-3">Receiver Name</th>
 
-                                        <th class="px-4 py-3">Location</th>
+                                        <th class="px-4 py-3">Storage Rack</th>
                                         <th class="px-4 py-3">Date & Time</th>
-                                        <th class="px-4 py-3">Actions</th>
+                                        <th class="px-4 py-3">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody id="historyTableBody">
@@ -982,20 +1016,10 @@ $is_admin = ($user_role === 'Admin');
                                 </div>
                             </div>
                             <div class="card-footer bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted" id="reportMeta">
-                                        Generated on: <span id="reportGeneratedDate">-</span> |
-                                        Generated by: <span id="reportGeneratedBy">-</span>
-                                    </small>
-                                    <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-outline-purple" onclick="printReport()">
-                                            <i class="fas fa-print me-1"></i>Print
-                                        </button>
-                                        <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
-                                            <i class="fas fa-file-excel me-1"></i>Excel
-                                        </button>
-                                    </div>
-                                </div>
+                                <small class="text-muted" id="reportMeta">
+                                    Generated on: <span id="reportGeneratedDate">-</span> |
+                                    Generated by: <span id="reportGeneratedBy">-</span>
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -1009,7 +1033,7 @@ $is_admin = ($user_role === 'Admin');
     <footer class="footer-custom">
         <div class="container">
             <div class="row">
-                <div class="col-md-6 mb-4 mb-md-0">
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                     <div class="d-flex align-items-center mb-3">
                         <img src="../assets/Icon Web.ico" alt="PPMS Logo" class="footer-logo">
                         <div>
@@ -1025,7 +1049,7 @@ $is_admin = ($user_role === 'Admin');
                         <?php endif; ?>
                     </p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h5 class="footer-section-title"><?php echo $is_admin ? 'Admin Support' : 'Staff Support'; ?></h5>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope me-2"></i> <?php echo $is_admin ? 'admin@' : 'staff@'; ?>perwiraparcel.uthm.edu.my</p>
@@ -1034,13 +1058,22 @@ $is_admin = ($user_role === 'Admin');
                         <p><i class="fas fa-<?php echo $is_admin ? 'shield-alt' : 'user-tie'; ?> me-2"></i> <?php echo $is_admin ? 'Administrator' : 'Staff'; ?> Access Level</p>
                     </div>
                 </div>
+                <div class="col-lg-4 col-12 mt-4 mt-lg-0">
+                    <h5 class="footer-section-title">Location</h5>
+                    <div class="ratio ratio-4x3 ppms-footer-map d-none d-md-block">
+                        <iframe title="PPMS Location Map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.7123755011366!2d103.09752854533595!3d1.8616741603266367!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d05c1ddc3a2039%3A0x6e5816f50fb38689!2sKolej%20Kediaman%20Luar%20Kampus%20-%20UTHM!5e0!3m2!1sen!2smy!4v1767879404889!5m2!1sen!2smy" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <a class="btn btn-outline-primary w-100 mt-2 d-md-none" href="https://www.google.com/maps?q=Kolej%20Kediaman%20Luar%20Kampus%20-%20UTHM" target="_blank" rel="noopener noreferrer" aria-label="Open PPMS location in Google Maps">
+                        <i class="fas fa-map-marked-alt me-2"></i>Open in Google Maps
+                    </a>
+                </div>
             </div>
 
             <!-- Delivery Partners Slider Section -->
-            <div class="row mt-4 pt-4" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
+            <div class="row mt-4 pt-4 delivery-partners" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
                 <div class="col-12">
                     <div class="text-center mb-4">
-                        <h6 class="footer-section-title" style="letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem;">
+                        <h6 class="footer-section-title">
                             <i class="fas fa-truck me-2"></i>Trusted Delivery Partners
                         </h6>
                         <p class="text-muted small mb-0">Reliable delivery services across Malaysia</p>
@@ -1289,9 +1322,26 @@ $is_admin = ($user_role === 'Admin');
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editDeliveryLocation" class="form-label fw-bold text-dark">
-                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>Delivery Location
+                                        <i class="fas fa-th me-2 text-primary"></i>Storage Rack
                                     </label>
-                                    <input type="text" class="form-control" id="editDeliveryLocation" placeholder="e.g., TSN" required>
+                                    <select class="form-select" id="editDeliveryLocation" required>
+                                        <option value="" disabled>Select storage rack...</option>
+                                        <optgroup label="Rack A">
+                                            <option value="A-1">A-1 (Bottom - Large Items)</option>
+                                            <option value="A-2">A-2 (Middle - Medium Items)</option>
+                                            <option value="A-3">A-3 (Top - Small Items)</option>
+                                        </optgroup>
+                                        <optgroup label="Rack B">
+                                            <option value="B-1">B-1 (Bottom - Large Items)</option>
+                                            <option value="B-2">B-2 (Middle - Medium Items)</option>
+                                            <option value="B-3">B-3 (Top - Small Items)</option>
+                                        </optgroup>
+                                        <optgroup label="Rack C">
+                                            <option value="C-1">C-1 (Bottom - Large Items)</option>
+                                            <option value="C-2">C-2 (Middle - Medium Items)</option>
+                                            <option value="C-3">C-3 (Top - Small Items)</option>
+                                        </optgroup>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -1339,6 +1389,7 @@ $is_admin = ($user_role === 'Admin');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Row 1: Tracking + Status (match receiver layout) -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -1348,39 +1399,45 @@ $is_admin = ($user_role === 'Admin');
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label fw-bold">Status:</label>
+                                <p id="viewStatus" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Receiver Matric + Receiver Name -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Receiver Matric:</label>
                                 <p id="viewReceiverIC" class="form-control-plaintext"></p>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Receiver Name:</label>
                                 <p id="viewReceiverName" class="form-control-plaintext"></p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Row 3: Weight + Delivery Location -->
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Weight:</label>
                                 <p id="viewParcelWeight" class="form-control-plaintext"></p>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Delivery Location:</label>
+                                <label class="form-label fw-bold">Storage Rack:</label>
                                 <p id="viewDeliveryLocation" class="form-control-plaintext"></p>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Status:</label>
-                                <p id="viewStatus" class="form-control-plaintext"></p>
-                            </div>
-                        </div>
                     </div>
+
+                    <!-- Row 4: Date Added + Time Added -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -1389,6 +1446,16 @@ $is_admin = ($user_role === 'Admin');
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Time Added:</label>
+                                <p id="viewTimeAdded" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Parcel Description -->
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Parcel Description:</label>
                                 <p id="viewParcelName" class="form-control-plaintext"></p>
@@ -1505,7 +1572,7 @@ $is_admin = ($user_role === 'Admin');
         function loadDashboardStats() {
             if (!isAdmin) return;
 
-            fetch('../php/admin-get-stats.php', {
+            fetch('../api/admin-get-stats.php', {
                 credentials: 'include'
             })
                 .then(response => response.json())
@@ -1554,7 +1621,7 @@ $is_admin = ($user_role === 'Admin');
 
         // Load all parcels
         function loadParcels() {
-            fetch('../php/staff-get-parcels.php', {
+            fetch('../api/staff-get-parcels.php', {
                 credentials: 'include'
             })
                 .then(response => response.json())
@@ -1620,10 +1687,10 @@ $is_admin = ($user_role === 'Admin');
                 const locationLines = (parcel.deliveryLocation || 'N/A').split(',');
                 const shortLocation = locationLines.length > 0 ? locationLines[locationLines.length - 1].trim() : 'N/A';
 
-                // Delete button (available for both Staff and Admin)
-                const deleteButton = '<button type="button" class="btn btn-outline-danger" onclick="deleteParcel(\'' + parcel.TrackingNumber + '\')" title="Delete">' +
-                                        '<i class="fas fa-trash"></i>' +
-                                      '</button>';
+                                // Delete button (available for both Staff and Admin) - unified style
+                                const deleteButton = '<button type="button" class="ppms-action-btn ppms-action-delete" onclick="deleteParcel(\'' + parcel.TrackingNumber + '\')" title="Delete">' +
+                                                                                '<i class="fas fa-trash"></i>' +
+                                                                            '</button>';
 
                 row.innerHTML =
                     '<td class="px-4 py-3">' +
@@ -1642,14 +1709,14 @@ $is_admin = ($user_role === 'Admin');
                     '</td>' +
                     '<td class="px-4 py-3">' + statusBadge + '</td>' +
                     '<td class="px-4 py-3">' +
-                        '<div class="btn-group btn-group-sm" role="group">' +
-                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: white; border: none;" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                        '<div class="ppms-history-actions">' +
+                            '<button type="button" class="ppms-action-btn ppms-action-view-staff" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #ff6b35, #ff8c42); color: white; border: none;" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
+                            '<button type="button" class="ppms-action-btn ppms-action-edit" onclick="editParcel(\'' + parcel.TrackingNumber + '\')" title="Edit">' +
                                 '<i class="fas fa-edit"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #17a2b8, #20c997); color: white; border: none;" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
+                            '<button type="button" class="ppms-action-btn ppms-action-qr-staff" onclick="generateParcelQR(\'' + parcel.TrackingNumber + '\')" title="Generate QR">' +
                                 '<i class="fas fa-qrcode"></i>' +
                             '</button>' +
                             deleteButton +
@@ -1938,7 +2005,7 @@ $is_admin = ($user_role === 'Admin');
                         background: '#ffffff',
                         backdrop: 'rgba(0, 0, 0, 0.85)'
                     }).then(() => {
-                        window.location.href = '../php/logout.php';
+                        window.location.href = '../api/logout.php';
                     });
                 }
             });
@@ -2047,7 +2114,7 @@ $is_admin = ($user_role === 'Admin');
             formData.append('deliveryLocation', document.getElementById('deliveryLocation').value);
             formData.append('name', document.getElementById('parcelName').value);
 
-            fetch('../php/staff-add-parcel.php', {
+            fetch('../api/staff-add-parcel.php', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -2107,7 +2174,7 @@ $is_admin = ($user_role === 'Admin');
 
             if (needsFetch) {
                 try {
-                    const response = await fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+                    const response = await fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`);
                     const data = await response.json();
                     if (data && data.success && data.parcel) {
                         parcel = data.parcel;
@@ -2150,6 +2217,13 @@ $is_admin = ($user_role === 'Admin');
             }
 
             document.getElementById('viewDateAdded').textContent = parcel.date || 'N/A';
+            // Add Time Added to match receiver layout
+            const timeEl = document.getElementById('viewTimeAdded');
+            if (timeEl) {
+                timeEl.textContent = parcel.time
+                    ? new Date('1970-01-01T' + parcel.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                    : 'N/A';
+            }
             document.getElementById('viewParcelName').textContent = parcel.name || 'Package';
 
             // Check if QR has been generated by staff
@@ -2267,7 +2341,7 @@ $is_admin = ($user_role === 'Admin');
             formData.append('name', document.getElementById('editParcelName').value);
             formData.append('status', document.getElementById('editStatus').value);
 
-            fetch('../php/staff-update-parcel.php', {
+            fetch('../api/staff-update-parcel.php', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -2321,7 +2395,7 @@ $is_admin = ($user_role === 'Admin');
                     const formData = new FormData();
                     formData.append('trackingNumber', trackingNumber);
 
-                    fetch('../php/admin-delete-parcel.php', {
+                    fetch('../api/admin-delete-parcel.php', {
                         method: 'POST',
                         body: formData,
                         credentials: 'include'
@@ -2366,7 +2440,7 @@ $is_admin = ($user_role === 'Admin');
 
         // Load parcel history (retrieved parcels only)
         function loadParcelHistory() {
-            fetch('../php/staff-get-parcel-history.php', {
+            fetch('../api/staff-get-parcel-history.php', {
                 credentials: 'include'
             })
                 .then(response => response.json())
@@ -2429,6 +2503,12 @@ $is_admin = ($user_role === 'Admin');
                 const locationLines = (parcel.deliveryLocation || 'N/A').split(',');
                 const shortLocation = locationLines.length > 0 ? locationLines[locationLines.length - 1].trim() : 'N/A';
 
+                const deleteBtn = isAdmin
+                    ? '<button type="button" class="ppms-action-btn ppms-action-delete" onclick="deleteParcel(\'' + parcel.TrackingNumber + '\')" title="Delete Parcel">' +
+                        '<i class="fas fa-trash"></i>' +
+                      '</button>'
+                    : '';
+
                 row.innerHTML =
                     '<td class="px-4 py-3">' +
                         '<span class="fw-bold text-primary">' + parcel.TrackingNumber + '</span>' +
@@ -2446,13 +2526,14 @@ $is_admin = ($user_role === 'Admin');
                         '</div>' +
                     '</td>' +
                     '<td class="px-4 py-3">' +
-                        '<div class="d-flex gap-2 flex-wrap">' +
-                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: white; border: none;" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
+                        '<div class="ppms-history-actions">' +
+                            '<button type="button" class="ppms-action-btn ppms-action-view-staff" onclick="viewParcel(\'' + parcel.TrackingNumber + '\')" title="View Details">' +
                                 '<i class="fas fa-eye"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #00695c, #009688); color: white; border: none;" onclick="downloadHistoryQRStaff(\'' + parcel.TrackingNumber + '\')" title="Download QR">' +
+                            '<button type="button" class="ppms-action-btn ppms-action-download-staff" onclick="downloadHistoryQRStaff(\'' + parcel.TrackingNumber + '\')" title="Download QR">' +
                                 '<i class="fas fa-download"></i>' +
                             '</button>' +
+                            deleteBtn +
                         '</div>' +
                     '</td>';
                 tbody.appendChild(row);
@@ -3129,7 +3210,7 @@ $is_admin = ($user_role === 'Admin');
                 formData.append('qrCode', qrBase64);
                 formData.append('verificationData', JSON.stringify(verificationData));
 
-                fetch('../php/admin-save-qr.php', {
+                fetch('../api/admin-save-qr.php', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include'
@@ -3240,7 +3321,7 @@ $is_admin = ($user_role === 'Admin');
         }
 
         function downloadQrFile(trackingNumber) {
-            const url = `../php/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+            const url = `../api/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
             const link = document.createElement('a');
             link.href = url;
             link.style.display = 'none';
@@ -3438,7 +3519,7 @@ $is_admin = ($user_role === 'Admin');
         function downloadHistoryQRStaff(trackingNumber) {
             console.log('Downloading QR for tracking:', trackingNumber);
 
-            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+            fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
                 credentials: 'include'
             })
             .then(r => r.json())
@@ -3491,7 +3572,7 @@ $is_admin = ($user_role === 'Admin');
             console.log('Enlarging QR for tracking:', trackingNumber);
 
             // Fetch parcel data with QR
-            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+            fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
                 credentials: 'include'
             })
             .then(r => r.json())
@@ -3646,7 +3727,7 @@ $is_admin = ($user_role === 'Admin');
             formData.append('status', status);
             formData.append('receiverIC', receiverIC);
 
-            fetch('../php/admin-generate-report.php', {
+            fetch('../api/admin-generate-report.php', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -4260,13 +4341,6 @@ $is_admin = ($user_role === 'Admin');
         100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
     }
 
-    /* === CLEAN MODERN CAROUSEL === */
-    .footer-section-title {
-        color: #1f2937;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-
     /* === CLEAN MODERN CAROUSEL WITH CSS SCROLL SNAP === */
     .modern-carousel-container {
         position: relative;
@@ -4574,7 +4648,7 @@ $is_admin = ($user_role === 'Admin');
     let isAutoSliding = false; // Carousel is now static by default
     let autoSlideInterval;
     let cardsPerView = 3;
-    let originalCardsCount = 8; // Number of unique cards
+    let originalCardsCount = 0; // Set dynamically from DOM
 
     // Infinite carousel state
     let carouselIsInfiniteReady = false;
@@ -4590,6 +4664,8 @@ $is_admin = ($user_role === 'Admin');
 
         const originals = Array.from(track.querySelectorAll('.partner-card'));
         if (originals.length === 0) return;
+
+        originalCardsCount = originals.length;
 
         // Avoid double-initializing
         if (track.dataset.infiniteReady === '1') return;
@@ -4684,6 +4760,10 @@ $is_admin = ($user_role === 'Admin');
 
         if (!viewport || cards.length === 0) return;
 
+        if (!originalCardsCount) {
+            originalCardsCount = cards.length;
+        }
+
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
@@ -4735,7 +4815,11 @@ $is_admin = ($user_role === 'Admin');
         const cards = document.querySelectorAll('.partner-card');
         const indicators = document.querySelectorAll('.carousel-indicator');
 
-        if (!viewport || cards.length === 0 || indicators.length === 0) return;
+        if (!viewport || cards.length === 0) return;
+
+        if (!originalCardsCount) {
+            originalCardsCount = cards.length;
+        }
 
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
@@ -4761,10 +4845,12 @@ $is_admin = ($user_role === 'Admin');
         const visibleIndex = Math.round(scrollPosition / cardWithGap);
         currentCarouselIndex = ((visibleIndex % originalCardsCount) + originalCardsCount) % originalCardsCount;
 
-        // Update active indicator
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentCarouselIndex);
-        });
+        // Update active indicator (if present)
+        if (indicators.length > 0) {
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentCarouselIndex);
+            });
+        }
     }
 
     // Carousel Drag Functionality

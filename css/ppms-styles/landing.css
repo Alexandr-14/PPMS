@@ -11,6 +11,8 @@
     align-items: center;
     position: relative;
     font-family: var(--font-family-primary);
+    /* Let the background video show without a white "wash" */
+    background: transparent;
 }
 
 .video-background {
@@ -21,7 +23,8 @@
     height: 100%;
     object-fit: cover;
     z-index: -1;
-    opacity: 0.3;
+    opacity: 1;
+    filter: none;
 }
 
 /* === Choice Container === */
@@ -202,7 +205,7 @@
     }
 
     .video-background {
-        opacity: 0.15;
+        opacity: 1;
     }
 }
 

@@ -1,0 +1,2 @@
+# Disable URL rewriting - all PHP files are directly in /php/ folder
+RewriteEngine Off

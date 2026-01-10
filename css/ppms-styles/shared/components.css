@@ -218,6 +218,81 @@ body {
     color: var(--text-white) !important;
 }
 
+/* === Parcel History: Consistent Action Buttons === */
+.ppms-history-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ppms-action-btn {
+    width: 40px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ppms-action-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.ppms-action-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.ppms-action-btn i {
+    font-size: 0.9rem;
+}
+
+/* Shared print button color (both dashboards) */
+.ppms-action-print {
+    background: linear-gradient(135deg, #6A1B9A 0%, #FF9800 100%);
+}
+
+/* Role-specific view (eye) colors */
+.ppms-action-view-receiver {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.ppms-action-view-staff {
+    background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+}
+
+/* Role-specific download colors */
+.ppms-action-download-receiver {
+    background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+}
+
+.ppms-action-download-staff {
+    background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+}
+
+/* Admin-only delete action */
+.ppms-action-delete {
+    background: var(--danger-gradient);
+}
+
+/* Edit action (shared) */
+.ppms-action-edit {
+    background: linear-gradient(135deg, #ff6b35, #ff8c42);
+}
+
+/* Generate QR (staff) */
+.ppms-action-qr-staff {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+}
+
 .bg-primary {
     background: var(--primary-gradient) !important;
     color: var(--text-white) !important;

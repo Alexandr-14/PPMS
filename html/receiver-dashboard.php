@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../php/db_connect.php';
+require_once '../api/db_connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['receiver_matric']) || empty($_SESSION['receiver_matric'])) {
@@ -179,9 +179,9 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         </div>
 
                         <div class="notification-dropdown-footer">
-                            <a href="#" class="btn btn-sm btn-success w-100" onclick="showAllNotifications()">
+                            <button type="button" class="btn btn-sm btn-success w-100" onclick="showAllNotifications()">
                                 <i class="fas fa-list me-1"></i> View All Notifications
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -235,7 +235,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 <h4 class="text-engaging">Track Your Parcel</h4>
                 <p class="welcome-text">Enter your tracking number to see the status of your parcel.</p>
 
-                <form method="post" action="../php/track-parcel.php" class="mt-4" style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; border: 1px solid #e9ecef;">
+                <form method="post" action="../api/track-parcel.php" class="mt-4" style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; border: 1px solid #e9ecef;">
                     <div class="mb-3">
                         <label for="trackingNumber" class="form-label" style="font-weight: 700 !important; color: #2d3748 !important; font-size: 1rem !important; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem !important;">
                              Tracking Number
@@ -289,7 +289,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             </div>
 
                             <!-- Status Badge -->
-                            <div class="status-container">
+                            <div class="status-container" id="parcelStatusBadge" data-status="<?php echo htmlspecialchars($parcel['status']); ?>">
                                 <?php if ($parcel['status'] == 'Pending'): ?>
                                     <div class="status-badge status-pending">
                                         <svg style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -345,14 +345,14 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                     </div>
                                 </div>
 
-                                <!-- Delivery Location -->
+                                <!-- Storage Rack -->
                                 <div class="details-row">
                                     <div class="detail-item-modern full-width">
                                         <div class="detail-item-icon">
                                             <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
                                         </div>
                                         <div class="detail-item-content">
-                                            <div class="detail-item-label">Delivery Location</div>
+                                            <div class="detail-item-label">Storage Rack</div>
                                             <div class="detail-item-value"><?php echo htmlspecialchars($parcel['deliveryLocation'] ?? 'Not specified'); ?></div>
                                         </div>
                                     </div>
@@ -402,28 +402,30 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             </div>
                         </div>
 
-                        <!-- Action Alert -->
-                        <?php if ($parcel['status'] == 'Pending'): ?>
-                            <div class="action-alert">
-                                <div class="alert-icon">
-                                    <i class="fas fa-hand-holding-box"></i>
+                        <!-- Action Alert (updated in real-time) -->
+                        <div id="parcelStatusAlert" data-status="<?php echo htmlspecialchars($parcel['status']); ?>">
+                            <?php if ($parcel['status'] == 'Pending'): ?>
+                                <div class="action-alert">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-hand-holding-box"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title text-friendly">Ready for Pickup!</div>
+                                        <div class="alert-message welcome-text">Your parcel is ready for collection. Please visit the parcel center with your IC and this tracking number.</div>
+                                    </div>
                                 </div>
-                                <div class="alert-content">
-                                    <div class="alert-title text-friendly">Ready for Pickup!</div>
-                                    <div class="alert-message welcome-text">Your parcel is ready for collection. Please visit the parcel center with your IC and this tracking number.</div>
+                            <?php elseif ($parcel['status'] == 'Retrieved'): ?>
+                                <div class="action-alert success-alert">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Package Retrieved</div>
+                                        <div class="alert-message">This parcel has been successfully collected. Thank you for using our service!</div>
+                                    </div>
                                 </div>
-                            </div>
-                        <?php elseif ($parcel['status'] == 'Retrieved'): ?>
-                            <div class="action-alert success-alert">
-                                <div class="alert-icon">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <div class="alert-content">
-                                    <div class="alert-title">Package Retrieved</div>
-                                    <div class="alert-message">This parcel has been successfully collected. Thank you for using our service!</div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <?php else: ?>
                     <div class="empty-state">
@@ -506,30 +508,32 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                     <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                                         <i class="fas fa-sort me-1"></i> Sort By
                                     </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'desc')">
-                                            <i class="fas fa-calendar me-2"></i>Date (Newest First)
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="sortHistory('date', 'asc')">
-                                            <i class="fas fa-calendar me-2"></i>Date (Oldest First)
-                                        </a></li>
+                                    <ul class="dropdown-menu ppms-sort-menu">
+                                        <li>
+                                            <button type="button" class="dropdown-item" onclick="sortHistory('tracking', 'asc')">
+                                                <i class="fas fa-sort-alpha-down me-2"></i>Tracking (A-Z)
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item" onclick="sortHistory('tracking', 'desc')">
+                                                <i class="fas fa-sort-alpha-up me-2"></i>Tracking (Z-A)
+                                            </button>
+                                        </li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('all')">
-                                            <i class="fas fa-list me-2"></i>Show All
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('Pending')">
-                                            <i class="fas fa-clock me-2"></i>Pending Only
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="filterHistory('Retrieved')">
-                                            <i class="fas fa-check me-2"></i>Retrieved Only
-                                        </a></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item" onclick="sortHistory('date', 'desc')">
+                                                <i class="fas fa-calendar me-2"></i>Date (Newest First)
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item" onclick="sortHistory('date', 'asc')">
+                                                <i class="fas fa-calendar me-2"></i>Date (Oldest First)
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
                                 <button class="btn btn-outline-success" onclick="refreshHistory()">
                                     <i class="fas fa-sync-alt me-1"></i> Refresh
-                                </button>
-                                <button class="btn btn-outline-primary" onclick="printReceiverHistory()">
-                                    <i class="fas fa-print me-1"></i> Print
                                 </button>
                             </div>
                         </div>
@@ -540,12 +544,11 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             <table class="table table-hover mb-0" id="historyTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-4 py-3">Tracking Number</th>
-                                        <th class="px-4 py-3">Date & Time</th>
-                                        <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3">Weight</th>
-                                        <th class="px-4 py-3">Location</th>
-                                        <th class="px-4 py-3">Actions</th>
+                                        <th class="px-3 py-2">Tracking Number</th>
+                                        <th class="px-3 py-2">Date & Time</th>
+                                        <th class="px-3 py-2">Weight</th>
+                                        <th class="px-3 py-2">Storage Rack</th>
+                                        <th class="px-3 py-2">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -555,10 +558,10 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                     while ($row = $result->fetch_assoc()):
                                     ?>
                                     <tr data-status="<?php echo htmlspecialchars($row['status'], ENT_QUOTES); ?>" data-date="<?php echo htmlspecialchars($row['date'], ENT_QUOTES); ?>" data-tracking="<?php echo htmlspecialchars($row['TrackingNumber'], ENT_QUOTES); ?>" data-matric="<?php echo htmlspecialchars($row['MatricNumber'], ENT_QUOTES); ?>" data-receiver-name="<?php echo htmlspecialchars($row['receiverName'] ?? 'N/A', ENT_QUOTES); ?>" data-location="<?php echo htmlspecialchars($row['deliveryLocation'] ?? 'N/A', ENT_QUOTES); ?>">
-                                            <td class="px-4 py-3">
+                                            <td class="px-3 py-2">
                                                 <span class="fw-bold text-primary"><?php echo htmlspecialchars($row['TrackingNumber'], ENT_QUOTES); ?></span>
                                             </td>
-                                            <td class="px-4 py-3">
+                                            <td class="px-3 py-2">
                                                 <div>
                                                     <?php echo date('M d, Y', strtotime($row['date'])); ?>
                                                     <?php if (!empty($row['time'])): ?>
@@ -566,32 +569,18 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
-                                            <td class="px-4 py-3">
-                                                <?php if ($row['status'] == 'Pending'): ?>
-                                                    <span class="badge bg-warning text-dark">
-                                                        <i class="fas fa-clock me-1"></i>Pending
-                                                    </span>
-                                                <?php elseif ($row['status'] == 'Retrieved'): ?>
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check-circle me-1"></i>Retrieved
-                                                    </span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-secondary">
-                                                        <?php echo htmlspecialchars($row['status'], ENT_QUOTES); ?>
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="px-4 py-3">
+                                            <!-- Status column removed -->
+                                            <td class="px-3 py-2">
                                                 <i class="fas fa-weight-hanging me-1 text-muted"></i>
                                                 <?php echo htmlspecialchars($row['weight'], ENT_QUOTES); ?> kg
                                             </td>
-                                            <td class="px-4 py-3">
+                                            <td class="px-3 py-2">
                                                 <i class="fas fa-map-marker-alt me-1 text-muted"></i>
                                                 <?php echo htmlspecialchars($row['deliveryLocation'] ?? 'Not specified', ENT_QUOTES); ?>
                                             </td>
-                                            <td class="px-4 py-3">
-                                                <div class="d-flex gap-2 flex-wrap">
-                                                    <button class="btn btn-sm eye-button" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none;"
+                                            <td class="px-3 py-2">
+                                                <div class="ppms-history-actions">
+                                                    <button type="button" class="ppms-action-btn ppms-action-view-receiver eye-button"
                                                             data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
                                                             data-status="<?php echo htmlspecialchars($row['status']); ?>"
                                                             data-ic="<?php echo htmlspecialchars($row['MatricNumber']); ?>"
@@ -604,7 +593,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                                             title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="btn btn-sm" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0); color: white; border: none;" 
+                                                    <button type="button" class="ppms-action-btn ppms-action-download-receiver" 
                                                             data-tracking="<?php echo htmlspecialchars($row['TrackingNumber']); ?>"
                                                             onclick="downloadHistoryQR('<?php echo htmlspecialchars($row['TrackingNumber']); ?>')"
                                                             title="Download QR">
@@ -767,7 +756,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
         <div class="container">
             <div class="row">
-                <div class="col-md-6 mb-4 mb-md-0">
+                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                     <div class="d-flex align-items-center mb-3">
                         <img src="../assets/Icon Web.ico" alt="PPMS Logo" class="footer-logo">
                         <div>
@@ -780,7 +769,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         We provide efficient and secure parcel management for UTHM students and staff.
                     </p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h5 class="footer-section-title">Contact Information</h5>
                     <div class="contact-info">
                         <div class="mb-2">
@@ -801,13 +790,23 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         </div>
                     </div>
                 </div>
+
+                <div class="col-lg-4 col-12 mt-4 mt-lg-0">
+                    <h5 class="footer-section-title">Location</h5>
+                    <div class="ratio ratio-4x3 ppms-footer-map d-none d-md-block">
+                        <iframe title="PPMS Location Map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.7123755011366!2d103.09752854533595!3d1.8616741603266367!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d05c1ddc3a2039%3A0x6e5816f50fb38689!2sKolej%20Kediaman%20Luar%20Kampus%20-%20UTHM!5e0!3m2!1sen!2smy!4v1767879404889!5m2!1sen!2smy" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <a class="btn btn-outline-primary w-100 mt-2 d-md-none" href="https://www.google.com/maps?q=Kolej%20Kediaman%20Luar%20Kampus%20-%20UTHM" target="_blank" rel="noopener noreferrer" aria-label="Open PPMS location in Google Maps">
+                        <i class="fas fa-map-marked-alt me-2"></i>Open in Google Maps
+                    </a>
+                </div>
             </div>
 
             <!-- Delivery Partners Slider Section -->
-            <div class="row mt-4 pt-4" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
+            <div class="row mt-4 pt-4 delivery-partners" style="border-top: 1px solid rgba(107, 114, 128, 0.1);">
                 <div class="col-12">
                     <div class="text-center mb-4">
-                        <h6 class="footer-section-title" style="letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem;">
+                        <h6 class="footer-section-title">
                             <i class="fas fa-truck me-2"></i>Trusted Delivery Partners
                         </h6>
                         <p class="text-muted small mb-0">Reliable delivery services across Malaysia</p>
@@ -996,7 +995,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Delivery Location:</label>
+                                <label class="form-label fw-bold">Storage Rack:</label>
                                 <p id="viewDeliveryLocation" class="form-control-plaintext"></p>
                             </div>
                         </div>
@@ -1080,7 +1079,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 console.log('📦 Parcel data:', {tracking, status, ic, receiverName, weight, location, date, time, name});
 
                 // Fetch verification data from server
-                fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+                fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
                     credentials: 'include'
                 })
                     .then(response => response.json())
@@ -1285,6 +1284,63 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         }
     }
 
+    // Inline handler for eye buttons to ensure clicks work after dynamic updates
+    function handleEyeButton(buttonEl) {
+        if (!buttonEl) return;
+
+        const tracking = buttonEl.getAttribute('data-tracking');
+        const status = buttonEl.getAttribute('data-status');
+        const ic = buttonEl.getAttribute('data-ic');
+        const receiverName = buttonEl.getAttribute('data-receiver-name');
+        const weight = buttonEl.getAttribute('data-weight');
+        const location = buttonEl.getAttribute('data-location');
+        const date = buttonEl.getAttribute('data-date');
+        const time = buttonEl.getAttribute('data-time');
+        const name = buttonEl.getAttribute('data-name');
+
+        fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+            credentials: 'include'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.parcel) {
+                    if (data.parcel.verificationData) {
+                        window.parcelVerificationData = data.parcel.verificationData;
+                    } else {
+                        window.parcelVerificationData = null;
+                    }
+                }
+                showParcelDetailsModal({
+                    TrackingNumber: tracking,
+                    status: status,
+                    ic: ic,
+                    receiverName: receiverName,
+                    weight: weight,
+                    deliveryLocation: location,
+                    date: date,
+                    time: time,
+                    name: name,
+                    qrGenerated: data.success ? data.parcel.qrGenerated : false,
+                    verificationData: data.success ? data.parcel.verificationData : null
+                });
+            })
+            .catch(() => {
+                showParcelDetailsModal({
+                    TrackingNumber: tracking,
+                    status: status,
+                    ic: ic,
+                    receiverName: receiverName,
+                    weight: weight,
+                    deliveryLocation: location,
+                    date: date,
+                    time: time,
+                    name: name,
+                    qrGenerated: false,
+                    verificationData: null
+                });
+            });
+    }
+
     // Helper function to format time
     function formatTime(timeString) {
         if (!timeString) return 'N/A';
@@ -1348,7 +1404,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             const tracking = trackingEl.textContent.trim();
             detailsQR.innerHTML = '<div class="text-muted small">Loading QR...</div>';
 
-            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+            fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
                 credentials: 'include'
             })
                 .then(r => r.json())
@@ -1407,7 +1463,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 updateNotificationBadges();
 
                 // Send AJAX request to mark as read
-                fetch('../php/mark-notifications-read.php', {
+                fetch('../api/mark-notifications-read.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1431,7 +1487,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         });
 
         // 4. Enhanced form submission with loading state
-        const trackForm = document.querySelector('form[action="../php/track-parcel.php"]');
+        const trackForm = document.querySelector('form[action="../api/track-parcel.php"]');
         if (trackForm) {
             trackForm.addEventListener('submit', function(e) {
                 const submitBtn = this.querySelector('button[type="submit"]');
@@ -1512,7 +1568,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                     background: '#ffffff',
                     backdrop: 'rgba(0, 0, 0, 0.6)'
                 }).then(() => {
-                    window.location.href = '../php/logout.php';
+                    window.location.href = '../api/logout.php';
                 });
             }
         });
@@ -1604,6 +1660,10 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             if (field === 'date') {
                 aVal = new Date(a.dataset.date);
                 bVal = new Date(b.dataset.date);
+            } else if (field === 'tracking') {
+                aVal = (a.dataset.tracking || '').toLowerCase();
+                bVal = (b.dataset.tracking || '').toLowerCase();
+                return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
             }
 
             if (order === 'asc') {
@@ -1656,7 +1716,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         });
 
         // Fetch fresh history data via AJAX
-        fetch('../php/receiver-get-history.php', {
+        fetch('../api/receiver-get-history.php', {
             credentials: 'include'
         })
         .then(response => {
@@ -1697,18 +1757,25 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                                 <td class="px-4 py-3"><i class="fas fa-weight-hanging me-1 text-muted"></i>${parcel.weight} kg</td>
                                 <td class="px-4 py-3"><i class="fas fa-map-marker-alt me-1 text-muted"></i>${parcel.deliveryLocation || 'Not specified'}</td>
                                 <td class="px-4 py-3">
-                                    <button class="btn btn-sm eye-button" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none;"
-                                            data-tracking="${parcel.TrackingNumber}"
-                                            data-status="${parcel.status}"
-                                            data-ic="${parcel.MatricNumber}"
-                                            data-receiver-name="${parcel.receiverName || 'N/A'}"
-                                            data-weight="${parcel.weight || 'N/A'}"
-                                            data-location="${parcel.deliveryLocation || 'N/A'}"
-                                            data-date="${parcel.date}"
-                                            data-time="${parcel.time}"
-                                            data-name="${parcel.name || 'Description only'}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <div class="ppms-history-actions">
+                                        <button type="button" class="ppms-action-btn ppms-action-view-receiver eye-button"
+                                                data-tracking="${parcel.TrackingNumber}"
+                                                data-status="${parcel.status}"
+                                                data-ic="${parcel.MatricNumber}"
+                                                data-receiver-name="${parcel.receiverName || 'N/A'}"
+                                                data-weight="${parcel.weight || 'N/A'}"
+                                                data-location="${parcel.deliveryLocation || 'N/A'}"
+                                                data-date="${parcel.date}"
+                                                data-time="${parcel.time}"
+                                                data-name="${parcel.name || ''}"
+                                                onclick="handleEyeButton(this)"
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="ppms-action-btn ppms-action-download-receiver" onclick="downloadHistoryQR('${parcel.TrackingNumber}')" title="Download QR">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             `;
 
@@ -1746,7 +1813,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                             const name = this.getAttribute('data-name');
 
                             // Fetch verification data from server
-                            fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
+                            fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(tracking)}`, {
                                 credentials: 'include'
                             })
                                 .then(response => response.json())
@@ -2015,7 +2082,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         }).then((result) => {
             if (result.isConfirmed) {
                 // AJAX call to mark all notifications as read
-                fetch('../php/mark-notifications-read.php', {
+                fetch('../api/mark-notifications-read.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2085,7 +2152,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
 
         // Fetch more notifications
-        fetch('../php/load-more-notifications.php', {
+        fetch('../api/load-more-notifications.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2208,7 +2275,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
     // Load real-time receiver statistics
     function loadReceiverStats() {
-        fetch('../php/receiver-get-stats.php', {
+        fetch('../api/receiver-get-stats.php', {
             credentials: 'include'
         })
             .then(response => response.json())
@@ -2380,7 +2447,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         }
 
         // AJAX call to mark as read in database
-        fetch('../php/mark-notifications-read.php', {
+        fetch('../api/mark-notifications-read.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2432,7 +2499,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         updateNotificationBadges();
 
         // AJAX call to mark as read in database
-        fetch('../php/mark-notifications-read.php', {
+        fetch('../api/mark-notifications-read.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2508,7 +2575,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
                 });
 
                 // AJAX call to delete notification
-                fetch('../php/delete-notification.php', {
+                fetch('../api/delete-notification.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2634,7 +2701,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     let isAutoSliding = false; // Carousel is static by default
     let autoSlideInterval;
     let cardsPerView = 3;
-    const originalCardsCount = 8; // Number of unique cards
+    let originalCardsCount = 0; // Set dynamically from DOM
 
     // Infinite carousel state
     let carouselIsInfiniteReady = false;
@@ -2650,6 +2717,8 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
         const originals = Array.from(track.querySelectorAll('.partner-card'));
         if (originals.length === 0) return;
+
+        originalCardsCount = originals.length;
 
         if (track.dataset.infiniteReady === '1') return;
 
@@ -2894,7 +2963,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
             return;
         }
 
-        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+        fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
             credentials: 'include'
         })
         .then(r => r.json())
@@ -2943,7 +3012,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     }
 
     function downloadQrFile(trackingNumber) {
-        const url = `../php/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+        const url = `../api/download-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`;
         const link = document.createElement('a');
         link.href = url;
         link.style.display = 'none';
@@ -3073,7 +3142,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
     function downloadHistoryQR(trackingNumber) {
         console.log('Downloading QR for tracking:', trackingNumber);
 
-        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+        fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
             credentials: 'include'
         })
         .then(r => r.json())
@@ -3126,7 +3195,7 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         console.log('Enlarging QR for tracking:', trackingNumber);
 
         // Fetch parcel data with QR
-        fetch(`../php/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+        fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
             credentials: 'include'
         })
         .then(r => r.json())
@@ -3246,6 +3315,10 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
 
         if (!viewport || cards.length === 0) return;
 
+        if (!originalCardsCount) {
+            originalCardsCount = cards.length;
+        }
+
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
         const cardWithGap = cardWidth + gap;
@@ -3297,7 +3370,11 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const cards = document.querySelectorAll('.partner-card');
         const indicators = document.querySelectorAll('.carousel-indicator');
 
-        if (!viewport || cards.length === 0 || indicators.length === 0) return;
+        if (!viewport || cards.length === 0) return;
+
+        if (!originalCardsCount) {
+            originalCardsCount = cards.length;
+        }
 
         const cardWidth = cards[0].offsetWidth;
         const gap = parseInt(window.getComputedStyle(document.querySelector('.carousel-track')).gap);
@@ -3321,17 +3398,99 @@ $receiverName = $_SESSION['receiver_name'] ?? 'User';
         const visibleIndex = Math.round(scrollPosition / cardWithGap);
         currentCarouselIndex = ((visibleIndex % originalCardsCount) + originalCardsCount) % originalCardsCount;
 
-        // Update active indicator
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentCarouselIndex);
-        });
+        // Update active indicator (if present)
+        if (indicators.length > 0) {
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentCarouselIndex);
+            });
+        }
     }
 
-    // Initialize carousel when page loads
+    function applyTrackedParcelStatus(nextStatus) {
+        const badgeContainer = document.getElementById('parcelStatusBadge');
+        const alertContainer = document.getElementById('parcelStatusAlert');
+        if (!badgeContainer || !alertContainer) return;
+
+        const currentStatus = badgeContainer.getAttribute('data-status') || '';
+        if (currentStatus === nextStatus) return;
+
+        badgeContainer.setAttribute('data-status', nextStatus);
+        alertContainer.setAttribute('data-status', nextStatus);
+
+        if (nextStatus === 'Pending') {
+            badgeContainer.innerHTML = `
+                <div class="status-badge status-pending">
+                    <svg style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Pending Pickup</span>
+                </div>
+            `;
+            alertContainer.innerHTML = `
+                <div class="action-alert">
+                    <div class="alert-icon"><i class="fas fa-hand-holding-box"></i></div>
+                    <div class="alert-content">
+                        <div class="alert-title text-friendly">Ready for Pickup!</div>
+                        <div class="alert-message welcome-text">Your parcel is ready for collection. Please visit the parcel center with your IC and this tracking number.</div>
+                    </div>
+                </div>
+            `;
+        } else if (nextStatus === 'Retrieved') {
+            badgeContainer.innerHTML = `
+                <div class="status-badge status-retrieved">
+                    <svg style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Retrieved</span>
+                </div>
+            `;
+            alertContainer.innerHTML = `
+                <div class="action-alert success-alert">
+                    <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="alert-content">
+                        <div class="alert-title">Package Retrieved</div>
+                        <div class="alert-message">This parcel has been successfully collected. Thank you for using our service!</div>
+                    </div>
+                </div>
+            `;
+        } else {
+            badgeContainer.innerHTML = `
+                <div class="status-badge status-other">
+                    <svg style="width: 16px; height: 16px; display: inline-block;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>${nextStatus || 'Unknown'}</span>
+                </div>
+            `;
+            alertContainer.innerHTML = '';
+        }
+    }
+
+    function startTrackedParcelRealtime() {
+        const trackingNumber = document.querySelector('.tracking-number')?.textContent?.trim();
+        const badgeContainer = document.getElementById('parcelStatusBadge');
+        const alertContainer = document.getElementById('parcelStatusAlert');
+        if (!trackingNumber || !badgeContainer || !alertContainer) return;
+
+        if (window.__ppmsTrackedParcelPoller) return;
+
+        const poll = () => {
+            fetch(`../api/get-parcel-with-qr.php?trackingNumber=${encodeURIComponent(trackingNumber)}`, {
+                credentials: 'include'
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success && data.parcel && data.parcel.status) {
+                        applyTrackedParcelStatus(data.parcel.status);
+                    }
+                })
+                .catch(() => {});
+        };
+
+        poll();
+        window.__ppmsTrackedParcelPoller = setInterval(poll, 5000);
+    }
+
+    // Initialize carousel and real-time tracked parcel status when page loads
     document.addEventListener('DOMContentLoaded', () => {
         initializeCarousel();
         initializeCarouselDrag();
         setupInfiniteCarousel();
+        startTrackedParcelRealtime();
     });
 
     </script>

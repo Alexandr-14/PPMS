@@ -1,0 +1,126 @@
+PPMS — User Manual (Receivers + Staff/Admin)
+
+1) Overview
+PPMS (Parcel Pickup Management System) helps:
+- Staff/Admin register incoming parcels, generate QR verification, and mark parcels as retrieved.
+- Receivers track their parcels, view details/QR, and receive notifications.
+
+2) Roles
+A) Receiver
+- Logs in using Matric Number and password.
+- Views parcel availability and parcel details.
+- Tracks a parcel by tracking number.
+- Receives notifications when parcels arrive / become ready / are retrieved.
+
+B) Staff / Admin
+- Logs in using Staff ID and password.
+- Adds/updates/deletes parcels (Admin has full privileges).
+- Generates QR codes for verification.
+- Verifies QR scans and processes retrieval.
+- Views parcel list (pending) and parcel history (retrieved).
+
+3) Receiver Guide
+
+3.1 Register (Receiver)
+1. Open the Receiver Register page.
+2. Fill Matric Number, Name, Phone Number, and Password.
+3. Submit registration.
+4. Proceed to login.
+
+3.2 Login (Receiver)
+1. Open Receiver Login page.
+2. Enter Matric Number + Password.
+3. After successful login you will be redirected to the Receiver Dashboard.
+
+3.3 Receiver Dashboard Tabs (common actions)
+A) Availability / Parcel List
+- Shows parcels that belong to your Matric Number.
+- Select a parcel to view full details.
+
+B) Parcel Details
+- Shows tracking number, parcel details, delivery location, status, and QR info (if generated).
+- If QR exists, you may view/download it (depending on the dashboard controls).
+
+C) Tracking
+- Enter a tracking number to find your parcel.
+- If the parcel exists but belongs to another receiver, you will be blocked (unauthorized).
+
+D) Notifications
+- Shows new and past notifications.
+- Notifications can be marked read; older ones can be loaded.
+
+3.4 Forgot Password (Receiver)
+1. Open the Forgot Password page.
+2. Verify identity (Matric + Phone).
+3. Answer the security question.
+4. Reset password when a reset token is provided.
+Notes:
+- Too many attempts may be rate-limited.
+
+4) Staff/Admin Guide
+
+4.1 Login (Staff/Admin)
+1. Open Staff Login page.
+2. Enter Staff ID + Password.
+3. On success, you will be redirected to Staff Dashboard.
+
+4.2 Staff Dashboard — Parcel List (Pending)
+- Shows parcels that are not retrieved.
+- Use this list to:
+  - Generate QR
+  - Update parcel info
+  - Mark retrieval (via QR verification workflow)
+
+4.3 Add Parcel
+1. Go to Add Parcel form.
+2. Fill tracking number, receiver matric, weight, delivery location, and optional description.
+3. Submit.
+Expected outcome:
+- Parcel is stored with status Pending.
+- Receiver gets a system notification (if enabled).
+
+4.4 Generate QR (Verification)
+1. Select a parcel.
+2. Click Generate QR.
+3. System stores:
+- QR image path (for display/download)
+- Verification payload (signed data) used for scan verification
+
+4.5 Verify QR Scan + Process Retrieval
+1. Scan the receiver’s QR.
+2. System verifies:
+- Signature validity
+- Parcel exists and belongs to the receiver
+- Parcel status is Pending
+3. If valid, staff confirms retrieval.
+4. System updates parcel status to Retrieved and logs retrieval record.
+5. Receiver receives a “retrieved” notification.
+
+4.6 Parcel History (Retrieved)
+- Shows retrieved parcels.
+- Use this for record and report reference.
+
+4.7 Admin Reporting (Admin only)
+- Use report filters (date range, status, staff ID, receiver matric, addedBy) to generate reports.
+
+5) Troubleshooting
+
+5.1 Login issues
+- Ensure correct credentials.
+- Confirm your database has the account record.
+
+5.2 QR image not saving / missing
+- Ensure `assets/qr-codes/` exists and is writable by the web server user.
+
+5.3 “Access denied” errors
+- Receiver endpoints require receiver session.
+- Staff endpoints require staff session and correct role.
+
+5.4 Notifications not updating
+- Confirm notification table exists and DB connection is correct.
+- Refresh dashboard; try loading more notifications.
+
+6) Notes for Deployment
+- If your hosting uses `public_html/` with `html/` and `php/` directories, keep the same relative paths so existing pages can reach PHP endpoints.
+
+End of manual

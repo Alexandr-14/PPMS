@@ -1,0 +1,107 @@
+<?php
+session_start();
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/notification-helper.php';
+require_once __DIR__ . '/qr-generator-helper.php';
+
+// Check if user is admin
+if (!isset($_SESSION['staff_role']) || $_SESSION['staff_role'] !== 'Admin') {
+    echo json_encode(['success' => false, 'message' => 'Access denied. Admin privileges required.']);
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $trackingNumber = trim($_POST['trackingNumber'] ?? '');
+    $receiverIC = trim($_POST['receiverIC'] ?? '');
+    $weight = trim($_POST['weight'] ?? '');
+    $deliveryLocation = trim($_POST['deliveryLocation'] ?? '');
+    $name = trim($_POST['name'] ?? '');
+
+    // Validate required fields (name/description is optional)
+    if (empty($trackingNumber) || empty($receiverIC) || empty($weight) || empty($deliveryLocation)) {
+        echo json_encode(['success' => false, 'message' => 'All required fields must be filled.']);
+        exit();
+    }
+
+    // Set default description if empty
+    if (empty($name)) {
+        $name = ''; // Default: empty description
+    }
+
+    // Validate weight is numeric
+    if (!is_numeric($weight) || $weight <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Weight must be a positive number.']);
+        exit();
+    }
+
+    try {
+        // Check if tracking number already exists
+        $checkQuery = "SELECT TrackingNumber FROM parcel WHERE TrackingNumber = ?";
+        $checkStmt = $conn->prepare($checkQuery);
+        $checkStmt->bind_param("s", $trackingNumber);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+
+        if ($checkResult->num_rows > 0) {
+            echo json_encode(['success' => false, 'message' => 'Tracking number already exists.']);
+            exit();
+        }
+
+        // Check if receiver Matric exists in receivers table
+        $receiverQuery = "SELECT MatricNumber FROM receiver WHERE MatricNumber = ?";
+        $receiverStmt = $conn->prepare($receiverQuery);
+        $receiverStmt->bind_param("s", $receiverIC);
+        $receiverStmt->execute();
+        $receiverResult = $receiverStmt->get_result();
+
+        if ($receiverResult->num_rows === 0) {
+            echo json_encode(['success' => false, 'message' => 'Receiver Matric number not found. Please ensure the receiver is registered.']);
+            exit();
+        }
+
+        // Get staff/admin ID who is adding this parcel
+        $addedBy = $_SESSION['staff_id'] ?? 'ADMIN';
+
+        // Insert new parcel with default status 'Pending' and track who added it
+        $insertQuery = "INSERT INTO parcel (TrackingNumber, MatricNumber, date, time, name, deliveryLocation, weight, status, addedBy) VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, 'Pending', ?)";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param("ssssds", $trackingNumber, $receiverIC, $name, $deliveryLocation, $weight, $addedBy);
+
+        if ($insertStmt->execute()) {
+            // Auto-generate QR code for the parcel (sends combined notification)
+            $qrResult = autoGenerateQRCode($trackingNumber, $receiverIC, $deliveryLocation, $conn, $name);
+
+            $response = [
+                'success' => true,
+                'message' => 'Parcel added successfully.',
+                'trackingNumber' => $trackingNumber,
+                'qrGenerated' => $qrResult['success']
+            ];
+
+            if ($qrResult['success']) {
+                $response['notification'] = 'Receiver notified successfully.';
+                $response['qrMessage'] = 'QR code generated automatically.';
+                $response['qrPath'] = $qrResult['qrPath'];
+            } else {
+                $response['notification'] = 'Parcel added but notification failed.';
+                $response['qrMessage'] = 'QR generation failed: ' . $qrResult['message'];
+            }
+
+            echo json_encode($response);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add parcel to database.']);
+        }
+
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ]);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+}
+
+$conn->close();
+?>
+

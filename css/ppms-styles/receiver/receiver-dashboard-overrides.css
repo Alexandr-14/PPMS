@@ -294,7 +294,7 @@ input[type="number"]:focus {
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     color: #475569 !important;
-    padding: 1rem 1.5rem !important;
+    padding: 1.25rem 1.5rem !important;
 }
 
 .table tbody tr {
@@ -313,6 +313,15 @@ input[type="number"]:focus {
     border: none !important;
     padding: 0.75rem 1rem !important;
     vertical-align: middle !important;
+}
+
+/* === History Table Compact Styling === */
+#historyTable thead th {
+    padding: 0.75rem 1rem !important;
+}
+
+#historyTable tbody td {
+    padding: 0.625rem 1rem !important;
 }
 
 /* === Enhanced Buttons === */
